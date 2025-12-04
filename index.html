@@ -454,13 +454,21 @@ function rebuildStatusOptions() {
   rawRecords.forEach(r => statusesInView.add(r.status || "UNKNOWN"));
 
   statusSelect.innerHTML = '<option value="All">All</option>';
-  Array.from(statusesInView).sort().forEach(s=>{
-    const val = s.replace(/\s+/g,'-');
-    const o = document.createElement('option'); o.value = val; o.textContent = s;
-    statusSelect.appendChild(o);
+
+  Array.from(statusesInView).sort().forEach(s => {
+    const val = s.replace(/\s+/g, '-').toUpperCase();
+    const option = document.createElement("option");
+    option.value = val;
+    option.textContent = s;
+    statusSelect.appendChild(option);
   });
-  statusSelect.value = prev && statusesInView.has(prev.replace(/-/g,' ')) ? prev : "All";
+
+  // Restore previous selection if still available
+  statusSelect.value = prev && Array.from(statusesInView).includes(prev)
+    ? prev
+    : "All";
 }
+
 
 function aggregateForView(){
   let start = view.startDate ? new Date(view.startDate) : null;
@@ -731,6 +739,7 @@ function loadCSVFromURL() {
 
 </body>
 </html>
+
 
 
 
