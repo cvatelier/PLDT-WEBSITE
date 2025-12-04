@@ -701,41 +701,40 @@ function loadCSVFromURL() {
   fetch(CSV_URL)
     .then(res => res.text())
     .then(csvText => {
-      // Parse CSV using SheetJS
-      const workbook = XLSX.read(csvText, { type: "string" });
+      const workbook = XLSX.read(csvText, { type: "string" }); // CSV string
       const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
       const json = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
 
       console.log("CSV Auto-loaded:", json.length, "rows");
 
       // Convert CSV rows to your record format
-      rawRecords = json.map(r => ({
-        jobID: r["Job ID"] || "",
-        resource: r["Resource"] || "",
-        cluster: r["Cluster"] || "",
-        status: r["Activity Status"] || "",
-        activity: r["Activity Category"] || "",
-        points: Number(r["Points"] || 0),
-        month: r["Month"] || "",
-        day: r["Day"] || "",
-        year: r["Year"] || ""
-      }));
+      rawRecords = json.map(r => {
+        let date = r["Month"] && r["Day"] && r["Year"] 
+          ? new Date(r["Year"], r["Month"] - 1, r["Day"]) 
+          : new Date();
 
-      // Rebuild everything after loading
+        return {
+          resource: r["Resource"] || "",
+          cluster: r["Cluster"] || "",
+          jobid: r["Job ID"] || "",
+          activity: r["Activity Category"] || "",
+          points: Number(r["Points"] || 0),
+          status: r["Activity Status"] || "UNKNOWN",
+          _parsedDate: date
+        };
+      });
+
       rebuildTechnicians();
-      updateFilters();
-      applyFilters();
+      renderTable();
     })
     .catch(err => {
       console.error("CSV Load Failed:", err);
       alert("Failed to load CSV from GitHub.");
     });
 }
-
-// Auto-run the CSV loader once the page is fully ready
-document.addEventListener("DOMContentLoaded", loadCSVFromURL);
 </script>
 
 </body>
 </html>
+
 
