@@ -699,9 +699,15 @@ const CSV_URL = "https://raw.githubusercontent.com/cvatelier/PLDT-WEBSITE/main/R
 
 function loadCSVFromURL() {
   fetch(CSV_URL)
-    .then(res => res.text())
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.text();
+    })
     .then(csvText => {
-      // Parse CSV directly
+      // Remove BOM if present
+      if (csvText.charCodeAt(0) === 0xFEFF) csvText = csvText.slice(1);
+
+      // Convert CSV text to sheet
       const worksheet = XLSX.utils.csv_to_sheet(csvText);
       const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
@@ -728,16 +734,16 @@ function loadCSVFromURL() {
     })
     .catch(err => {
       console.error("CSV Load Failed:", err);
-      alert("Failed to load CSV from GitHub.");
+      alert("Failed to load CSV from GitHub. See console for details.");
     });
 }
 
-// Call it after defining
 loadCSVFromURL();
 </script>
 
 </body>
 </html>
+
 
 
 
