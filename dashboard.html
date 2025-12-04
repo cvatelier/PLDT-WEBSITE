@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PLDT DASHBOARD</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Flatpickr -->
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- SheetJS -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<!-- html2canvas + jspdf -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Add jsPDF + autoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+body { font-family:"Segoe UI",sans-serif; font-size:14px; background:#f8f9fa; color:#495057; }
+#sidebar { min-width:220px; max-width:220px; height:100vh; background:#343a40; color:#fff; position:sticky; top:0; padding:1rem; }
+#sidebar h3 { font-size:1.1rem; font-weight:700; margin-bottom:1rem; }
+#sidebar .nav-link {border-radius:6px; margin-bottom:6px; padding:.45rem .75rem; transition:0.2s; }
+#sidebar .nav-link:hover, .nav-link.active { background:#495057; color:#fff; font-weight:500; }
+main { flex:1; padding:1rem 2rem; }
+.navbar { border-radius:0.75rem; box-shadow:0 3px 12px rgba(0,0,0,0.08); }
+.navbar .form-control, .navbar .form-select { border-radius:0.5rem; }
+.kpi { border-radius:1rem; padding:1.2rem 1.5rem; color:#fff; box-shadow:0 4px 16px rgba(0,0,0,0.08); display:flex; flex-direction:column; justify-content:center; min-height:100px; position:relative; transition:0.2s; font-weight:500; }
+.kpi .small-muted { font-size:13px; opacity:0.85; }
+.kpi i { position:absolute; top:12px; right:12px; font-size:1.5rem; opacity:0.2; }
+.bg-pr { background: linear-gradient(135deg,#0d6efd,#3d8bfd); }
+.bg-warning { background: linear-gradient(135deg,#ffc107,#ffcd39); color:#212529 !important; }
+.bg-success { background: linear-gradient(135deg,#198754,#45c271); }
+.bg-all { background: linear-gradient(135deg,#6c757d,#868e96); }
+.card { border-radius:1rem; box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+.table-hover tbody tr:hover { background:#e2e6ea; cursor:pointer; transition:0.15s; }
+.table thead th { position:sticky; top:0; background:#fff; z-index:2; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+.table tbody tr:nth-child(even) { background:#f1f3f5; }
+.status-PENDING { border-left: 4px solid #ffc107; }
+.status-COMPLETED { border-left: 4px solid #28a745; }
+.status-STARTED { border-left: 4px solid #0dcaf0; }
+.status-NOT-DONE { border-left: 4px solid #dc3545; }
+.status-CANCELED { border-left: 4px solid #6c757d; }
+.status-SUSPENDED { border-left: 4px solid #fd7e14; }
+.modal-content { border-radius:1rem; box-shadow:0 10px 24px rgba(0,0,0,0.15); }
+.modal-header, .modal-footer { border:none; }
+.modal-title { font-weight:600; }
+.btn-outline-primary, .btn-outline-success, .btn-outline-secondary { border-radius:0.5rem; transition:0.2s; }
+.btn-outline-primary:hover { background:#0d6efd; color:#fff; border-color:#0d6efd; }
+.btn-outline-success:hover { background:#198754; color:#fff; border-color:#198754; }
+.btn-outline-secondary:hover { background:#6c757d; color:#fff; border-color:#6c757d; }
+.suggestion-box { border-radius:0.5rem; box-shadow:0 4px 12px rgba(0,0,0,0.08); background:#fff; max-height:200px; overflow-y:auto; position:absolute; width:100%; z-index:10; }
+.form-control:focus, .form-select:focus { box-shadow:0 0 8px rgba(13,110,253,0.25); border-color:#0d6efd; }
+@media (max-width:992px){
+  #sidebar { position:fixed; z-index:1030; transform:translateX(-100%); transition:0.3s; }
+  #sidebar.show { transform:translateX(0); }
+}
+.btn-group .btn {
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.7rem;
+}
+
+.dashboard-btns {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.dashboard-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.dashboard-btn i {
+  font-size: 1.2rem;
+}
+
+.dashboard-btn-excel {
+  background: #0d6efd;
+  color: #fff;
+}
+.dashboard-btn-excel:hover {
+  background: #0b5ed7;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.dashboard-btn-pdf {
+  background: #6c757d;
+  color: #fff;
+}
+.dashboard-btn-pdf:hover {
+  background: #5c636a;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.dashboard-btn-upload {
+  background: #198754;
+  color: #fff;
+}
+.dashboard-btn-upload:hover {
+  background: #157347;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.navbar .dashboard-btns {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.navbar .dashboard-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.825rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.navbar .dashboard-btn i {
+  font-size: 1rem;
+  transition: transform 0.25s ease;
+}
+
+/* Excel = Green */
+.dashboard-btn-excel { background: #198754; color: #fff; }
+.dashboard-btn-excel:hover { 
+  background: #157347; 
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15); 
+}
+.dashboard-btn-excel:hover i { transform: scale(1.2) rotate(-5deg); }
+
+/* PDF = Red */
+.dashboard-btn-pdf { background: #dc3545; color: #fff; }
+.dashboard-btn-pdf:hover { 
+  background: #b02a37; 
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15); 
+}
+.dashboard-btn-pdf:hover i { transform: scale(1.2) rotate(5deg); }
+
+/* Upload = Gray */
+.dashboard-btn-upload { background: #6c757d; color: #fff; }
+.dashboard-btn-upload:hover { 
+  background: #5c636a; 
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15); 
+}
+.dashboard-btn-upload:hover i { transform: scale(1.2); }
+
+#fileInput { display: none; }
+
+/* --- Flatpickr calendar style fix --- */
+.flatpickr-calendar {
+  font-size: 0.85rem; /* smaller overall font */
+}
+
+.flatpickr-month {
+  font-size: 0.9rem; /* smaller month header */
+}
+
+.flatpickr-weekdays {
+  font-size: 0.75rem; /* weekday labels smaller */
+}
+
+.flatpickr-days .flatpickr-day {
+  font-size: 0.8rem; /* individual day numbers */5
+}
+
+/* Shrink only the month/year header in Flatpickr */
+.flatpickr-current-month {
+  font-size: 0.9rem !important;  /* adjust as needed */
+}
+/* Reduce table font + spacing */
+.table {
+  font-size: 13px;
+}
+
+.table td, .table th {
+  padding: 6px 8px !important;
+}
+
+/* Slightly reduce card padding */
+.card-body {
+  padding: .5rem !important;
+}
+
+</style>
+</head>
+<body>
+<div class="d-flex">
+<aside id="sidebar" class="d-flex flex-column p-3">
+  <a href="#" class="d-flex align-items-center mb-3 text-decoration-none">
+    <img src="logo.png" alt="Logo" style="height:40px; width:30px; object-fit:contain; margin-right:10px;">
+    <span class="fs-4 fw-bold text-white" style="line-height:40px;">PLDT</span>
+  </a>
+<ul class="nav nav-pills flex-column">
+  <li class="nav-item"><a class="nav-link active" href="dashboard.html" id="dashboardLink"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a></li>
+<li class="nav-item"><a class="nav-link" href="resources.html"><i class="bi bi-person-lines-fill me-1"></i> Resources</a></li>
+</ul>
+</aside>
+
+<main class="flex-fill p-3 p-lg-4">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-3 rounded">
+  <div class="container-fluid">
+    <div class="controls ms-auto d-flex align-items-center" style="gap:.5rem;">
+      <div id="dateControls" style="min-width:220px; position:relative;">
+        <input id="dateRangePicker" class="form-control form-control-sm" placeholder="Date / range (click to pick)" readonly>
+        <div id="clearDate" class="position-absolute" style="right:6px;top:6px;cursor:pointer" title="Clear date"><i class="bi bi-x-circle text-secondary"></i></div>
+      </div>
+
+      <select id="clusterSelect" class="form-select form-select-sm" style="min-width:160px;"></select>
+      <select id="statusSelect" class="form-select form-select-sm" style="min-width:160px;"></select>
+
+      <div style="min-width:300px; position:relative;">
+        <input id="employeeSearch" class="form-control form-control-sm" placeholder="Search Resource (name) or Job ID">
+        <div id="suggestionBox" class="suggestion-box"></div>
+        <div id="clearSearch" class="position-absolute" style="right:6px;top:6px;cursor:pointer" title="Clear search"><i class="bi bi-x-circle text-secondary"></i></div>
+      </div>
+
+<div class="dashboard-btns">
+  <button class="dashboard-btn dashboard-btn-excel" id="exportExcelBtn">
+    <i class="bi bi-file-earmark-excel"></i></button>
+  <button class="dashboard-btn dashboard-btn-pdf" id="exportPdfBtn">
+    <i class="bi bi-file-earmark-pdf"></i></button>
+  <label class="dashboard-btn dashboard-btn-upload" for="fileInput">
+    <i class="bi bi-upload"></i></label>
+  <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
+</div>
+    </div>
+  </div>
+</nav>
+
+<div class="d-flex justify-content-between align-items-start mb-2">
+  <div>
+    <h1 class="mb-0">Technician Points Dashboard</h1>
+    <div id="filterStatus" class="small-muted mt-1">Filtered by: All | No date selected | All resources | All</div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-sm-6 col-md-3">
+    <div class="kpi bg-pr">
+      <div class="small-muted">PR Points</div>
+      <div id="kpiPR" class="fs-4">—</div>
+      <i class="bi bi-bar-chart"></i>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-3">
+    <div class="kpi bg-warning text-dark">
+      <div class="small-muted">WAR Points</div>
+      <div id="kpiWAR" class="fs-4">—</div>
+      <i class="bi bi-bar-chart"></i>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-3">
+    <div class="kpi bg-success">
+      <div class="small-muted">SA Points</div>
+      <div id="kpiSA" class="fs-4">—</div>
+      <i class="bi bi-bar-chart"></i>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-3">
+    <div class="kpi bg-all">
+      <div class="small-muted">Resources</div>
+      <div id="kpiResources" class="fs-4">—</div>
+      <i class="bi bi-people"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Replace the table card with a two-column layout -->
+<div class="row g-3 mb-3">
+<div class="row g-3 mb-3">
+  <div class="col-lg-6">
+    <div class="card p-3">
+      <h6 class="fw-bold">Points Distribution</h6>
+      <canvas id="pointsChart" height="160"></canvas>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card p-3">
+      <h6 class="fw-bold">Daily Productivity Trend</h6>
+      <canvas id="trendChart" height="160"></canvas>
+    </div>
+  </div>
+</div>
+  <!-- Table Column -->
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <div><strong>Productivity</strong> <span class="small-muted"> (click column to sort)</span></div>
+        <div class="small-muted">Click a row to view details</div>
+      </div>
+      <div class="card-body p-0" style="max-height:500px; overflow-y:auto;">
+        <table class="table table-hover mb-0 table-sm">
+          <thead class="table-light">
+            <tr>
+              <th class="text-center">Rank</th>
+              <th>Date</th>
+              <th>Resource</th>
+              <th>Cluster</th>
+              <th class="text-end">PR</th>
+              <th class="text-end">WAR</th>
+              <th class="text-end">SA</th>
+              <th class="text-end">Total</th>
+              <th class="text-center">Quota</th>
+            </tr>
+          </thead>
+          <tbody id="productivityTable"></tbody>
+        </table>
+        <div class="p-2 d-flex justify-content-between align-items-center">
+          <button id="prevPage" class="btn btn-sm btn-outline-secondary">Previous</button>
+          <span id="pageInfo" class="fw-semibold"></span>
+          <button id="nextPage" class="btn btn-sm btn-outline-secondary">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Column -->
+  <div class="col-lg-5">
+    <div class="card shadow-sm p-3">
+      <div class="card-header bg-white">
+        <strong>Points Overview</strong>
+      </div>
+      <div class="card-body">
+        <canvas id="pointsChart" style="width:100%; height:350px;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
+
+<div class="modal fade" id="techModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="techModalTitle" class="modal-title">Record Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="techDetails"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const COL_CLUSTER = "Cluster";
+const COL_RESOURCE = "Resource";
+const COL_JOBID = "Job ID";
+const COL_ACTIVITY = "Activity Category";
+const COL_POINTS = "Points";
+const COL_STATUS = "Activity Status";
+const COL_MONTH = "Month";
+const COL_DAY = "Day";
+const COL_YEAR = "Year";
+
+let rawRecords = [];
+let technicians = {};
+let techList = [];
+let availableClusters = new Set();
+let view = { startDate:null, endDate:null, cluster:"All", status:"All", search:"", sort:{key:"totalPoints", dir:"desc"} };
+
+let currentPage = 1;
+const rowsPerPage = 20;
+let paginatedData = [];
+
+const tableBody = document.getElementById("productivityTable");
+const clusterSelect = document.getElementById("clusterSelect");
+const statusSelect = document.getElementById("statusSelect");
+const searchInput = document.getElementById("employeeSearch");
+const suggestionBox = document.getElementById("suggestionBox");
+const clearSearch = document.getElementById("clearSearch");
+const dateControls = document.getElementById("dateControls");
+const dateRangePickerEl = document.getElementById("dateRangePicker");
+const clearDateBtn = document.getElementById("clearDate");
+const fileInput = document.getElementById("fileInput");
+const exportExcelBtn = document.getElementById("exportExcelBtn");
+const exportPdfBtn = document.getElementById("exportPdfBtn");
+const filterStatus = document.getElementById("filterStatus");
+
+function formatDisplayDate(d){
+  if (!d) return "";
+  const dateObj = (d instanceof Date) ? d : new Date(d);
+  if (isNaN(dateObj)) return "";
+  const mm = String(dateObj.getMonth()+1).padStart(2,'0');
+  const dd = String(dateObj.getDate()).padStart(2,'0');
+  const yyyy = dateObj.getFullYear();
+  return `${mm}/${dd}/${yyyy}`;
+}
+
+function rebuildTechnicians(){
+  technicians = {};
+  availableClusters = new Set();
+  rawRecords.forEach(r=>{
+    const res = (r.resource||"").toString().trim() || "(Unassigned)";
+    const cluster = (r.cluster||"").toString().trim() || "Unassigned";
+    availableClusters.add(cluster);
+    const pts = Number(r.points)||0;
+    if (!technicians[res]) technicians[res]={resource:res, cluster, points:0, records:[]};
+    technicians[res].points += pts;
+    technicians[res].records.push(Object.assign({}, r, { points: pts }));
+  });
+  techList = Object.keys(technicians).sort((a,b)=>a.localeCompare(b));
+  
+  // Rebuild Cluster options
+  const prevCluster = clusterSelect.value || "All";
+  clusterSelect.innerHTML = '<option value="All">All</option>';
+  Array.from(availableClusters).sort().forEach(c=>{
+    const o = document.createElement('option'); o.value=c; o.textContent=c;
+    clusterSelect.appendChild(o);
+  });
+  clusterSelect.value = prevCluster && Array.from(availableClusters).includes(prevCluster)?prevCluster:"All";
+
+  rebuildStatusOptions(); // <-- rebuild Status dynamically
+}
+
+function rebuildStatusOptions() {
+  const prev = statusSelect.value || "All";
+  const statusesInView = new Set();
+  rawRecords.forEach(r => statusesInView.add(r.status || "UNKNOWN"));
+
+  statusSelect.innerHTML = '<option value="All">All</option>';
+  Array.from(statusesInView).sort().forEach(s=>{
+    const val = s.replace(/\s+/g,'-');
+    const o = document.createElement('option'); o.value = val; o.textContent = s;
+    statusSelect.appendChild(o);
+  });
+  statusSelect.value = prev && statusesInView.has(prev.replace(/-/g,' ')) ? prev : "All";
+}
+
+function aggregateForView(){
+  let start = view.startDate ? new Date(view.startDate) : null;
+  let end = view.endDate ? new Date(view.endDate) : null;
+  if (start) start.setHours(0,0,0,0);
+  if (end) end.setHours(23,59,59,999);
+
+  const out = [];
+  rawRecords.forEach(r=>{
+    if (view.cluster!=="All" && (r.cluster||"")!==view.cluster) return;
+
+    if (view.status!=="All") {
+      const rowStatus = (r.status||"UNKNOWN").toUpperCase().replace(/\s+/g,'-');
+      const selectedStatus = view.status.toUpperCase().replace(/\s+/g,'-');
+      if(rowStatus !== selectedStatus) return;
+    }
+
+    if (view.search){
+      const q=view.search.toLowerCase();
+      const matches = ((r.resource||"") + " " + (r.jobid||"")).toLowerCase();
+      if (!matches.includes(q)) return;
+    }
+
+    if (r._parsedDate) {
+      const rd = new Date(r._parsedDate);
+      if (start && rd < start) return;
+      if (end && rd > end) return;
+    }
+
+    out.push(r);
+  });
+  return out;
+}
+
+function renderKPIs(rows){
+  const totals = { PR:0, WAR:0, SA:0 };
+  const resourcesSet = new Set();
+
+  rows.forEach(r=>{
+    const activity = (r.activity||"").toUpperCase();
+    if (activity.includes("PR")) totals.PR += Number(r.points)||0;
+    if (activity.includes("WAR")) totals.WAR += Number(r.points)||0;
+    if (activity.includes("SA")) totals.SA += Number(r.points)||0;
+    if (r.resource) resourcesSet.add(r.resource);
+  });
+
+  document.getElementById('kpiPR').innerText = totals.PR;
+  document.getElementById('kpiWAR').innerText = totals.WAR;
+  document.getElementById('kpiSA').innerText = totals.SA;
+  document.getElementById('kpiResources').innerText = resourcesSet.size;
+}
+
+function aggregateDailyPerTechnician(rows){
+  const daily=[]; const map={};
+  rows.forEach(r=>{
+    if (!r.resource || !r._parsedDate) return;
+    const res=r.resource, date=r._parsedDate instanceof Date ? r._parsedDate : new Date(r._parsedDate), cluster=r.cluster||"Unassigned";
+    const dateKey = date.toISOString().slice(0,10);
+    if (!map[res]) map[res]={};
+    if (!map[res][dateKey]) map[res][dateKey]={date: date, resource:res, cluster, totalPoints:0, records:[], prPoints:0, warPoints:0, saPoints:0};
+    map[res][dateKey].totalPoints+=Number(r.points)||0;
+    const act = (r.activity||"").toUpperCase();
+    const pts = Number(r.points)||0;
+    if(act.includes("PR")) map[res][dateKey].prPoints += pts;
+    if(act.includes("WAR")) map[res][dateKey].warPoints += pts;
+    if(act.includes("SA")) map[res][dateKey].saPoints += pts;
+    map[res][dateKey].records.push(r);
+  });
+  Object.values(map).forEach(dayMap=>Object.values(dayMap).forEach(obj=>daily.push(obj)));
+  daily.sort((a,b)=>{
+    if (a.date.getTime() !== b.date.getTime()) return b.date.getTime() - a.date.getTime();
+    return a.resource.localeCompare(b.resource);
+  });
+  return daily;
+}
+
+function renderTable(){
+  const rows = aggregateForView();
+  const dailyAggregates = aggregateDailyPerTechnician(rows);
+
+  // Compute rank per day
+  dailyAggregates.sort((a,b)=>{
+    if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+    return a.resource.localeCompare(b.resource);
+  });
+
+  let currentRank = 0;
+  let lastPoints = null;
+  dailyAggregates.forEach((d, idx) => {
+    if (d.totalPoints !== lastPoints) {
+      currentRank = idx + 1;
+      lastPoints = d.totalPoints;
+    }
+    d.rank = currentRank;
+  });
+
+  // Use pagination instead of direct table rendering
+  applyPagination(dailyAggregates);
+
+  renderKPIs(rows);
+  updateFilterStatusLabel();
+}
+
+function updateFilterStatusLabel(){
+  const dateText = view.startDate && view.endDate ? `${formatDisplayDate(view.startDate)} - ${formatDisplayDate(view.endDate)}` : "No date selected";
+  filterStatus.innerText=`Filtered by: ${view.cluster} | ${dateText} | ${view.search || "All resources"} | ${view.status}`;
+}
+
+function showTechDetails(d){
+  const modalTitle = document.getElementById('techModalTitle');
+  const techDetails = document.getElementById('techDetails');
+  modalTitle.innerText=`Details for ${d.resource} on ${formatDisplayDate(d.date)}`;
+  techDetails.innerHTML = `<table class="table table-sm table-bordered">
+    <thead class="table-light"><tr><th>Job ID</th><th>Activity</th><th>Points</th><th>Status</th></tr></thead>
+    <tbody>
+      ${d.records.map(r=>`<tr>
+        <td>${r.jobid||""}</td>
+        <td>${r.activity||""}</td>
+        <td>${r.points||0}</td>
+        <td>${r.status||""}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+  const modal = new bootstrap.Modal(document.getElementById('techModal'));
+  modal.show();
+}
+
+// Init
+flatpickr(dateRangePickerEl, {
+  mode:"range",
+  dateFormat:"m/d/Y",
+  onClose: (selectedDates)=>{
+    if(selectedDates.length===2){ view.startDate=selectedDates[0]; view.endDate=selectedDates[1]; }
+    renderTable();
+  }
+});
+clearDateBtn.addEventListener('click',()=>{ dateRangePickerEl._flatpickr.clear(); view.startDate=null; view.endDate=null; renderTable(); });
+
+clusterSelect.addEventListener('change',e=>{ view.cluster=e.target.value; renderTable(); });
+statusSelect.addEventListener('change',e=>{ view.status=e.target.value; renderTable(); });
+searchInput.addEventListener('input',e=>{ view.search=e.target.value.trim(); renderTable(); });
+clearSearch.addEventListener('click',()=>{ searchInput.value=""; view.search=""; renderTable(); });
+
+// File upload
+fileInput.addEventListener('change',e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    let data = evt.target.result;
+    let workbook = XLSX.read(data,{type:'binary'});
+    const sheetName = workbook.SheetNames[0];
+    let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {defval:""});
+    rawRecords = jsonData.map(r=>{
+      let date = r[COL_MONTH] && r[COL_DAY] && r[COL_YEAR] ? new Date(r[COL_YEAR], r[COL_MONTH]-1, r[COL_DAY]) : new Date();
+      return {
+        resource: r[COL_RESOURCE]||"",
+        cluster: r[COL_CLUSTER]||"",
+        jobid: r[COL_JOBID]||"",
+        activity: r[COL_ACTIVITY]||"",
+        points: Number(r[COL_POINTS])||0,
+        status: r[COL_STATUS]||"UNKNOWN",
+        _parsedDate: date
+      };
+    });
+    rebuildTechnicians();
+    renderTable();
+  };
+  reader.readAsBinaryString(file);
+});
+
+// --- EXPORT EXCEL & PDF remain unchanged ---
+// ...
+
+/* ============================================
+   PAGINATION (20 rows per page)
+============================================ */
+function applyPagination(fullData) {
+    paginatedData = fullData;
+    currentPage = 1;
+    renderPage();
+}
+
+function renderPage() {
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const rows = paginatedData.slice(start, end);
+
+    tableBody.innerHTML = "";
+
+    rows.forEach((d, i) => {
+        const tr = document.createElement("tr");
+        const quotaMet = d.totalPoints >= 4;
+        tr.innerHTML = `
+            <td class="text-center">${d.rank}</td> 
+            <td>${formatDisplayDate(d.date)}</td>
+            <td>${d.resource}</td>
+            <td>${d.cluster}</td>
+            <td class="text-end">${d.prPoints}</td>
+            <td class="text-end">${d.warPoints}</td>
+            <td class="text-end">${d.saPoints}</td>
+            <td class="text-end">${d.totalPoints}</td>
+            <td class="text-center">${quotaMet ? '<span class="badge bg-success">✓</span>' : '<span class="badge bg-danger">✗</span>'}</td>
+        `;
+        tr.addEventListener('click',()=>showTechDetails(d));
+        tableBody.appendChild(tr);
+    });
+
+    document.getElementById("pageInfo").innerText =
+        `Page ${currentPage} of ${Math.ceil(paginatedData.length / rowsPerPage)}`;
+
+    document.getElementById("prevPage").disabled = (currentPage === 1);
+    document.getElementById("nextPage").disabled = (end >= paginatedData.length);
+}
+
+document.getElementById("nextPage").addEventListener("click", () => {
+    const maxPage = Math.ceil(paginatedData.length / rowsPerPage);
+    if (currentPage < maxPage) {
+        currentPage++;
+        renderPage();
+    }
+});
+
+document.getElementById("prevPage").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderPage();
+    }
+});
+
+// initial render
+renderTable();
+</script>
+
+</body>
+</html>
