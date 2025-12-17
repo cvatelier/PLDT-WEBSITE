@@ -244,9 +244,6 @@ main { flex:1; padding:1rem 2rem; }
     <i class="bi bi-file-earmark-excel"></i></button>
   <button class="dashboard-btn dashboard-btn-pdf" id="exportPdfBtn">
     <i class="bi bi-file-earmark-pdf"></i></button>
-  <label class="dashboard-btn dashboard-btn-upload" for="fileInput">
-    <i class="bi bi-upload"></i></label>
-  <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
 </div>
     </div>
   </div>
@@ -612,34 +609,6 @@ statusSelect.addEventListener('change',e=>{ view.status=e.target.value; renderTa
 searchInput.addEventListener('input',e=>{ view.search=e.target.value.trim(); renderTable(); });
 clearSearch.addEventListener('click',()=>{ searchInput.value=""; view.search=""; renderTable(); });
 
-// File upload
-fileInput.addEventListener('change',e=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(evt){
-    let data = evt.target.result;
-    let workbook = XLSX.read(data,{type:'binary'});
-    const sheetName = workbook.SheetNames[0];
-    let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {defval:""});
-    rawRecords = jsonData.map(r=>{
-      let date = r[COL_MONTH] && r[COL_DAY] && r[COL_YEAR] ? new Date(r[COL_YEAR], r[COL_MONTH]-1, r[COL_DAY]) : new Date();
-      return {
-        resource: r[COL_RESOURCE]||"",
-        cluster: r[COL_CLUSTER]||"",
-        jobid: r[COL_JOBID]||"",
-        activity: r[COL_ACTIVITY]||"",
-        points: Number(r[COL_POINTS])||0,
-        status: r[COL_STATUS]||"UNKNOWN",
-        _parsedDate: date
-      };
-    });
-    rebuildTechnicians();
-    renderTable();
-  };
-  reader.readAsBinaryString(file);
-});
-
 // --- EXPORT EXCEL & PDF remain unchanged ---
 // ...
 
@@ -745,6 +714,7 @@ window.addEventListener("DOMContentLoaded", loadCSVFromURL);
 
 </body>
 </html>
+
 
 
 
