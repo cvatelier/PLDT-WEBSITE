@@ -702,43 +702,50 @@ document.getElementById("prevPage").addEventListener("click", () => {
 // initial render
 renderTable();
 
-// Auto-load RAW DATA CSV from GitHub
-const CSV_URL = "https://raw.githubusercontent.com/cvatelier/PLDT-WEBSITE/refs/heads/main/RAW%20DATA.csv";
+<script>
+const CSV_URL =
+  "https://raw.githubusercontent.com/cvatelier/PLDT-WEBSITE/main/RAW%20DATA.csv";
 
 function loadCSVFromURL() {
- fetch(CSV_URL)
-  .then(res => res.text())
-  .then(csvText => {
-    // Parse CSV text
-    const worksheet = XLSX.utils.csv_to_sheet(csvText);
-    const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-    
-    rawRecords = json.map(r => {
-      const date = r["Month"] && r["Day"] && r["Year"]
-        ? new Date(r["Year"], r["Month"] - 1, r["Day"])
-        : new Date();
+  fetch(CSV_URL)
+    .then(res => {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.text();
+    })
+    .then(csvText => {
+      const worksheet = XLSX.utils.csv_to_sheet(csvText);
+      const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
-      return {
-        resource: r["Resource"] || "",
-        cluster: r["Cluster"] || "",
-        jobid: r["Job ID"] || "",
-        activity: r["Activity Category"] || "",
-        points: Number(r["Points"] || 0),
-        status: r["Activity Status"] || "UNKNOWN",
-        _parsedDate: date
-      };
-    });
+      rawRecords = json.map(r => {
+        const date =
+          r["Month"] && r["Day"] && r["Year"]
+            ? new Date(r["Year"], r["Month"] - 1, r["Day"])
+            : new Date();
 
-    rebuildTechnicians();
-    renderTable();
-  })
-  .catch(err => console.error("CSV Load Failed:", err));
+        return {
+          resource: r["Resource"] || "",
+          cluster: r["Cluster"] || "",
+          jobid: r["Job ID"] || "",
+          activity: r["Activity Category"] || "",
+          points: Number(r["Points"]) || 0,
+          status: r["Activity Status"] || "UNKNOWN",
+          _parsedDate: date
+        };
+      });
+
+      rebuildTechnicians();
+      renderTable();
+    })
+    .catch(err => console.error("CSV Load Failed:", err));
 }
 
+// 🔥 AUTO LOAD ON PAGE OPEN
+window.addEventListener("DOMContentLoaded", loadCSVFromURL);
 </script>
 
 </body>
 </html>
+
 
 
 
