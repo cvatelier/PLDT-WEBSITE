@@ -681,25 +681,23 @@ function loadCSVFromURL() {
       return res.text();
     })
     .then(csvText => {
-      const worksheet = XLSX.utils.csv_to_sheet(csvText);
+      const workbook = XLSX.read(csvText, { type: "string" });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
       const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
-      rawRecords = json.map(r => {
-        const date =
-          r["Month"] && r["Day"] && r["Year"]
+      rawRecords = json.map(r => ({
+        resource: r["Resource"] || "",
+        cluster: r["Cluster"] || "",
+        jobid: r["Job ID"] || "",
+        activity: r["Activity Category"] || "",
+        points: Number(r["Points"]) || 0,
+        status: r["Activity Status"] || "UNKNOWN",
+        _parsedDate:
+          r["Year"] && r["Month"] && r["Day"]
             ? new Date(r["Year"], r["Month"] - 1, r["Day"])
-            : new Date();
-
-        return {
-          resource: r["Resource"] || "",
-          cluster: r["Cluster"] || "",
-          jobid: r["Job ID"] || "",
-          activity: r["Activity Category"] || "",
-          points: Number(r["Points"]) || 0,
-          status: r["Activity Status"] || "UNKNOWN",
-          _parsedDate: date
-        };
-      });
+            : new Date()
+      }));
 
       rebuildTechnicians();
       renderTable();
@@ -713,6 +711,7 @@ window.addEventListener("DOMContentLoaded", loadCSVFromURL);
 
 </body>
 </html>
+
 
 
 
