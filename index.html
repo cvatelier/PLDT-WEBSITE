@@ -620,10 +620,9 @@ function renderTable(){
 
   // Use pagination instead of direct table rendering
   applyPagination(dailyAggregates);
-
+  renderPointsOverview(rows);
   renderKPIs(rows);
   updateFilterStatusLabel();
-  renderPointsOverview(rows);
 }
 
 function updateFilterStatusLabel(){
@@ -768,6 +767,7 @@ window.addEventListener("DOMContentLoaded", loadCSVFromURL);
 
 </body>
 </html>
+
 
 
 
