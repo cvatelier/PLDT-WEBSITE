@@ -603,11 +603,6 @@ function renderTable(){
   const dailyAggregates = aggregateDailyPerTechnician(rows);
   renderPointsOverview(rows);
 
-    applyPagination(dailyAggregates);
-  renderKPIs(rows);
-  renderPointsOverview(rows); // ✅ ADD THIS
-  updateFilterStatusLabel();
-
   // Compute rank per day
   dailyAggregates.sort((a,b)=>{
     if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
@@ -773,6 +768,7 @@ window.addEventListener("DOMContentLoaded", loadCSVFromURL);
 
 </body>
 </html>
+
 
 
 
