@@ -673,65 +673,192 @@ clearSearch.addEventListener('click',()=>{ searchInput.value=""; view.search="";
 
 // --- EXPORT EXCEL & PDF remain unchanged ---
 // ...
-// ================= GLOBAL STATE =================
+/* =====================================================
+   GLOBAL STATE
+===================================================== */
 
 // Productivity table pagination
 let currentPage = 1;
 const rowsPerPage = 20;
 let paginatedData = [];
 
-// Points Overview pagination  ✅ ADD THIS HERE
-let pointsPage = 1;
-const pointsRowsPerPage = 20;
+// Points Overview (no pagination yet – stable)
 let pointsData = [];
-/* ============================================
-   PAGINATION (20 rows per page)
-============================================ */
+
+
+/* =====================================================
+   DATA AGGREGATION
+===================================================== */
+
+function aggregateForView() {
+  // Your existing logic here
+  // MUST return an array of rows with:
+  // { date, resource, activity, points, ... }
+
+  return window.filteredRows || []; // example
+}
+
+function aggregateDailyPerTechnician(rows) {
+  const map = {};
+
+  rows.forEach(r => {
+    const dateKey = new Date(r.date).toISOString().slice(0, 10);
+    const key = `${dateKey}|${r.resource}`;
+
+    if (!map[key]) {
+      map[key] = {
+        date: dateKey,
+        resource: r.resource,
+        totalPoints: 0
+      };
+    }
+
+    map[key].totalPoints += Number(r.points) || 0;
+  });
+
+  return Object.values(map);
+}
+
+/* 🔥 MUST BE TOP-LEVEL (NOT INSIDE ANY FUNCTION) */
+function aggregatePointsPerResource(rows) {
+  const map = {};
+
+  rows.forEach(r => {
+    const res = r.resource || "(Unassigned)";
+    const pts = Number(r.points) || 0;
+    const act = (r.activity || "").toUpperCase();
+
+    if (!map[res]) {
+      map[res] = { resource: res, pr: 0, war: 0, sa: 0, total: 0 };
+    }
+
+    if (act.includes("PR")) map[res].pr += pts;
+    if (act.includes("WAR")) map[res].war += pts;
+    if (act.includes("SA")) map[res].sa += pts;
+
+    map[res].total += pts;
+  });
+
+  return Object.values(map).sort((a, b) => b.total - a.total);
+}
+
+
+/* =====================================================
+   PRODUCTIVITY PAGINATION
+===================================================== */
+
 function applyPagination(fullData) {
-    paginatedData = fullData;
-    currentPage = 1;
-    renderPage();
+  paginatedData = fullData;
+  currentPage = 1;
+  renderPage();
 }
 
 function renderPage() {
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const rows = paginatedData.slice(start, end);
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const rows = paginatedData.slice(start, end);
 
-    tableBody.innerHTML = "";
-
-    rows.forEach((d, i) => {
-        const tr = document.createElement("tr");
-        const quotaMet = d.totalPoints >= 4;
-        tr.innerHTML = `
-            <td class="text-center">${d.rank}</td> 
-            <td>${formatDisplayDate(d.date)}</td>
-            <td>${d.resource}</td>
-            <td>${d.cluster}</td>
-            <td class="text-end">${d.prPoints}</td>
-            <td class="text-end">${d.warPoints}</td>
-            <td class="text-end">${d.saPoints}</td>
-            <td class="text-end">${d.totalPoints}</td>
-            <td class="text-center">${quotaMet ? '<span class="badge bg-success">✓</span>' : '<span class="badge bg-danger">✗</span>'}</td>
-        `;
-        tr.addEventListener('click',()=>showTechDetails(d));
-        tableBody.appendChild(tr);
-    });
-
-    document.getElementById("pageInfo").innerText =
-        `Page ${currentPage} of ${Math.ceil(paginatedData.length / rowsPerPage)}`;
-
-    document.getElementById("prevPage").disabled = (currentPage === 1);
-    document.getElementById("nextPage").disabled = (end >= paginatedData.length);
+  renderProductivityTable(rows);
+  updatePaginationInfo();
 }
 
-document.getElementById("nextPage").addEventListener("click", () => {
-    const maxPage = Math.ceil(paginatedData.length / rowsPerPage);
-    if (currentPage < maxPage) {
-        currentPage++;
-        renderPage();
-    }
+function updatePaginationInfo() {
+  const pageInfo = document.getElementById("pageInfo");
+  if (!pageInfo) return;
+
+  pageInfo.innerText =
+    `Page ${currentPage} of ${Math.ceil(paginatedData.length / rowsPerPage)}`;
+}
+
+
+/* =====================================================
+   RENDER FUNCTIONS
+===================================================== */
+
+function renderProductivityTable(rows) {
+  const tbody = document.getElementById("productivityTableBody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.date}</td>
+      <td>${r.resource}</td>
+      <td class="text-end">${r.totalPoints}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderPointsOverview(rows) {
+  const tbody = document.getElementById("pointsOverviewTable");
+  if (!tbody) return;
+
+  pointsData = aggregatePointsPerResource(rows);
+  tbody.innerHTML = "";
+
+  pointsData.forEach((r, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="text-center">${idx + 1}</td>
+      <td>${r.resource}</td>
+      <td class="text-end">${r.pr}</td>
+      <td class="text-end">${r.war}</td>
+      <td class="text-end">${r.sa}</td>
+      <td class="text-end fw-bold">${r.total}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderKPIs(rows) {
+  // your existing KPI logic here
+}
+
+function updateFilterStatusLabel() {
+  // your existing filter label logic
+}
+
+
+/* =====================================================
+   MAIN RENDER PIPELINE
+===================================================== */
+
+function renderTable() {
+  const rows = aggregateForView();
+  const dailyAggregates = aggregateDailyPerTechnician(rows);
+
+  // Rank PER DAY (safe placeholder – optional)
+  dailyAggregates.sort((a, b) => b.totalPoints - a.totalPoints);
+
+  applyPagination(dailyAggregates);
+  renderPointsOverview(rows);
+  renderKPIs(rows);
+  updateFilterStatusLabel();
+}
+
+
+/* =====================================================
+   EVENT LISTENERS
+===================================================== */
+
+document.getElementById("nextPage")?.addEventListener("click", () => {
+  const maxPage = Math.ceil(paginatedData.length / rowsPerPage);
+  if (currentPage < maxPage) {
+    currentPage++;
+    renderPage();
+  }
 });
+
+document.getElementById("prevPage")?.addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    renderPage();
+  }
+});
+
 
 document.getElementById("prevPage").addEventListener("click", () => {
     if (currentPage > 1) {
@@ -783,6 +910,7 @@ window.addEventListener("DOMContentLoaded", loadCSVFromURL);
 
 </body>
 </html>
+
 
 
 
