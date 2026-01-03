@@ -507,6 +507,31 @@
       }
       
       // ================= DATA PROCESSING =================
+      function renderTable() {
+    // 1️⃣ Filter data according to current view
+    const filtered = aggregateForView();
+
+    // 2️⃣ Render KPI cards
+    renderKPIs(filtered);
+
+    // 3️⃣ Render Points Overview
+    renderPointsOverview(filtered);
+
+    // 4️⃣ Apply pagination for main productivity table
+    const rows = filtered.map((r, index) => ({
+        rank: index + 1,
+        date: r._parsedDate,
+        resource: r.resource,
+        cluster: r.cluster,
+        prPoints: r.activity.toUpperCase().includes("PR") ? r.points : 0,
+        warPoints: r.activity.toUpperCase().includes("WAR") ? r.points : 0,
+        saPoints: r.activity.toUpperCase().includes("SA") ? r.points : 0,
+        totalPoints: r.points
+    }));
+
+    applyPagination(rows);
+}
+
       function rebuildTechnicians() {
           technicians = {};
           availableClusters = new Set();
@@ -752,7 +777,7 @@ function loadCSVFromURL() {
     fetch(CSV_URL)
         .then(res => {
             if (!res.ok) throw new Error("HTTP " + res.status);
-            return res.arrayBuffer(); // get raw bytes
+            return res.arrayBuffer(); // CSP-safe
         })
         .then(arrayBuffer => {
             const workbook = XLSX.read(arrayBuffer, { type: "array" });
@@ -778,11 +803,13 @@ function loadCSVFromURL() {
         .catch(err => console.error("CSV Load Failed:", err));
 }
 
+
       
       window.addEventListener("DOMContentLoaded", loadCSVFromURL);
       
     </script>
   </body>
 </html>
+
 
 
