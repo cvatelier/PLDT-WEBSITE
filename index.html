@@ -445,350 +445,278 @@
       </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // ================= GLOBAL CONSTANTS =================
-      const COL_CLUSTER = "Cluster";
-      const COL_RESOURCE = "Resource";
-      const COL_JOBID = "Job ID";
-      const COL_ACTIVITY = "Activity Category";
-      const COL_POINTS = "Points";
-      const COL_STATUS = "Activity Status";
-      const COL_MONTH = "Month";
-      const COL_DAY = "Day";
-      const COL_YEAR = "Year";
-      
-      // ================= GLOBAL STATE =================
-      let rawRecords = [];
-      let technicians = {};
-      let techList = [];
-      let availableClusters = new Set();
-      let view = {
-          startDate: null,
-          endDate: null,
-          cluster: "All",
-          status: "All",
-          search: "",
-          sort: { key: "totalPoints", dir: "desc" }
-      };
-      
-      let currentPage = 1;
-      const rowsPerPage = 20;
-      let paginatedData = [];
-      
-      // Points Overview Pagination
-      let pointsPage = 1;
-      const pointsRowsPerPage = 20;
-      let pointsData = [];
-      
-      // ================= DOM ELEMENTS =================
-      const tableBody = document.getElementById("productivityTable");
-      const clusterSelect = document.getElementById("clusterSelect");
-      const statusSelect = document.getElementById("statusSelect");
-      const searchInput = document.getElementById("employeeSearch");
-      const suggestionBox = document.getElementById("suggestionBox");
-      const clearSearch = document.getElementById("clearSearch");
-      const dateControls = document.getElementById("dateControls");
-      const dateRangePickerEl = document.getElementById("dateRangePicker");
-      const clearDateBtn = document.getElementById("clearDate");
-      const fileInput = document.getElementById("fileInput");
-      const exportExcelBtn = document.getElementById("exportExcelBtn");
-      const exportPdfBtn = document.getElementById("exportPdfBtn");
-      const filterStatus = document.getElementById("filterStatus");
-      
-      // ================= UTILITIES =================
-      function formatDisplayDate(d) {
-          if (!d) return "";
-          const dateObj = (d instanceof Date) ? d : new Date(d);
-          if (isNaN(dateObj)) return "";
-          const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
-          const dd = String(dateObj.getDate()).padStart(2, "0");
-          const yyyy = dateObj.getFullYear();
-          return `${mm}/${dd}/${yyyy}`;
-      }
-      
-      // ================= DATA PROCESSING =================
-      function renderTable() {
-    // 1️⃣ Filter data according to current view
+<script>
+// ================= GLOBAL CONSTANTS =================
+const COL_CLUSTER = "Cluster";
+const COL_RESOURCE = "Resource";
+const COL_JOBID = "Job ID";
+const COL_ACTIVITY = "Activity Category";
+const COL_POINTS = "Points";
+const COL_STATUS = "Activity Status";
+const COL_MONTH = "Month";
+const COL_DAY = "Day";
+const COL_YEAR = "Year";
+
+// ================= GLOBAL STATE =================
+let rawRecords = [];
+let technicians = {};
+let techList = [];
+let availableClusters = new Set();
+let view = {
+    startDate: null,
+    endDate: null,
+    cluster: "All",
+    status: "All",
+    search: "",
+    sort: { key: "totalPoints", dir: "desc" }
+};
+
+let currentPage = 1;
+const rowsPerPage = 20;
+let paginatedData = [];
+
+// Points Overview
+let pointsData = [];
+
+// ================= DOM ELEMENTS =================
+const tableBody = document.getElementById("productivityTable");
+const clusterSelect = document.getElementById("clusterSelect");
+const statusSelect = document.getElementById("statusSelect");
+const searchInput = document.getElementById("employeeSearch");
+const suggestionBox = document.getElementById("suggestionBox");
+const clearSearch = document.getElementById("clearSearch");
+const dateRangePickerEl = document.getElementById("dateRangePicker");
+const clearDateBtn = document.getElementById("clearDate");
+const filterStatus = document.getElementById("filterStatus");
+
+// ================= UTILITIES =================
+function formatDisplayDate(d) {
+    if (!d) return "";
+    const dateObj = (d instanceof Date) ? d : new Date(d);
+    if (isNaN(dateObj)) return "";
+    const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const dd = String(dateObj.getDate()).padStart(2, "0");
+    const yyyy = dateObj.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+}
+
+// ================= DATA PROCESSING =================
+function rebuildTechnicians() {
+    technicians = {};
+    availableClusters = new Set();
+
+    rawRecords.forEach(r => {
+        const res = (r.resource || "").toString().trim() || "(Unassigned)";
+        const cluster = (r.cluster || "").toString().trim() || "Unassigned";
+        availableClusters.add(cluster);
+
+        const pts = Number(r.points) || 0;
+
+        if (!technicians[res]) {
+            technicians[res] = { resource: res, cluster, points: 0, records: [] };
+        }
+
+        technicians[res].points += pts;
+        technicians[res].records.push(Object.assign({}, r, { points: pts }));
+    });
+
+    techList = Object.keys(technicians).sort((a, b) => a.localeCompare(b));
+
+    // Rebuild Cluster options
+    const prevCluster = clusterSelect.value || "All";
+    clusterSelect.innerHTML = '<option value="All">All</option>';
+    Array.from(availableClusters).sort().forEach(c => {
+        const o = document.createElement("option");
+        o.value = c;
+        o.textContent = c;
+        clusterSelect.appendChild(o);
+    });
+    clusterSelect.value = prevCluster && Array.from(availableClusters).includes(prevCluster)
+        ? prevCluster
+        : "All";
+
+    rebuildStatusOptions();
+}
+
+function rebuildStatusOptions() {
+    const prev = statusSelect.value || "All";
+    const statusesInView = new Set();
+    rawRecords.forEach(r => statusesInView.add(r.status || "UNKNOWN"));
+
+    statusSelect.innerHTML = '<option value="All">All</option>';
+    Array.from(statusesInView).sort().forEach(s => {
+        const val = s.replace(/\s+/g, '-').toUpperCase();
+        const option = document.createElement("option");
+        option.value = val;
+        option.textContent = s;
+        statusSelect.appendChild(option);
+    });
+
+    statusSelect.value = prev && Array.from(statusesInView).includes(prev) ? prev : "All";
+}
+
+function aggregateForView() {
+    let start = view.startDate ? new Date(view.startDate) : null;
+    let end = view.endDate ? new Date(view.endDate) : null;
+    if (start) start.setHours(0, 0, 0, 0);
+    if (end) end.setHours(23, 59, 59, 999);
+
+    const out = [];
+
+    rawRecords.forEach(r => {
+        if (view.cluster !== "All" && (r.cluster || "") !== view.cluster) return;
+
+        if (view.status !== "All") {
+            const rowStatus = (r.status || "UNKNOWN").toUpperCase().replace(/\s+/g, '-');
+            const selectedStatus = view.status.toUpperCase().replace(/\s+/g, '-');
+            if (rowStatus !== selectedStatus) return;
+        }
+
+        if (view.search) {
+            const q = view.search.toLowerCase();
+            const matches = ((r.resource || "") + " " + (r.jobid || "")).toLowerCase();
+            if (!matches.includes(q)) return;
+        }
+
+        if (r._parsedDate) {
+            const rd = new Date(r._parsedDate);
+            if (start && rd < start) return;
+            if (end && rd > end) return;
+        }
+
+        out.push(r);
+    });
+
+    return out;
+}
+
+// ================== DAILY AGGREGATION ==================
+function aggregatePointsPerResourcePerDay(rows) {
+    const map = {};
+
+    rows.forEach(r => {
+        const res = r.resource || "(Unassigned)";
+        const dateKey = r._parsedDate ? r._parsedDate.toISOString().slice(0, 10) : "UnknownDate";
+        const key = `${res}__${dateKey}`;
+
+        if (!map[key]) {
+            map[key] = {
+                resource: res,
+                cluster: r.cluster || "(Unassigned)",
+                date: r._parsedDate,
+                prPoints: 0,
+                warPoints: 0,
+                saPoints: 0,
+                totalPoints: 0
+            };
+        }
+
+        const activity = (r.activity || "").toUpperCase();
+        const pts = Number(r.points) || 0;
+
+        if (activity.includes("PR")) map[key].prPoints += pts;
+        if (activity.includes("WAR")) map[key].warPoints += pts;
+        if (activity.includes("SA")) map[key].saPoints += pts;
+        map[key].totalPoints += pts;
+    });
+
+    return Object.values(map).sort((a, b) => {
+        if (a.date && b.date) {
+            const diff = a.date - b.date;
+            if (diff !== 0) return diff;
+        }
+        return b.totalPoints - a.totalPoints;
+    });
+}
+
+// ================== RENDER TABLE ==================
+function renderTable() {
     const filtered = aggregateForView();
 
-    // 2️⃣ Render KPI cards
+    // Update KPIs
     renderKPIs(filtered);
 
-    // 3️⃣ Render Points Overview
+    // Update Points Overview
     renderPointsOverview(filtered);
 
-    // 4️⃣ Apply pagination for main productivity table
-    const rows = filtered.map((r, index) => ({
+    // Aggregate for productivity table
+    const rows = aggregatePointsPerResourcePerDay(filtered).map((r, index) => ({
         rank: index + 1,
-        date: r._parsedDate,
+        date: r.date,
         resource: r.resource,
         cluster: r.cluster,
-        prPoints: r.activity.toUpperCase().includes("PR") ? r.points : 0,
-        warPoints: r.activity.toUpperCase().includes("WAR") ? r.points : 0,
-        saPoints: r.activity.toUpperCase().includes("SA") ? r.points : 0,
-        totalPoints: r.points
+        prPoints: r.prPoints,
+        warPoints: r.warPoints,
+        saPoints: r.saPoints,
+        totalPoints: r.totalPoints
     }));
 
     applyPagination(rows);
 }
 
-      function rebuildTechnicians() {
-          technicians = {};
-          availableClusters = new Set();
-      
-          rawRecords.forEach(r => {
-              const res = (r.resource || "").toString().trim() || "(Unassigned)";
-              const cluster = (r.cluster || "").toString().trim() || "Unassigned";
-              availableClusters.add(cluster);
-      
-              const pts = Number(r.points) || 0;
-      
-              if (!technicians[res]) {
-                  technicians[res] = { resource: res, cluster, points: 0, records: [] };
-              }
-      
-              technicians[res].points += pts;
-              technicians[res].records.push(Object.assign({}, r, { points: pts }));
-          });
-      
-          techList = Object.keys(technicians).sort((a, b) => a.localeCompare(b));
-      
-          // Rebuild Cluster options
-          const prevCluster = clusterSelect.value || "All";
-          clusterSelect.innerHTML = '<option value="All">All</option>';
-          Array.from(availableClusters).sort().forEach(c => {
-              const o = document.createElement("option");
-              o.value = c;
-              o.textContent = c;
-              clusterSelect.appendChild(o);
-          });
-          clusterSelect.value = prevCluster && Array.from(availableClusters).includes(prevCluster)
-              ? prevCluster
-              : "All";
-      
-          rebuildStatusOptions();
-      }
-      
-      function rebuildStatusOptions() {
-          const prev = statusSelect.value || "All";
-          const statusesInView = new Set();
-          rawRecords.forEach(r => statusesInView.add(r.status || "UNKNOWN"));
-      
-          statusSelect.innerHTML = '<option value="All">All</option>';
-          Array.from(statusesInView).sort().forEach(s => {
-              const val = s.replace(/\s+/g, '-').toUpperCase();
-              const option = document.createElement("option");
-              option.value = val;
-              option.textContent = s;
-              statusSelect.appendChild(option);
-          });
-      
-          statusSelect.value = prev && Array.from(statusesInView).includes(prev) ? prev : "All";
-      }
-      
-      function aggregateForView() {
-          let start = view.startDate ? new Date(view.startDate) : null;
-          let end = view.endDate ? new Date(view.endDate) : null;
-          if (start) start.setHours(0, 0, 0, 0);
-          if (end) end.setHours(23, 59, 59, 999);
-      
-          const out = [];
-      
-          rawRecords.forEach(r => {
-              if (view.cluster !== "All" && (r.cluster || "") !== view.cluster) return;
-      
-              if (view.status !== "All") {
-                  const rowStatus = (r.status || "UNKNOWN").toUpperCase().replace(/\s+/g, '-');
-                  const selectedStatus = view.status.toUpperCase().replace(/\s+/g, '-');
-                  if (rowStatus !== selectedStatus) return;
-              }
-      
-              if (view.search) {
-                  const q = view.search.toLowerCase();
-                  const matches = ((r.resource || "") + " " + (r.jobid || "")).toLowerCase();
-                  if (!matches.includes(q)) return;
-              }
-      
-              if (r._parsedDate) {
-                  const rd = new Date(r._parsedDate);
-                  if (start && rd < start) return;
-                  if (end && rd > end) return;
-              }
-      
-              out.push(r);
-          });
-      
-          return out;
-      }
-      
-      function aggregatePointsPerResource(rows) {
-          const map = {};
-          rows.forEach(r => {
-              const res = r.resource || "(Unassigned)";
-              const pts = Number(r.points) || 0;
-              const act = (r.activity || "").toUpperCase();
-      
-              if (!map[res]) map[res] = { resource: res, pr: 0, war: 0, sa: 0, total: 0 };
-      
-              if (act.includes("PR")) map[res].pr += pts;
-              if (act.includes("WAR")) map[res].war += pts;
-              if (act.includes("SA")) map[res].sa += pts;
-              map[res].total += pts;
-          });
-      
-          return Object.values(map).sort((a, b) => b.total - a.total);
-      }
-      
-   function renderPointsOverview(rows) {
-    const tbody = document.getElementById("pointsOverviewTable");
-    if (!tbody) return;
-
-    // 1️⃣ Aggregate points per resource
-    const data = aggregatePointsPerResource(rows);
-
-    // 2️⃣ Sort by total descending (already done in aggregatePointsPerResource)
-    data.sort((a, b) => b.total - a.total);
-
-    tbody.innerHTML = "";
-
-    // 3️⃣ Add rank while looping
-    data.forEach((r, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td class="text-center">${index + 1}</td> <!-- Rank -->
-            <td>${r.resource}</td>
-            <td class="text-end">${r.pr}</td>
-            <td class="text-end">${r.war}</td>
-            <td class="text-end">${r.sa}</td>
-            <td class="text-end fw-bold">${r.total}</td>
-        `;
-        tbody.appendChild(tr);
-    });
+// ================== PAGINATION ==================
+function applyPagination(fullData) {
+    paginatedData = fullData;
+    currentPage = 1;
+    renderPage();
 }
 
-      
-      function renderKPIs(rows) {
-          const totals = { PR: 0, WAR: 0, SA: 0 };
-          const resourcesSet = new Set();
-      
-          rows.forEach(r => {
-              const activity = (r.activity || "").toUpperCase();
-              if (activity.includes("PR")) totals.PR += Number(r.points) || 0;
-              if (activity.includes("WAR")) totals.WAR += Number(r.points) || 0;
-              if (activity.includes("SA")) totals.SA += Number(r.points) || 0;
-              if (r.resource) resourcesSet.add(r.resource);
-          });
-      
-          document.getElementById("kpiPR").innerText = totals.PR;
-          document.getElementById("kpiWAR").innerText = totals.WAR;
-          document.getElementById("kpiSA").innerText = totals.SA;
-          document.getElementById("kpiResources").innerText = resourcesSet.size;
-      }
-      
-      // ================= PAGINATION =================
-      function applyPagination(fullData) {
-          paginatedData = fullData;
-          currentPage = 1;
-          renderPage();
-      }
-      
-      function renderPage() {
-          const start = (currentPage - 1) * rowsPerPage;
-          const end = start + rowsPerPage;
-          const rows = paginatedData.slice(start, end);
-      
-          tableBody.innerHTML = "";
-      
-          rows.forEach(d => {
-              const tr = document.createElement("tr");
-              const quotaMet = d.totalPoints >= 4;
-              tr.innerHTML = `
-                  <td class="text-center">${d.rank}</td>
-                  <td>${formatDisplayDate(d.date)}</td>
-                  <td>${d.resource}</td>
-                  <td>${d.cluster}</td>
-                  <td class="text-end">${d.prPoints}</td>
-                  <td class="text-end">${d.warPoints}</td>
-                  <td class="text-end">${d.saPoints}</td>
-                  <td class="text-end">${d.totalPoints}</td>
-                  <td class="text-center">${quotaMet ? '<span class="badge bg-success">✓</span>' : '<span class="badge bg-danger">✗</span>'}</td>
-              `;
-              tr.addEventListener("click", () => showTechDetails(d));
-              tableBody.appendChild(tr);
-          });
-      
-          document.getElementById("pageInfo").innerText = `Page ${currentPage} of ${Math.ceil(paginatedData.length / rowsPerPage)}`;
-          document.getElementById("prevPage").disabled = currentPage === 1;
-          document.getElementById("nextPage").disabled = end >= paginatedData.length;
-      }
-      
-      document.getElementById("nextPage").addEventListener("click", () => {
-          const maxPage = Math.ceil(paginatedData.length / rowsPerPage);
-          if (currentPage < maxPage) {
-              currentPage++;
-              renderPage();
-          }
-      });
-      
-      document.getElementById("prevPage").addEventListener("click", () => {
-          if (currentPage > 1) {
-              currentPage--;
-              renderPage();
-          }
-      });
-      
-      // ================= INIT FLATPICKR =================
-      flatpickr(dateRangePickerEl, {
-          mode: "range",
-          dateFormat: "m/d/Y",
-          onClose: (selectedDates) => {
-              if (selectedDates.length === 2) {
-                  view.startDate = selectedDates[0];
-                  view.endDate = selectedDates[1];
-              }
-              renderTable();
-          }
-      });
-      
-      clearDateBtn.addEventListener("click", () => {
-          dateRangePickerEl._flatpickr.clear();
-          view.startDate = null;
-          view.endDate = null;
-          renderTable();
-      });
-      
-      clusterSelect.addEventListener("change", e => {
-          view.cluster = e.target.value;
-          renderTable();
-      });
-      
-      statusSelect.addEventListener("change", e => {
-          view.status = e.target.value;
-          renderTable();
-      });
-      
-      searchInput.addEventListener("input", e => {
-          view.search = e.target.value.trim();
-          renderTable();
-      });
-      
-      clearSearch.addEventListener("click", () => {
-          searchInput.value = "";
-          view.search = "";
-          renderTable();
-      });
-      
-      // ================= LOAD CSV =================
-      const CSV_URL = "https://raw.githubusercontent.com/cvatelier/PLDT-WEBSITE/main/RAW%20DATA.csv";
-      
+function renderPage() {
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const rows = paginatedData.slice(start, end);
+
+    tableBody.innerHTML = "";
+
+    rows.forEach(d => {
+        const tr = document.createElement("tr");
+        const quotaMet = d.totalPoints >= 4;
+        tr.innerHTML = `
+            <td class="text-center">${d.rank}</td>
+            <td>${formatDisplayDate(d.date)}</td>
+            <td>${d.resource}</td>
+            <td>${d.cluster}</td>
+            <td class="text-end">${d.prPoints}</td>
+            <td class="text-end">${d.warPoints}</td>
+            <td class="text-end">${d.saPoints}</td>
+            <td class="text-end">${d.totalPoints}</td>
+            <td class="text-center">${quotaMet ? '<span class="badge bg-success">✓</span>' : '<span class="badge bg-danger">✗</span>'}</td>
+        `;
+        tr.addEventListener("click", () => showTechDetails(d));
+        tableBody.appendChild(tr);
+    });
+
+    document.getElementById("pageInfo").innerText = `Page ${currentPage} of ${Math.ceil(paginatedData.length / rowsPerPage)}`;
+    document.getElementById("prevPage").disabled = currentPage === 1;
+    document.getElementById("nextPage").disabled = end >= paginatedData.length;
+}
+
+// Pagination buttons
+document.getElementById("nextPage").addEventListener("click", () => {
+    const maxPage = Math.ceil(paginatedData.length / rowsPerPage);
+    if (currentPage < maxPage) {
+        currentPage++;
+        renderPage();
+    }
+});
+document.getElementById("prevPage").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderPage();
+    }
+});
+
+// ================== CSV LOAD ==================
+const CSV_URL = "https://raw.githubusercontent.com/cvatelier/PLDT-WEBSITE/refs/heads/main/RAW%20DATA.csv";
+
 function loadCSVFromURL() {
     fetch(CSV_URL)
         .then(res => {
             if (!res.ok) throw new Error("HTTP " + res.status);
-            return res.arrayBuffer(); // CSP-safe
+            return res.text();
         })
-        .then(arrayBuffer => {
-            const workbook = XLSX.read(arrayBuffer, { type: "array" });
+        .then(csvText => {
+            const workbook = XLSX.read(csvText, { type: "string" });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
@@ -811,13 +739,12 @@ function loadCSVFromURL() {
         .catch(err => console.error("CSV Load Failed:", err));
 }
 
-
-      
-      window.addEventListener("DOMContentLoaded", loadCSVFromURL);
-      
-    </script>
+// ================== INITIALIZE ==================
+window.addEventListener("DOMContentLoaded", loadCSVFromURL);
+</script>
   </body>
 </html>
+
 
 
 
