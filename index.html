@@ -514,6 +514,46 @@ function aggregateForView(){
     out.push(r);
   });
   return out;
+  function aggregatePointsPerResource(rows) {
+  const map = {};
+
+  rows.forEach(r => {
+    const res = r.resource || "(Unassigned)";
+    const pts = Number(r.points) || 0;
+    const act = (r.activity || "").toUpperCase();
+
+    if (!map[res]) {
+      map[res] = { resource: res, pr: 0, war: 0, sa: 0, total: 0 };
+    }
+
+    if (act.includes("PR")) map[res].pr += pts;
+    if (act.includes("WAR")) map[res].war += pts;
+    if (act.includes("SA")) map[res].sa += pts;
+
+    map[res].total += pts;
+  });
+
+  return Object.values(map).sort((a, b) => b.total - a.total);
+}
+}
+function renderPointsOverview(rows) {
+  const tbody = document.getElementById("pointsOverviewTable");
+  if (!tbody) return;
+
+  const data = aggregatePointsPerResource(rows);
+  tbody.innerHTML = "";
+
+  data.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.resource}</td>
+      <td class="text-end">${r.pr}</td>
+      <td class="text-end">${r.war}</td>
+      <td class="text-end">${r.sa}</td>
+      <td class="text-end fw-bold">${r.total}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 function renderKPIs(rows){
@@ -561,6 +601,12 @@ function aggregateDailyPerTechnician(rows){
 function renderTable(){
   const rows = aggregateForView();
   const dailyAggregates = aggregateDailyPerTechnician(rows);
+  renderPointsOverview(rows);
+
+    applyPagination(dailyAggregates);
+  renderKPIs(rows);
+  renderPointsOverview(rows); // ✅ ADD THIS
+  updateFilterStatusLabel();
 
   // Compute rank per day
   dailyAggregates.sort((a,b)=>{
@@ -727,6 +773,7 @@ window.addEventListener("DOMContentLoaded", loadCSVFromURL);
 
 </body>
 </html>
+
 
 
 
