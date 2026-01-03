@@ -639,25 +639,33 @@
           return Object.values(map).sort((a, b) => b.total - a.total);
       }
       
-      function renderPointsOverview(rows) {
-          const tbody = document.getElementById("pointsOverviewTable");
-          if (!tbody) return;
-      
-          const data = aggregatePointsPerResource(rows);
-          tbody.innerHTML = "";
-      
-          data.forEach(r => {
-              const tr = document.createElement("tr");
-              tr.innerHTML = `
-                  <td>${r.resource}</td>
-                  <td class="text-end">${r.pr}</td>
-                  <td class="text-end">${r.war}</td>
-                  <td class="text-end">${r.sa}</td>
-                  <td class="text-end fw-bold">${r.total}</td>
-              `;
-              tbody.appendChild(tr);
-          });
-      }
+   function renderPointsOverview(rows) {
+    const tbody = document.getElementById("pointsOverviewTable");
+    if (!tbody) return;
+
+    // 1️⃣ Aggregate points per resource
+    const data = aggregatePointsPerResource(rows);
+
+    // 2️⃣ Sort by total descending (already done in aggregatePointsPerResource)
+    data.sort((a, b) => b.total - a.total);
+
+    tbody.innerHTML = "";
+
+    // 3️⃣ Add rank while looping
+    data.forEach((r, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td class="text-center">${index + 1}</td> <!-- Rank -->
+            <td>${r.resource}</td>
+            <td class="text-end">${r.pr}</td>
+            <td class="text-end">${r.war}</td>
+            <td class="text-end">${r.sa}</td>
+            <td class="text-end fw-bold">${r.total}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
       
       function renderKPIs(rows) {
           const totals = { PR: 0, WAR: 0, SA: 0 };
@@ -810,6 +818,7 @@ function loadCSVFromURL() {
     </script>
   </body>
 </html>
+
 
 
 
