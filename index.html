@@ -361,11 +361,11 @@ main { flex:1; padding:1rem 2rem; }
     </thead>
     <tbody id="pointsOverviewTable"></tbody>
   </table>
-          <div class="p-2 d-flex justify-content-between align-items-center">
-          <button id="prevPage" class="btn btn-sm btn-outline-secondary">Previous</button>
-          <span id="pageInfo" class="fw-semibold"></span>
-          <button id="nextPage" class="btn btn-sm btn-outline-secondary">Next</button>
-        </div>
+<div class="p-2 d-flex justify-content-between align-items-center">
+  <button id="pointsPrevPage" class="btn btn-sm btn-outline-secondary">Previous</button>
+  <span id="pointsPageInfo" class="fw-semibold"></span>
+  <button id="pointsNextPage" class="btn btn-sm btn-outline-secondary">Next</button>
+</div>
 </div>
 
     </div>
@@ -607,7 +607,7 @@ function aggregateDailyPerTechnician(rows){
 function renderTable(){
   const rows = aggregateForView();
   const dailyAggregates = aggregateDailyPerTechnician(rows);
-  
+  pointsPage = 1; // ✅ RESET overview pagination
   // Compute rank per day
   dailyAggregates.sort((a,b)=>{
     if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
@@ -626,6 +626,7 @@ function renderTable(){
 
   // Use pagination instead of direct table rendering
   applyPagination(dailyAggregates);
+  renderPointsOverview(rows);
   renderKPIs(rows);
   updateFilterStatusLabel();
 }
@@ -672,7 +673,17 @@ clearSearch.addEventListener('click',()=>{ searchInput.value=""; view.search="";
 
 // --- EXPORT EXCEL & PDF remain unchanged ---
 // ...
+// ================= GLOBAL STATE =================
 
+// Productivity table pagination
+let currentPage = 1;
+const rowsPerPage = 20;
+let paginatedData = [];
+
+// Points Overview pagination  ✅ ADD THIS HERE
+let pointsPage = 1;
+const pointsRowsPerPage = 20;
+let pointsData = [];
 /* ============================================
    PAGINATION (20 rows per page)
 ============================================ */
@@ -772,6 +783,7 @@ window.addEventListener("DOMContentLoaded", loadCSVFromURL);
 
 </body>
 </html>
+
 
 
 
