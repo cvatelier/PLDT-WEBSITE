@@ -654,6 +654,8 @@ function prevModalPage() {
       
       // ================= DATA PROCESSING =================
       function renderTable() {
+
+
     // 1️⃣ Filter data according to current view
     const filtered = aggregateForView();
 
@@ -661,6 +663,7 @@ function prevModalPage() {
     renderKPIs(filtered);
 
     // 3️⃣ Render Points Overview
+    pointsPage = 1;
     renderPointsOverview(filtered);
 
     // 4️⃣ Apply pagination for main productivity table
@@ -785,45 +788,26 @@ function prevModalPage() {
           return Object.values(map).sort((a, b) => b.total - a.total);
       }
       
-   function renderPointsOverview(rows) {
-    const tbody = document.getElementById("pointsOverviewTable");
-    if (!tbody) return;
-
-    // 1️⃣ Aggregate points per resource
-    const data = aggregatePointsPerResource(rows);
-
-    // 2️⃣ Sort by total descending (already done in aggregatePointsPerResource)
-    data.sort((a, b) => b.total - a.total);
-
-    tbody.innerHTML = "";
-
-    // 3️⃣ Add rank while looping
-    data.forEach((r, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td class="text-center">${index + 1}</td> <!-- Rank -->
-            <td>${r.resource}</td>
-            <td class="text-end">${r.pr}</td>
-            <td class="text-end">${r.war}</td>
-            <td class="text-end">${r.sa}</td>
-            <td class="text-end fw-bold">${r.total}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
 function renderPointsOverview(rows) {
     const tbody = document.getElementById("pointsOverviewTable");
-    if (!tbody) return;
+    const pageInfo = document.getElementById("pointsPageInfo");
 
-    // Aggregate points per resource
+    // Aggregate
     pointsData = aggregatePointsPerResource(rows);
+
+    const totalPages = Math.ceil(pointsData.length / pointsRowsPerPage);
+    if (pointsPage > totalPages) pointsPage = totalPages || 1;
+
+    const start = (pointsPage - 1) * pointsRowsPerPage;
+    const end = start + pointsRowsPerPage;
+    const pageRows = pointsData.slice(start, end);
 
     tbody.innerHTML = "";
 
-    pointsData.forEach((r, index) => {
+    pageRows.forEach((r, index) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td class="text-center">${index + 1}</td>
+            <td class="text-center">${start + index + 1}</td>
             <td>${r.resource}</td>
             <td class="text-end">${r.pr}</td>
             <td class="text-end">${r.war}</td>
@@ -833,7 +817,26 @@ function renderPointsOverview(rows) {
         tr.addEventListener("click", () => showPointsDetails(r));
         tbody.appendChild(tr);
     });
+
+    pageInfo.innerText = `Page ${pointsPage} of ${totalPages}`;
+    document.getElementById("pointsPrevPage").disabled = pointsPage === 1;
+    document.getElementById("pointsNextPage").disabled = pointsPage === totalPages;
 }
+document.getElementById("pointsNextPage").addEventListener("click", () => {
+    const maxPage = Math.ceil(pointsData.length / pointsRowsPerPage);
+    if (pointsPage < maxPage) {
+        pointsPage++;
+        renderPointsOverview(aggregateForView());
+    }
+});
+
+document.getElementById("pointsPrevPage").addEventListener("click", () => {
+    if (pointsPage > 1) {
+        pointsPage--;
+        renderPointsOverview(aggregateForView());
+    }
+});
+
 let pointsModalPage = 1;
 const pointsModalRowsPerPage = 10;
 let pointsModalData = [];
@@ -1192,6 +1195,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
