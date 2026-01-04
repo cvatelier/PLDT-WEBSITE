@@ -706,7 +706,7 @@ modalBody.innerHTML = `
           rows.forEach(r => {
               const res = r.resource || "(Unassigned)";
               const pts = Number(r.points) || 0;
-              const act = (r.activity || "").toUpperCase();
+              const act = (r.activitycategory || "").toUpperCase();
       
               if (!map[res]) map[res] = { resource: res, pr: 0, war: 0, sa: 0, total: 0 };
       
@@ -752,7 +752,7 @@ modalBody.innerHTML = `
           const resourcesSet = new Set();
       
           rows.forEach(r => {
-              const activity = (r.activity || "").toUpperCase();
+              const activity = (r.activitycategory || "").toUpperCase();
               if (activity.includes("PR")) totals.PR += Number(r.points) || 0;
               if (activity.includes("WAR")) totals.WAR += Number(r.points) || 0;
               if (activity.includes("SA")) totals.SA += Number(r.points) || 0;
@@ -793,7 +793,7 @@ function aggregatePointsPerResourcePerDay(rows) {
             };
         }
 
-        const activity = (r.activity || "").toUpperCase();
+        const activity = (r.activitycategory || "").toUpperCase();
         const pts = Number(r.points) || 0;
 
         if (activity.includes("PR")) map[key].prPoints += pts;
@@ -1028,6 +1028,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
