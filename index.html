@@ -505,6 +505,63 @@
           const yyyy = dateObj.getFullYear();
           return `${mm}/${dd}/${yyyy}`;
       }
+
+function showTechDetails(row) {
+    const modalTitle = document.getElementById("techModalTitle");
+    const modalBody = document.getElementById("techDetails");
+
+    const clickedDate = row.date
+        ? row.date.toISOString().slice(0, 10)
+        : null;
+
+    // Filter RAW DATA
+    const matched = rawRecords.filter(r => {
+        const rDate = r._parsedDate
+            ? r._parsedDate.toISOString().slice(0, 10)
+            : null;
+
+        return (
+            r.resource === row.resource &&
+            rDate === clickedDate
+        );
+    });
+
+    modalTitle.innerText = `${row.resource} — ${formatDisplayDate(row.date)}`;
+
+    if (matched.length === 0) {
+        modalBody.innerHTML = `<p class="text-muted">No raw records found.</p>`;
+    } else {
+        modalBody.innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Activity</th>
+                            <th>Status</th>
+                            <th>Cluster</th>
+                            <th class="text-end">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${matched.map(r => `
+                            <tr class="status-${(r.status || "").replace(/\s+/g,'-').toUpperCase()}">
+                                <td>${r.jobid}</td>
+                                <td>${r.activity}</td>
+                                <td>${r.status}</td>
+                                <td>${r.cluster}</td>
+                                <td class="text-end">${r.points}</td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById("techModal"));
+    modal.show();
+}
       
       // ================= DATA PROCESSING =================
       function renderTable() {
@@ -938,6 +995,7 @@ function loadCSVFromURL() {
     </script>
   </body>
 </html>
+
 
 
 
