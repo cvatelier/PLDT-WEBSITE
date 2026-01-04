@@ -1167,7 +1167,10 @@ rawRecords = json.map(r => ({
     activitycategory: r["Activity Category"] || "",
     activitytype: r["Activity Type"] || "",
     points: Number(r["Points"]) || 0,
-    status: r["Activity Status"] || "UNKNOWN",
+    status: (r["Activity Status"] || "UNKNOWN")
+    .toUpperCase()
+    .replace(/\s+/g, '-'),
+
 
     customerName: r["Customer Name"] || "",
     address: r["Address"] || "",
@@ -1195,6 +1198,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
