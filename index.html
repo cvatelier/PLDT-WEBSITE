@@ -533,7 +533,7 @@ const modalRowsPerPage = 10;
         .toUpperCase()
         .trim();
 
-    if (s.includes("NOT") && s.includes("DONE")) return "NOT-DONE";
+    if (s.includes("NOT") && s.includes("DONE")) return "NOT DONE";
     if (s.includes("CANCEL")) return "CANCELED";
     if (s.includes("COMPLETE") || s.includes("DONE")) return "COMPLETED";
     if (s.includes("START")) return "STARTED";
@@ -1213,6 +1213,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
