@@ -520,7 +520,6 @@ function showTechDetails(row) {
         ? row.date.toISOString().slice(0, 10)
         : null;
 
-    // Filter RAW DATA
     modalData = rawRecords.filter(r => {
         const rDate = r._parsedDate
             ? r._parsedDate.toISOString().slice(0, 10)
@@ -543,7 +542,8 @@ function showTechDetails(row) {
 
     const modal = new bootstrap.Modal(document.getElementById("techModal"));
     modal.show();
-}
+} // ✅ only one closing brace
+
 function renderModalPage() {
     const modalBody = document.getElementById("techDetails");
 
@@ -939,7 +939,6 @@ document.getElementById("prevPage").addEventListener("click", () => {
     }
 });
 
-      
       function renderPage() {
           const start = (currentPage - 1) * rowsPerPage;
           const end = start + rowsPerPage;
@@ -1076,6 +1075,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
