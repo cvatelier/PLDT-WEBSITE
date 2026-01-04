@@ -398,6 +398,23 @@
               </div>
             </div>
           </div>
+                  <!-- Technician Modal -->
+        <div class="modal fade" id="techModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 id="techModalTitle" class="modal-title">Record Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div id="techDetails"></div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
           <!-- Points Overview Table -->
           <div class="col-lg-5">
             <div class="card shadow-sm p-3">
@@ -425,23 +442,23 @@
             </div>
           </div>
         </div>
-        <!-- Technician Modal -->
-        <div class="modal fade" id="techModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 id="techModalTitle" class="modal-title">Record Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body">
-                <div id="techDetails"></div>
-              </div>
-              <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- Points Overview Modal -->
+<div class="modal fade" id="pointsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="pointsModalTitle" class="modal-title">Resource Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="pointsModalBody"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
       </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -794,6 +811,106 @@ function prevModalPage() {
         tbody.appendChild(tr);
     });
 }
+function renderPointsOverview(rows) {
+    const tbody = document.getElementById("pointsOverviewTable");
+    if (!tbody) return;
+
+    // Aggregate points per resource
+    pointsData = aggregatePointsPerResource(rows);
+
+    tbody.innerHTML = "";
+
+    pointsData.forEach((r, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td class="text-center">${index + 1}</td>
+            <td>${r.resource}</td>
+            <td class="text-end">${r.pr}</td>
+            <td class="text-end">${r.war}</td>
+            <td class="text-end">${r.sa}</td>
+            <td class="text-end fw-bold">${r.total}</td>
+        `;
+        tr.addEventListener("click", () => showPointsDetails(r));
+        tbody.appendChild(tr);
+    });
+}
+let pointsModalPage = 1;
+const pointsModalRowsPerPage = 10;
+let pointsModalData = [];
+
+function showPointsDetails(resourceRow) {
+    pointsModalData = rawRecords.filter(r => r.resource === resourceRow.resource);
+    pointsModalPage = 1;
+    renderPointsModalPage(resourceRow.resource);
+
+    const modal = new bootstrap.Modal(document.getElementById("pointsModal"));
+    modal.show();
+}
+
+function renderPointsModalPage(resourceName) {
+    const modalBody = document.getElementById("pointsModalBody");
+    const start = (pointsModalPage - 1) * pointsModalRowsPerPage;
+    const end = start + pointsModalRowsPerPage;
+    const pageRows = pointsModalData.slice(start, end);
+
+    modalBody.innerHTML = `
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Job ID</th>
+              <th>Activity Category</th>
+              <th>Activity Type</th>
+              <th>Status</th>
+              <th class="text-end">Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pageRows.map(r => `
+              <tr class="status-${(r.status || "").replace(/\s+/g,'-').toUpperCase()}">
+                <td>${formatDisplayDate(r._parsedDate)}</td>
+                <td>${valOrNoRecord(r.jobid)}</td>
+                <td>${valOrNoRecord(r.activitycategory)}</td>
+                <td>${valOrNoRecord(r.activitytype)}</td>
+                <td>${valOrNoRecord(r.status)}</td>
+                <td class="text-end">${valOrNoRecord(r.points)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-2">
+        <button class="btn btn-sm btn-outline-secondary"
+          onclick="prevPointsModalPage()" ${pointsModalPage === 1 ? "disabled" : ""}>
+          Previous
+        </button>
+        <span class="fw-semibold">Page ${pointsModalPage} of ${Math.ceil(pointsModalData.length / pointsModalRowsPerPage)}</span>
+        <button class="btn btn-sm btn-outline-secondary"
+          onclick="nextPointsModalPage()" ${end >= pointsModalData.length ? "disabled" : ""}>
+          Next
+        </button>
+      </div>
+    `;
+
+    document.getElementById("pointsModalTitle").innerText = `Details for ${resourceName}`;
+}
+
+function nextPointsModalPage() {
+    const maxPage = Math.ceil(pointsModalData.length / pointsModalRowsPerPage);
+    if (pointsModalPage < maxPage) {
+        pointsModalPage++;
+        renderPointsModalPage(pointsModalData[0].resource);
+    }
+}
+
+function prevPointsModalPage() {
+    if (pointsModalPage > 1) {
+        pointsModalPage--;
+        renderPointsModalPage(pointsModalData[0].resource);
+    }
+}
 
       function renderKPIs(rows) {
           const totals = { PR: 0, WAR: 0, SA: 0 };
@@ -1075,6 +1192,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
