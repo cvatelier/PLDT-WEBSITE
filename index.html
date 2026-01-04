@@ -982,17 +982,26 @@ function loadCSVFromURL() {
             const worksheet = workbook.Sheets[sheetName];
             const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
-            rawRecords = json.map(r => ({
-                resource: r["Resource"] || "",
-                cluster: r["Cluster"] || "",
-                jobid: r["Job ID"] || "",
-                activity: r["Activity Category"] || "",
-                points: Number(r["Points"]) || 0,
-                status: r["Activity Status"] || "UNKNOWN",
-                _parsedDate: r["Year"] && r["Month"] && r["Day"]
-                    ? new Date(r["Year"], r["Month"] - 1, r["Day"])
-                    : new Date()
-            }));
+rawRecords = json.map(r => ({
+    resource: r["Resource"] || "",
+    cluster: r["Cluster"] || "",
+    jobid: r["Job ID"] || "",
+    activity: r["Activity Category"] || "",
+    points: Number(r["Points"]) || 0,
+    status: r["Activity Status"] || "UNKNOWN",
+
+    customerName: r["Customer Name"] || "",
+    address: r["Address"] || "",
+    city: r["City"] || "",
+    accountNumber: r["Activity Type Account Number"] || "",
+    telephone: r["Telephone Number"] || "",
+    cafac: r["CAFAC"] || "",
+    onuSerial: r["ONU Serial"] || "",
+
+    _parsedDate: r["Year"] && r["Month"] && r["Day"]
+        ? new Date(r["Year"], r["Month"] - 1, r["Day"])
+        : new Date()
+}));
 
             rebuildTechnicians();
             renderTable();
@@ -1007,6 +1016,7 @@ function loadCSVFromURL() {
     </script>
   </body>
 </html>
+
 
 
 
