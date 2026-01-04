@@ -856,17 +856,20 @@ document.getElementById("pointsPrevPage").addEventListener("click", () => {
 let pointsModalPage = 1;
 const pointsModalRowsPerPage = 10;
 let pointsModalData = [];
+let currentPointsResource = null;
 
 function showPointsDetails(resourceRow) {
     pointsModalData = rawRecords.filter(r => r.resource === resourceRow.resource);
     pointsModalPage = 1;
-    renderPointsModalPage(resourceRow.resource);
+    currentPointsResource = resourceRow.resource; // <-- track the resource
+    renderPointsModalPage();
 
     const modal = new bootstrap.Modal(document.getElementById("pointsModal"));
     modal.show();
 }
 
-function renderPointsModalPage(resourceName) {
+
+function renderPointsModalPage() {
     const modalBody = document.getElementById("pointsModalBody");
     const start = (pointsModalPage - 1) * pointsModalRowsPerPage;
     const end = start + pointsModalRowsPerPage;
@@ -913,21 +916,21 @@ function renderPointsModalPage(resourceName) {
       </div>
     `;
 
-    document.getElementById("pointsModalTitle").innerText = `${resourceName}`;
+    document.getElementById("pointsModalTitle").innerText = currentPointsResource;
 }
 
 function nextPointsModalPage() {
     const maxPage = Math.ceil(pointsModalData.length / pointsModalRowsPerPage);
     if (pointsModalPage < maxPage) {
         pointsModalPage++;
-        renderPointsModalPage(pointsModalData[0].resource);
+        renderPointsModalPage();
     }
 }
 
 function prevPointsModalPage() {
     if (pointsModalPage > 1) {
         pointsModalPage--;
-        renderPointsModalPage(pointsModalData[0].resource);
+        renderPointsModalPage();
     }
 }
 
@@ -1206,13 +1209,12 @@ rawRecords = json.map(r => ({
         .catch(err => console.error("CSV Load Failed:", err));
 }
 
-
-      
       window.addEventListener("DOMContentLoaded", loadCSVFromURL);
       
     </script>
   </body>
 </html>
+
 
 
 
