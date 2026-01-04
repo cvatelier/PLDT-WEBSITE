@@ -552,16 +552,21 @@ function showTechDetails(row) {
         ? row.date.toISOString().slice(0, 10)
         : null;
 
-    modalData = rawRecords.filter(r => {
-        const rDate = r._parsedDate
-            ? r._parsedDate.toISOString().slice(0, 10)
-            : null;
+modalData = rawRecords.filter(r => {
+    if (r.resource !== row.resource) return false;
+    if (!row.date || !r._parsedDate) return false;
 
-        return (
-            r.resource === row.resource &&
-            rDate === clickedDate
-        );
-    });
+    // Compare only year/month/day
+    const d1 = r._parsedDate;
+    const d2 = row.date;
+
+    return (
+        d1.getFullYear() === d2.getFullYear() &&
+        d1.getMonth() === d2.getMonth() &&
+        d1.getDate() === d2.getDate()
+    );
+});
+
 
     modalPage = 1;
     modalTitle.innerText = `${row.resource} — ${formatDisplayDate(row.date)}`;
@@ -1208,6 +1213,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
