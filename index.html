@@ -426,7 +426,21 @@
             </div>
           </div>
         </div>
-        <div class = "modal fade" id="techModal" tabindex="-1"></div>
+<div class="modal fade" id="techModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="techModalTitle"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="techDetails"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+        
         <!-- Points Overview Modal -->
 <div class="modal fade" id="pointsModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -1194,6 +1208,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
