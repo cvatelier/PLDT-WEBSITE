@@ -763,11 +763,11 @@ function rebuildStatusOptions() {
               if (view.cluster !== "All" && (r.cluster || "") !== view.cluster) return;
       
               if (view.status !== "All") {
-                  const rowStatus = (r.status || "UNKNOWN").toUpperCase().replace(/\s+/g, '-');
-                  const selectedStatus = view.status.toUpperCase().replace(/\s+/g, '-');
-                  if (rowStatus !== selectedStatus) return;
+                  const rowStatus = (r.status || "UNKNOWN").toUpperCase().trim();
+                  const selectedStatus = view.status.toUpperCase().trim();
+              if (rowStatus !== selectedStatus) return;
               }
-      
+
               if (view.search) {
                   const q = view.search.toLowerCase();
                   const matches = ((r.resource || "") + " " + (r.jobid || "")).toLowerCase();
@@ -1213,6 +1213,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
