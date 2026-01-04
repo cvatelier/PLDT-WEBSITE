@@ -528,6 +528,20 @@ const modalRowsPerPage = 10;
           const yyyy = dateObj.getFullYear();
           return `${mm}/${dd}/${yyyy}`;
       }
+      function normalizeStatus(raw) {
+    const s = (raw || "")
+        .toUpperCase()
+        .trim();
+
+    if (s.includes("NOT") && s.includes("DONE")) return "NOT-DONE";
+    if (s.includes("CANCEL")) return "CANCELED";
+    if (s.includes("COMPLETE") || s.includes("DONE")) return "COMPLETED";
+    if (s.includes("START")) return "STARTED";
+    if (s.includes("PENDING")) return "PENDING";
+    if (s.includes("SUSPEND")) return "SUSPENDED";
+
+    return "UNKNOWN";
+}
 
 function showTechDetails(row) {
     const modalTitle = document.getElementById("techModalTitle");
@@ -718,22 +732,24 @@ function prevModalPage() {
           rebuildStatusOptions();
       }
       
-      function rebuildStatusOptions() {
-          const prev = statusSelect.value || "All";
-          const statusesInView = new Set();
-          rawRecords.forEach(r => statusesInView.add(r.status || "UNKNOWN"));
-      
-          statusSelect.innerHTML = '<option value="All">All</option>';
-          Array.from(statusesInView).sort().forEach(s => {
-              const val = s.replace(/\s+/g, '-').toUpperCase();
-              const option = document.createElement("option");
-              option.value = val;
-              option.textContent = s;
-              statusSelect.appendChild(option);
-          });
-      
-          statusSelect.value = prev && Array.from(statusesInView).includes(prev) ? prev : "All";
-      }
+function rebuildStatusOptions() {
+    const prev = statusSelect.value || "All";
+    const statusesInView = new Set();
+
+    rawRecords.forEach(r => statusesInView.add(r.status));
+
+    statusSelect.innerHTML = '<option value="All">All</option>';
+
+    Array.from(statusesInView).sort().forEach(s => {
+        const option = document.createElement("option");
+        option.value = s;                  // e.g. NOT-DONE
+        option.textContent = s.replace(/-/g, ' '); // e.g. NOT DONE
+        statusSelect.appendChild(option);
+    });
+
+    statusSelect.value = statusesInView.has(prev) ? prev : "All";
+}
+
       
       function aggregateForView() {
           let start = view.startDate ? new Date(view.startDate) : null;
@@ -1167,9 +1183,8 @@ rawRecords = json.map(r => ({
     activitycategory: r["Activity Category"] || "",
     activitytype: r["Activity Type"] || "",
     points: Number(r["Points"]) || 0,
-    status: (r["Activity Status"] || "UNKNOWN")
-    .toUpperCase()
-    .replace(/\s+/g, '-'),
+    status: normalizeStatus(r["Activity Status"]),
+
 
 
     customerName: r["Customer Name"] || "",
@@ -1198,6 +1213,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
