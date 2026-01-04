@@ -554,7 +554,7 @@ modalBody.innerHTML = `
         <tbody>
             ${matched.map(r => `
 <tr class="status-${(r.status || "").replace(/\s+/g,'-').toUpperCase()}">
-    <td>${valOrNoRecord(r.jobId)}</td>
+    <td>${valOrNoRecord(r.jobid)}</td>
     <td>${valOrNoRecord(r.customerName)}</td>
     <td>${valOrNoRecord(r.address)}</td>
     <td>${valOrNoRecord(r.city)}</td>
@@ -562,8 +562,8 @@ modalBody.innerHTML = `
     <td>${valOrNoRecord(r.telephone)}</td>
     <td>${valOrNoRecord(r.cafac)}</td>
     <td>${valOrNoRecord(r.onuSerial)}</td>
-    <td>${valOrNoRecord(r.activity)}</td>
-    <td>${valOrNoRecord(r.activityType)}</td>
+    <td>${valOrNoRecord(r.activitycategory)}</td>
+    <td>${valOrNoRecord(r.activitytype)}</td>
     <td>${valOrNoRecord(r.status)}</td>
     <td>${valOrNoRecord(r.cluster)}</td>
     <td class="text-end">${valOrNoRecord(r.points)}</td>
@@ -997,7 +997,8 @@ rawRecords = json.map(r => ({
     resource: r["Resource"] || "",
     cluster: r["Cluster"] || "",
     jobid: r["Job ID"] || "",
-    activity: r["Activity Category"] || "",
+    activitycategory: r["Activity Category"] || "",
+    activitytype: r["Activity Type"] || "",
     points: Number(r["Points"]) || 0,
     status: r["Activity Status"] || "UNKNOWN",
 
@@ -1027,6 +1028,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
