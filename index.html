@@ -531,30 +531,42 @@ function showTechDetails(row) {
     if (matched.length === 0) {
         modalBody.innerHTML = `<p class="text-muted">No raw records found.</p>`;
     } else {
-        modalBody.innerHTML = `
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Job ID</th>
-                            <th>Activity</th>
-                            <th>Status</th>
-                            <th>Cluster</th>
-                            <th class="text-end">Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${matched.map(r => `
-                            <tr class="status-${(r.status || "").replace(/\s+/g,'-').toUpperCase()}">
-                                <td>${r.jobid}</td>
-                                <td>${r.activity}</td>
-                                <td>${r.status}</td>
-                                <td>${r.cluster}</td>
-                                <td class="text-end">${r.points}</td>
-                            </tr>
-                        `).join("")}
-                    </tbody>
-                </table>
+modalBody.innerHTML = `
+<div class="table-responsive">
+    <table class="table table-sm table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Customer Name</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>Account #</th>
+                <th>Telephone</th>
+                <th>CAFAC</th>
+                <th>ONU Serial</th>
+                <th>Activity</th>
+                <th>Status</th>
+                <th>Cluster</th>
+                <th class="text-end">Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${matched.map(r => `
+                <tr class="status-${(r.status || "").replace(/\s+/g,'-').toUpperCase()}">
+                    <td>${r.customerName || ""}</td>
+                    <td>${r.address || ""}</td>
+                    <td>${r.city || ""}</td>
+                    <td>${r.accountNumber || ""}</td>
+                    <td>${r.telephone || ""}</td>
+                    <td>${r.cafac || ""}</td>
+                    <td>${r.onuSerial || ""}</td>
+                    <td>${r.activity}</td>
+                    <td>${r.status}</td>
+                    <td>${r.cluster}</td>
+                    <td class="text-end">${r.points}</td>
+                </tr>
+            `).join("")}
+        </tbody>
+        </table>
             </div>
         `;
     }
@@ -995,6 +1007,7 @@ function loadCSVFromURL() {
     </script>
   </body>
 </html>
+
 
 
 
