@@ -539,11 +539,12 @@ modalBody.innerHTML = `
                 <th>Customer Name</th>
                 <th>Address</th>
                 <th>City</th>
-                <th>Account #</th>
+                <th>Account No.</th>
                 <th>Telephone</th>
                 <th>CAFAC</th>
                 <th>ONU Serial</th>
                 <th>Activity</th>
+                <th>Activity Type</th>
                 <th>Status</th>
                 <th>Cluster</th>
                 <th class="text-end">Points</th>
@@ -560,6 +561,7 @@ modalBody.innerHTML = `
     <td>${valOrNoRecord(r.cafac)}</td>
     <td>${valOrNoRecord(r.onuSerial)}</td>
     <td>${valOrNoRecord(r.activity)}</td>
+    <td>${valOrNoRecord(r.activityType)}</td>
     <td>${valOrNoRecord(r.status)}</td>
     <td>${valOrNoRecord(r.cluster)}</td>
     <td class="text-end">${valOrNoRecord(r.points)}</td>
@@ -1023,6 +1025,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
