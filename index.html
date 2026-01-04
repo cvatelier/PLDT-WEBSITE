@@ -551,25 +551,32 @@ modalBody.innerHTML = `
         </thead>
         <tbody>
             ${matched.map(r => `
-                <tr class="status-${(r.status || "").replace(/\s+/g,'-').toUpperCase()}">
-                    <td>${r.customerName || ""}</td>
-                    <td>${r.address || ""}</td>
-                    <td>${r.city || ""}</td>
-                    <td>${r.accountNumber || ""}</td>
-                    <td>${r.telephone || ""}</td>
-                    <td>${r.cafac || ""}</td>
-                    <td>${r.onuSerial || ""}</td>
-                    <td>${r.activity}</td>
-                    <td>${r.status}</td>
-                    <td>${r.cluster}</td>
-                    <td class="text-end">${r.points}</td>
-                </tr>
+<tr class="status-${(r.status || "").replace(/\s+/g,'-').toUpperCase()}">
+    <td>${valOrNoRecord(r.customerName)}</td>
+    <td>${valOrNoRecord(r.address)}</td>
+    <td>${valOrNoRecord(r.city)}</td>
+    <td>${valOrNoRecord(r.accountNumber)}</td>
+    <td>${valOrNoRecord(r.telephone)}</td>
+    <td>${valOrNoRecord(r.cafac)}</td>
+    <td>${valOrNoRecord(r.onuSerial)}</td>
+    <td>${valOrNoRecord(r.activity)}</td>
+    <td>${valOrNoRecord(r.status)}</td>
+    <td>${valOrNoRecord(r.cluster)}</td>
+    <td class="text-end">${valOrNoRecord(r.points)}</td>
+</tr>
             `).join("")}
         </tbody>
         </table>
             </div>
         `;
     }
+  function valOrNoRecord(v) {
+    if (v === null || v === undefined || String(v).trim() === "") {
+        return `<span class="text-muted fst-italic">No record</span>`;
+    }
+    return v;
+}
+
 
     const modal = new bootstrap.Modal(document.getElementById("techModal"));
     modal.show();
@@ -1016,6 +1023,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
