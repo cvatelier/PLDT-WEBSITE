@@ -126,128 +126,49 @@ body { font-family:"Segoe UI", sans-serif; background:#f4f5f7; }
 
 <script>
 let employees = [
-  { 
-    name:"John Doe", role:"Technician", cluster:"A", 
-    vacation:{start:null,end:null}, shift:{start:null,end:null}, 
-    job:"Install", status:"Active", restDays:["Saturday","Sunday"] 
-  },
-  { 
-    name:"Jane Smith", role:"Technician", cluster:"B", 
-    vacation:{start:null,end:null}, shift:{start:null,end:null}, 
-    job:"Repair", status:"Vacation", restDays:["Sunday"] 
-  }
+  // ===== CLUSTER 1 =====
+  { name:"Cabrera, Mark Anthony O.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Caldona, Marc Vincent G.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Corpuz, John Patrick M.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Dizon, Richard A.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Ong, Wilson Jr. A.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Quiroz, Jason Albert A.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Siapno, Ariel E.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Siapno, Peter Bryan B.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Soriano, Marc Jefferson Z.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Sta. Maria, Luigi S.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Vergara, Jake Yvan G.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Dalope, Jerome Caesar S.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Daroy, Joeboy M.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Adona, Danica Ann L.", role:"WMA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Latina, Rhodelyn Keeshia A.", role:"WMA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Mangosong, Reggie M.", role:"WMS", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+
+  // ===== CLUSTER 2 =====
+  { name:"Aquino, Ralph Allen P.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Abalos, Jose III Q.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Cabiles, Raymond V.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Dacanay, Jayson R.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Dacasin, Edgen Derek C.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"De Guzman, Antonio Jr. Z.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Festejo, Jan Rainier B.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Idio, Christian Kenneth C.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Langit, Timothy C.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Loresco, Allan John S.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Parayno, Armel King F.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Viado, Don Maurice C.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Alanzalon, Jenine Mae G.", role:"WMA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Romero, Caesar Jim V.", role:"WMA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Mostoles, Aries V.", role:"WMS", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+
+  // ===== ZONE / SF TEAM / HEAD =====
+  { name:"Villanueva, Iris Faye M.", role:"BP", cluster:"ZONE", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Espiritu, Kristine D.", role:"ES", cluster:"ZONE", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
+  { name:"Villena, Edwin S.", role:"Head", cluster:"ZONE", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" }
 ];
-
-function formatDate(d){ 
-  if(!d) return "-";
-  const dateObj = new Date(d);
-  const mm = String(dateObj.getMonth()+1).padStart(2,'0');
-  const dd = String(dateObj.getDate()).padStart(2,'0');
-  const yyyy = dateObj.getFullYear();
-  const hh = String(dateObj.getHours()).padStart(2,'0');
-  const min = String(dateObj.getMinutes()).padStart(2,'0');
-  return `${mm}/${dd}/${yyyy} ${hh}:${min}`;
-}
-
-function renderTable(){
-  const tbody = document.getElementById('employeeTable');
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  tbody.innerHTML = '';
-  employees.forEach((e, idx)=>{
-    if(!e.name.toLowerCase().includes(search)) return;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${e.name}</td>
-      <td>${e.role}</td>
-      <td>${e.cluster}</td>
-      <td>${formatDate(e.vacation.start)} - ${formatDate(e.vacation.end)}</td>
-      <td>${formatDate(e.shift.start)} - ${formatDate(e.shift.end)}</td>
-      <td>${e.job || "-"}</td>
-      <td>${e.restDays.join(", ")}</td>
-      <td><span class="status-${e.status}">${e.status}</span></td>
-      <td>
-        <button class="btn btn-sm btn-outline-primary" onclick="openEditModal(${idx})"><i class="bi bi-pencil"></i></button>
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${idx})"><i class="bi bi-trash"></i></button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function openEditModal(idx){
-  const e = employees[idx];
-  document.getElementById('employeeIndex').value = idx;
-  document.getElementById('empName').value = e.name;
-  document.getElementById('empRole').value = e.role;
-  document.getElementById('empCluster').value = e.cluster;
-  document.getElementById('vacStart')._flatpickr.setDate(e.vacation.start);
-  document.getElementById('vacEnd')._flatpickr.setDate(e.vacation.end);
-  document.getElementById('shiftStart')._flatpickr.setDate(e.shift.start);
-  document.getElementById('shiftEnd')._flatpickr.setDate(e.shift.end);
-  document.getElementById('empJob').value = e.job;
-  
-  // Set Rest Days in multi-select
-  const options = document.getElementById('empRestDays').options;
-  for(let i=0;i<options.length;i++){
-    options[i].selected = e.restDays.includes(options[i].value);
-  }
-
-  document.getElementById('empStatus').value = e.status;
-  document.getElementById('modalTitle').innerText = "Edit Employee";
-  new bootstrap.Modal(document.getElementById('editModal')).show();
-}
-
-function openAddModal(){
-  document.getElementById('employeeIndex').value = '';
-  document.getElementById('empName').value = '';
-  document.getElementById('empRole').value = '';
-  document.getElementById('empCluster').value = '';
-  document.getElementById('vacStart')._flatpickr.clear();
-  document.getElementById('vacEnd')._flatpickr.clear();
-  document.getElementById('shiftStart')._flatpickr.clear();
-  document.getElementById('shiftEnd')._flatpickr.clear();
-  document.getElementById('empJob').value = '';
-  
-  // Clear rest days
-  const options = document.getElementById('empRestDays').options;
-  for(let i=0;i<options.length;i++){ options[i].selected = false; }
-
-  document.getElementById('empStatus').value = 'Active';
-  document.getElementById('modalTitle').innerText = "Add Employee";
-}
-
-function saveEmployee(){
-  const idx = document.getElementById('employeeIndex').value;
-  const emp = {
-    name: document.getElementById('empName').value,
-    role: document.getElementById('empRole').value,
-    cluster: document.getElementById('empCluster').value,
-    vacation: { start: document.getElementById('vacStart').value || null, end: document.getElementById('vacEnd').value || null },
-    shift: { start: document.getElementById('shiftStart').value || null, end: document.getElementById('shiftEnd').value || null },
-    job: document.getElementById('empJob').value,
-    restDays: Array.from(document.getElementById('empRestDays').selectedOptions).map(opt => opt.value),
-    status: document.getElementById('empStatus').value
-  };
-  if(idx === '') employees.push(emp);
-  else employees[idx] = emp;
-  renderTable();
-  bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-}
-
-function deleteEmployee(idx){
-  if(confirm("Are you sure you want to delete this employee?")){
-    employees.splice(idx,1);
-    renderTable();
-  }
-}
-
-// Initialize Flatpickr
-flatpickr("#vacStart", { enableTime:false, dateFormat:"m/d/Y" });
-flatpickr("#vacEnd", { enableTime:false, dateFormat:"m/d/Y" });
-flatpickr("#shiftStart", { enableTime:true, dateFormat:"m/d/Y H:i" });
-flatpickr("#shiftEnd", { enableTime:true, dateFormat:"m/d/Y H:i" });
 
 renderTable();
 </script>
 </body>
 </html>
+
