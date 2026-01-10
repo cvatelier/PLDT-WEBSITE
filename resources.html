@@ -111,27 +111,25 @@ main {
 </style>
 </head>
 <body>
-<div class="d-flex">
-
-  <!-- Sidebar -->
-  <aside id="sidebar">
-    <div class="brand">
-      <i class="bi bi-calendar-week fs-4"></i>
-      <span>Scheduler</span>
-    </div>
-
-    <ul class="nav nav-pills flex-column">
-      <li class="nav-item">
-        <a class="nav-link active" href="#">
-          <i class="bi bi-speedometer2 me-1"></i> Dashboard
+    <div class="d-flex">
+      <!-- Sidebar -->
+      <aside id="sidebar" class="d-flex flex-column p-3">
+        <a href="#" class="d-flex align-items-center mb-3 text-decoration-none">
+        <img src="logo.png" alt="Logo" style="height:40px; width:30px; object-fit:contain; margin-right:10px;">
+        <span class="fs-4 fw-bold text-white" style="line-height:40px;">PLDT</span>
         </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">
-          <i class="bi bi-people me-1"></i> Employees
-        </a>
-      </li>
-    </ul>
+        <ul class="nav nav-pills flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="index.html" id="dashboardLink">
+            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="resources.html">
+            <i class="bi bi-person-lines-fill me-1"></i> Resources
+            </a>
+          </li>
+        </ul>
   </aside>
 
   <!-- Main Content -->
@@ -327,6 +325,7 @@ renderTable();
 </script>
 </body>
 </html>
+
 
 
 
