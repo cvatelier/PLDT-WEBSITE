@@ -94,6 +94,48 @@ main {
     transform: translateX(0);
   }
 }
+.scheduler-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  user-select: none;
+}
+
+.scheduler-header,
+.scheduler-time {
+  background: #f1f3f5;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  border: 1px solid #dee2e6;
+  padding: 6px;
+}
+
+.scheduler-cell {
+  border: 1px solid #dee2e6;
+  height: 38px;
+  position: relative;
+  cursor: pointer;
+}
+
+.scheduler-cell.dragging {
+  background: #e7f1ff;
+}
+
+.block {
+  position: absolute;
+  inset: 4px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.block.shift { background: #198754; }
+.block.vacation { background: #ffc107; color:#000; }
+.block.rest { background: #dc3545; }
+.block.job { background: #0d6efd; }
 </style>
 </head>
 <body>
@@ -170,6 +212,45 @@ main {
         </thead>
         <tbody id="employeeTable"></tbody>
       </table>
+      <div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <strong>Schedule</strong>
+
+    <div class="d-flex gap-2 align-items-center">
+      <select id="employeeFilter" class="form-select form-select-sm"></select>
+
+      <button class="btn btn-sm btn-outline-secondary" onclick="prevWeek()">‹</button>
+      <span id="weekLabel" class="fw-semibold"></span>
+      <button class="btn btn-sm btn-outline-secondary" onclick="nextWeek()">›</button>
+    </div>
+  </div>
+
+  <div id="schedulerGrid" class="scheduler-grid"></div>
+</div>
+<div class="modal fade" id="assignModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Assign Schedule</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label class="fw-semibold">Type</label>
+        <select id="assignType" class="form-select mb-2">
+          <option value="shift">Shift</option>
+          <option value="vacation">Vacation</option>
+          <option value="rest">Rest Day</option>
+          <option value="job">Job</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="saveAssignment()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
       <div class="card mt-4">
   <div class="card-header d-flex justify-content-between align-items-center">
     <strong id="calendarTitle">Employee Calendar</strong>
@@ -414,10 +495,131 @@ function loadEmployeeCalendar() {
   calendar.addEventSource(events);
 }
 
+const hours = [...Array(10)].map((_,i)=>i+8);
+let currentWeek = 0;
+let selectedCells = [];
+let assignContext = null;
+
+let schedules = JSON.parse(localStorage.getItem("schedules")) || [];
+
+function saveStorage(){
+  localStorage.setItem("schedules", JSON.stringify(schedules));
+}
+
+function getWeekDates(){
+  const start = new Date();
+  start.setDate(start.getDate() - start.getDay() + 1 + currentWeek*7);
+  return [...Array(7)].map((_,i)=>{
+    const d=new Date(start);
+    d.setDate(start.getDate()+i);
+    return d;
+  });
+}
+
+function renderEmployeeFilter(){
+  const f=document.getElementById("employeeFilter");
+  f.innerHTML=`<option value="">All Employees</option>`;
+  employees.forEach((e,i)=>{
+    f.innerHTML+=`<option value="${i}">${e.name}</option>`;
+  });
+}
+
+function renderScheduler(){
+  const grid=document.getElementById("schedulerGrid");
+  grid.innerHTML="";
+  const days=getWeekDates();
+
+  document.getElementById("weekLabel").innerText =
+    days[0].toDateString()+" – "+days[6].toDateString();
+
+  grid.appendChild(document.createElement("div"));
+  days.forEach(d=>{
+    const h=document.createElement("div");
+    h.className="scheduler-header";
+    h.innerText=d.toDateString().slice(0,10);
+    grid.appendChild(h);
+  });
+
+  hours.forEach(hr=>{
+    const t=document.createElement("div");
+    t.className="scheduler-time";
+    t.innerText=(hr>12?hr-12:hr)+(hr>=12?" PM":" AM");
+    grid.appendChild(t);
+
+    days.forEach(d=>{
+      const cell=document.createElement("div");
+      cell.className="scheduler-cell";
+      cell.dataset.date=d.toISOString().slice(0,10);
+      cell.dataset.hour=hr;
+
+      cell.onmousedown=()=>startDrag(cell);
+      cell.onmouseover=()=>dragOver(cell);
+      cell.onmouseup=endDrag;
+
+      schedules.forEach(s=>{
+        if(s.date===cell.dataset.date && hr>=s.start && hr<s.end){
+          const b=document.createElement("div");
+          b.className="block "+s.type;
+          b.innerText=s.type;
+          cell.appendChild(b);
+        }
+      });
+
+      grid.appendChild(cell);
+    });
+  });
+}
+
+function startDrag(cell){
+  selectedCells=[cell];
+  cell.classList.add("dragging");
+}
+
+function dragOver(cell){
+  if(selectedCells.length){
+    if(!selectedCells.includes(cell)){
+      selectedCells.push(cell);
+      cell.classList.add("dragging");
+    }
+  }
+}
+
+function endDrag(){
+  if(!selectedCells.length) return;
+  assignContext=selectedCells;
+  new bootstrap.Modal(assignModal).show();
+}
+
+function saveAssignment(){
+  const type=document.getElementById("assignType").value;
+  const emp=document.getElementById("employeeFilter").value;
+  const date=assignContext[0].dataset.date;
+  const hrs=assignContext.map(c=>+c.dataset.hour);
+  schedules.push({
+    employeeId: emp,
+    date,
+    start: Math.min(...hrs),
+    end: Math.max(...hrs)+1,
+    type
+  });
+  saveStorage();
+  selectedCells=[];
+  bootstrap.Modal.getInstance(assignModal).hide();
+  renderScheduler();
+}
+
+function prevWeek(){ currentWeek--; renderScheduler(); }
+function nextWeek(){ currentWeek++; renderScheduler(); }
+
+document.addEventListener("DOMContentLoaded",()=>{
+  renderEmployeeFilter();
+  renderScheduler();
+});
 renderTable();
 </script>
 </body>
 </html>
+
 
 
 
