@@ -3,641 +3,267 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-<!-- Favicon -->
-<link rel="icon" type="image/png" href="logo.png">
-<title>PLDT</title>
 
-<!-- Bootstrap CSS -->
+<link rel="icon" type="image/png" href="logo.png">
+<title>PLDT Scheduler</title>
+
+<!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-<!-- Flatpickr CSS -->
-<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+
+<!-- FullCalendar -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
-  
 
 <style>
-body {
-font-family: "Segoe UI", sans-serif;
-font-size: 14px;
-background: #f8f9fa;
-color: #495057;
-}
-  
-.table thead th { background:#fff; position: sticky; top: 0; z-index: 2; }
-.status-Active { background:#d4edda; color:#155724; padding:3px 6px; border-radius:0.25rem; }
-.status-Vacation { background:#fff3cd; color:#856404; padding:3px 6px; border-radius:0.25rem; }
-.status-Inactive { background:#f8d7da; color:#721c24; padding:3px 6px; border-radius:0.25rem; }
-.modal-label { font-weight:600; }
-
-/* ===== Sidebar ===== */
-#sidebar {
-  min-width: 220px;
-  max-width: 220px;
-  height: 100vh;
-  background: #343a40;
-  color: #fff;
-  position: sticky;
-  top: 0;
+body{
+  font-family:"Segoe UI",sans-serif;
+  background:#f8f9fa;
 }
 
-#sidebar .nav-link {
-  color: #adb5bd;
-  border-radius: 6px;
-  padding: .45rem .75rem;
-  margin-bottom: 6px;
-  transition: .2s;
+/* Sidebar */
+#sidebar{
+  width:220px;
+  background:#343a40;
+  color:#fff;
+  min-height:100vh;
 }
+#sidebar .nav-link{color:#adb5bd}
+#sidebar .nav-link:hover{color:#fff}
 
-/* ===== Main ===== */
-main {
-  flex: 1;
-  padding: 1.5rem 2rem;
-}
+/* Status */
+.status-Active{background:#d4edda;color:#155724;padding:4px 6px;border-radius:4px}
+.status-Vacation{background:#fff3cd;color:#856404;padding:4px 6px;border-radius:4px}
+.status-Inactive{background:#f8d7da;color:#721c24;padding:4px 6px;border-radius:4px}
 
-/* Table tweaks */
-.table thead th {
-  background: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 2;
+/* Scheduler */
+.scheduler-grid{
+  display:grid;
+  grid-template-columns:repeat(7,36px);
+  gap:6px;
+  padding:16px;
 }
-
-.status-Active {
-  background:#d4edda;
-  color:#155724;
-  padding:3px 6px;
-  border-radius:0.25rem;
+.scheduler-header{
+  font-size:12px;
+  text-align:center;
+  font-weight:600;
 }
-.status-Vacation {
-  background:#fff3cd;
-  color:#856404;
-  padding:3px 6px;
-  border-radius:0.25rem;
+.scheduler-cell{
+  width:36px;
+  height:36px;
+  background:#e9ecef;
+  border-radius:6px;
+  cursor:pointer;
+  position:relative;
 }
-.status-Inactive {
-  background:#f8d7da;
-  color:#721c24;
-  padding:3px 6px;
-  border-radius:0.25rem;
+.scheduler-cell.dragging{
+  outline:2px solid #0d6efd;
 }
-
-/* Responsive sidebar */
-@media (max-width: 992px) {
-  #sidebar {
-    position: fixed;
-    transform: translateX(-100%);
-    transition: 0.3s;
-    z-index: 1030;
-  }
-  #sidebar.show {
-    transform: translateX(0);
-  }
+.block{
+  position:absolute;
+  inset:4px;
+  border-radius:6px;
+  color:#fff;
+  font-size:10px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-/* ===== Matrix Scheduler (No Time) ===== */
-
-.scheduler-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 36px);
-  gap: 6px;
-  padding: 16px;
-  justify-content: start;
-}
-
-.scheduler-header {
-  font-size: 12px;
-  font-weight: 600;
-  text-align: center;
-  color: #555;
-}
-
-.scheduler-cell {
-  width: 36px;
-  height: 36px;
-  background: #f1f3f5;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  transition: .15s;
-}
-
-.scheduler-cell:hover {
-  background: #e9ecef;
-}
-
-.scheduler-cell.dragging {
-  outline: 2px solid #0d6efd;
-}
-
-.block {
-  position: absolute;
-  inset: 4px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-}
-
-.block.shift { background: #198754; }
-.block.vacation { background: #ffc107; color:#000; }
-.block.rest { background: #dc3545; }
-.block.job { background: #0d6efd; }
+.block.shift{background:#198754}
+.block.vacation{background:#ffc107;color:#000}
+.block.rest{background:#dc3545}
+.block.job{background:#0d6efd}
 </style>
 </head>
+
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-    <div class="d-flex">
-      <!-- Sidebar -->
-<aside id="sidebar" class="d-flex flex-column p-3">
-  <a href="index.html" class="d-flex align-items-center mb-3 text-decoration-none">
-    <img src="logo.png" alt="Logo"
-      style="height:40px;width:30px;object-fit:contain" class="me-2">
-    <span class="fs-5 fw-bold text-white">PLDT</span>
-  </a>
+<div class="d-flex">
 
-  <ul class="nav nav-pills flex-column mb-auto">
-    <li class="nav-item">
-      <a class="nav-link" href="index.html">
-        <i class="bi bi-speedometer2 me-2"></i>
-        Dashboard
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="resources.html">
-        <i class="bi bi-person-lines-fill me-2"></i>
-        Resources
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="scheduler.html">
-        <i class="bi bi-calendar-week me-2"></i>
-        Scheduler
-      </a>
-    </li>
+<!-- SIDEBAR -->
+<aside id="sidebar" class="p-3">
+  <h5 class="text-white mb-3">PLDT</h5>
+  <ul class="nav flex-column">
+    <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
+    <li class="nav-item"><a class="nav-link" href="#">Resources</a></li>
+    <li class="nav-item"><a class="nav-link active" href="#">Scheduler</a></li>
   </ul>
 </aside>
-  <!-- Main Content -->
-  <main>
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h1 class="mb-0">Employee Scheduler</h1>
-      <input type="text" id="searchInput"
-        class="form-control w-25"
-        placeholder="Search by name"
-        onkeyup="renderTable()">
-    </div>
+<!-- MAIN -->
+<main class="flex-fill p-4">
 
-    <!-- Actions -->
-    <div class="mb-3">
-      <button class="btn btn-success"
-        data-bs-toggle="modal"
-        data-bs-target="#editModal"
-        onclick="openAddModal()">
-        <i class="bi bi-plus-circle"></i> Add Employee
-      </button>
-    </div>
+<h3>Employee Scheduler</h3>
 
-    <!-- Table -->
-    <div class="table-responsive bg-white rounded shadow-sm">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Name</th>
-            <th>Role</th>
-            <th>Cluster</th>
-            <th>Vacation</th>
-            <th>Shift</th>
-            <th>Job</th>
-            <th>Rest Days</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="employeeTable"></tbody>
-      </table>
-      <div class="card mt-4">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <strong>Schedule</strong>
-
-    <div class="d-flex gap-2 align-items-center">
-      <select id="employeeFilter" class="form-select form-select-sm"></select>
-
-      <button class="btn btn-sm btn-outline-secondary" onclick="prevWeek()">‹</button>
-      <span id="weekLabel" class="fw-semibold"></span>
-      <button class="btn btn-sm btn-outline-secondary" onclick="nextWeek()">›</button>
-    </div>
-  </div>
-
-  <div id="schedulerGrid" class="scheduler-grid"></div>
+<div class="d-flex justify-content-between mb-3">
+  <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editModal" onclick="openAddModal()">
+    <i class="bi bi-plus-circle"></i> Add Employee
+  </button>
+  <input id="searchInput" class="form-control w-25" placeholder="Search name" onkeyup="renderTable()">
 </div>
+
+<!-- TABLE -->
+<div class="table-responsive bg-white shadow-sm rounded">
+<table class="table mb-0">
+<thead class="table-light">
+<tr>
+<th>Name</th><th>Role</th><th>Cluster</th><th>Rest Days</th><th>Status</th><th>Actions</th>
+</tr>
+</thead>
+<tbody id="employeeTable"></tbody>
+</table>
+</div>
+
+<!-- SCHEDULER -->
+<div class="card mt-4">
+<div class="card-header d-flex justify-content-between">
+<strong>Schedule (No Time)</strong>
+<div class="d-flex gap-2">
+<select id="employeeFilter" class="form-select form-select-sm"></select>
+<button class="btn btn-sm btn-outline-secondary" onclick="prevWeek()">‹</button>
+<span id="weekLabel"></span>
+<button class="btn btn-sm btn-outline-secondary" onclick="nextWeek()">›</button>
+</div>
+</div>
+<div id="schedulerGrid" class="scheduler-grid"></div>
+</div>
+
+<!-- CALENDAR -->
+<div class="card mt-4">
+<div class="card-header d-flex justify-content-between">
+<strong id="calendarTitle">Employee Calendar</strong>
+<select id="employeeSelect" class="form-select w-25" onchange="loadEmployeeCalendar()"></select>
+</div>
+<div class="card-body">
+<div id="calendar"></div>
+</div>
+</div>
+
+</main>
+</div>
+
+<!-- ASSIGN MODAL -->
 <div class="modal fade" id="assignModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5>Assign Schedule</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <label class="fw-semibold">Type</label>
-        <select id="assignType" class="form-select mb-2">
-          <option value="shift">Shift</option>
-          <option value="vacation">Vacation</option>
-          <option value="rest">Rest Day</option>
-          <option value="job">Job</option>
-        </select>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" onclick="saveAssignment()">Save</button>
-      </div>
-    </div>
-  </div>
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5>Assign Schedule</h5>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+<select id="assignType" class="form-select">
+<option value="shift">Shift</option>
+<option value="vacation">Vacation</option>
+<option value="rest">Rest</option>
+<option value="job">Job</option>
+</select>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="saveAssignment()">Save</button>
+</div>
+</div>
+</div>
 </div>
 
-      <div class="card mt-4">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <strong id="calendarTitle">Employee Calendar</strong>
-    <select id="employeeSelect" class="form-select w-25" onchange="loadEmployeeCalendar()">
-      <option value="">Select Employee</option>
-    </select>
-  </div>
-  <div class="card-body">
-    <div id="calendar"></div>
-  </div>
+<!-- EMPLOYEE MODAL -->
+<div class="modal fade" id="editModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5>Add Employee</h5>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+<input id="empName" class="form-control mb-2" placeholder="Name">
+<input id="empRole" class="form-control mb-2" placeholder="Role">
+<input id="empCluster" class="form-control mb-2" placeholder="Cluster">
+</div>
+<div class="modal-footer">
+<button class="btn btn-primary" onclick="saveEmployee()">Save</button>
+</div>
+</div>
+</div>
 </div>
 
-    </div>
-
-  </main>
-</div>
-<div class="container py-4">
-  <h1 class="mb-3">Employee Scheduler</h1>
-  <div class="mb-3 d-flex justify-content-between">
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editModal" onclick="openAddModal()">
-      <i class="bi bi-plus-circle"></i> Add Employee
-    </button>
-    <input type="text" id="searchInput" class="form-control w-25" placeholder="Search by name" onkeyup="renderTable()">
-  </div>
-
-  <div class="table-responsive">
-    <table class="table table-hover">
-      <thead class="table-light">
-        <tr>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Cluster</th>
-          <th>Vacation</th>
-          <th>Shift</th>
-          <th>Job</th>
-          <th>Rest Days</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="employeeTable"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Edit/Add Modal -->
-<div class="modal fade" id="editModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalTitle">Edit Employee</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="employeeIndex">
-        <div class="mb-2">
-          <label class="modal-label">Name</label>
-          <input type="text" id="empName" class="form-control">
-        </div>
-        <div class="mb-2">
-          <label class="modal-label">Role</label>
-          <input type="text" id="empRole" class="form-control">
-        </div>
-        <div class="mb-2">
-          <label class="modal-label">Cluster</label>
-          <input type="text" id="empCluster" class="form-control">
-        </div>
-        <div class="mb-2">
-          <label class="modal-label">Vacation</label>
-          <div class="d-flex gap-2">
-            <input type="text" id="vacStart" class="form-control" placeholder="Start">
-            <input type="text" id="vacEnd" class="form-control" placeholder="End">
-          </div>
-        </div>
-        <div class="mb-2">
-          <label class="modal-label">Shift</label>
-          <div class="d-flex gap-2">
-            <input type="text" id="shiftStart" class="form-control" placeholder="Start">
-            <input type="text" id="shiftEnd" class="form-control" placeholder="End">
-          </div>
-        </div>
-        <div class="mb-2">
-          <label class="modal-label">Job</label>
-          <input type="text" id="empJob" class="form-control">
-        </div>
-        <div class="mb-2">
-          <label class="modal-label">Rest Days</label>
-          <select id="empRestDays" class="form-select" multiple>
-            <option value="Sunday">Sunday</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-          </select>
-        </div>
-        <div class="mb-2">
-          <label class="modal-label">Status</label>
-          <select id="empStatus" class="form-select">
-            <option>Active</option>
-            <option>Vacation</option>
-            <option>Inactive</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" onclick="saveEmployee()">Save</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Scripts -->
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 <script>
-let employees = [
-  // ===== CLUSTER 1 =====
-  { name:"Cabrera, Mark Anthony O.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Caldona, Marc Vincent G.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Corpuz, John Patrick M.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Dizon, Richard A.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Ong, Wilson Jr. A.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Quiroz, Jason Albert A.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Siapno, Ariel E.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Siapno, Peter Bryan B.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Soriano, Marc Jefferson Z.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Sta. Maria, Luigi S.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Vergara, Jake Yvan G.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Dalope, Jerome Caesar S.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Daroy, Joeboy M.", role:"CXSDA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Adona, Danica Ann L.", role:"WMA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Latina, Rhodelyn Keeshia A.", role:"WMA", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Mangosong, Reggie M.", role:"WMS", cluster:"CLUSTER 1", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-
-  // ===== CLUSTER 2 =====
-  { name:"Aquino, Ralph Allen P.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Abalos, Jose III Q.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Cabiles, Raymond V.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Dacanay, Jayson R.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Dacasin, Edgen Derek C.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"De Guzman, Antonio Jr. Z.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Festejo, Jan Rainier B.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Idio, Christian Kenneth C.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Langit, Timothy C.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Loresco, Allan John S.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Parayno, Armel King F.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Viado, Don Maurice C.", role:"CXSDA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Alanzalon, Jenine Mae G.", role:"WMA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Romero, Caesar Jim V.", role:"WMA", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Mostoles, Aries V.", role:"WMS", cluster:"CLUSTER 2", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-
-  // ===== ZONE / SF TEAM / HEAD =====
-  { name:"Villanueva, Iris Faye M.", role:"BP", cluster:"ZONE", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Espiritu, Kristine D.", role:"ES", cluster:"ZONE", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" },
-  { name:"Villena, Edwin S.", role:"Head", cluster:"ZONE", vacation:{start:null,end:null}, shift:{start:null,end:null}, job:"", restDays:[], status:"Active" }
+let employees=[
+{name:"Romero, Caesar",role:"WMA",cluster:"CLUSTER 2",restDays:["Sunday"],status:"Active"}
 ];
 
-let calendar;
+let schedules=JSON.parse(localStorage.getItem("schedules"))||[];
+let currentWeek=0,selectedCells=[],assignContext=[];
+const assignModal=document.getElementById("assignModal");
 
-function populateEmployeeDropdown() {
-  const select = document.getElementById("employeeSelect");
-  select.innerHTML = `<option value="">Select Employee</option>`;
-  
-  employees.forEach((emp, index) => {
-    select.innerHTML += `<option value="${index}">${emp.name}</option>`;
-  });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  populateEmployeeDropdown();
-  initCalendar();
-  renderEmployeeFilter();
-  renderScheduler();
+function renderTable(){
+const tbody=document.getElementById("employeeTable");
+tbody.innerHTML="";
+employees.forEach((e,i)=>{
+tbody.innerHTML+=`
+<tr>
+<td>${e.name}</td>
+<td>${e.role}</td>
+<td>${e.cluster}</td>
+<td>${e.restDays.join(", ")}</td>
+<td><span class="status-${e.status}">${e.status}</span></td>
+<td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
+</tr>`;
 });
-
-function initCalendar() {
-  const calendarEl = document.getElementById("calendar");
-
-  calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
-    height: "auto",
-    headerToolbar: {
-      left: "prev,next today",
-      center: "title",
-      right: "dayGridMonth,timeGridWeek,timeGridDay"
-    },
-    events: []
-  });
-
-  calendar.render();
 }
 
-function loadEmployeeCalendar() {
-  const index = document.getElementById("employeeSelect").value;
-  if (index === "") return;
-
-  const emp = employees[index];
-  document.getElementById("calendarTitle").innerText =
-    `Schedule: ${emp.name}`;
-
-  let events = [];
-
-  // Vacation
-  if (emp.vacation.start && emp.vacation.end) {
-    events.push({
-      title: "Vacation",
-      start: emp.vacation.start,
-      end: emp.vacation.end,
-      color: "#ffc107"
-    });
-  }
-
-  // Shift (example daily shift)
-  if (emp.shift.start && emp.shift.end) {
-    events.push({
-      title: `Shift (${emp.shift.start} - ${emp.shift.end})`,
-      daysOfWeek: [1,2,3,4,5], // Mon–Fri
-      startTime: emp.shift.start,
-      endTime: emp.shift.end,
-      color: "#198754"
-    });
-  }
-
-  // Rest Days
-  emp.restDays.forEach(day => {
-    const map = {
-      Sunday: 0, Monday: 1, Tuesday: 2,
-      Wednesday: 3, Thursday: 4,
-      Friday: 5, Saturday: 6
-    };
-
-    events.push({
-      title: "Rest Day",
-      daysOfWeek: [map[day]],
-      color: "#dc3545"
-    });
-  });
-
-  calendar.removeAllEvents();
-  calendar.addEventSource(events);
-}
-
-const hours = [...Array(10)].map((_,i)=>i+8);
-let currentWeek = 0;
-let selectedCells = [];
-let assignContext = null;
-
-let schedules = JSON.parse(localStorage.getItem("schedules")) || [];
-
-function saveStorage(){
-  localStorage.setItem("schedules", JSON.stringify(schedules));
+function openAddModal(){}
+function saveEmployee(){
+bootstrap.Modal.getInstance(editModal).hide();
+renderTable();
 }
 
 function getWeekDates(){
-  const start = new Date();
-  start.setDate(start.getDate() - start.getDay() + 1 + currentWeek*7);
-  return [...Array(7)].map((_,i)=>{
-    const d=new Date(start);
-    d.setDate(start.getDate()+i);
-    return d;
-  });
+const start=new Date();
+start.setDate(start.getDate()-start.getDay()+1+currentWeek*7);
+return [...Array(7)].map((_,i)=>{let d=new Date(start);d.setDate(start.getDate()+i);return d;});
 }
 
-function renderEmployeeFilter(){
-  const f=document.getElementById("employeeFilter");
-  f.innerHTML=`<option value="">All Employees</option>`;
-  employees.forEach((e,i)=>{
-    f.innerHTML+=`<option value="${i}">${e.name}</option>`;
-  });
-}
-
-function renderScheduler() {
-  const grid = document.getElementById("schedulerGrid");
-  grid.innerHTML = "";
-
-  const days = getWeekDates();
-  const rows = 6; // number of slot rows per week (visual only)
-
-  document.getElementById("weekLabel").innerText =
-    days[0].toDateString() + " – " + days[6].toDateString();
-
-  // Day headers
-  days.forEach(d => {
-    const h = document.createElement("div");
-    h.className = "scheduler-header";
-    h.innerText = d.toLocaleDateString("en-US", { weekday: "short", day: "numeric" });
-    grid.appendChild(h);
-  });
-
-  // Slot rows
-  for (let r = 0; r < rows; r++) {
-    days.forEach(d => {
-      const cell = document.createElement("div");
-      cell.className = "scheduler-cell";
-      cell.dataset.date = d.toISOString().slice(0,10);
-      cell.dataset.row = r;
-
-      cell.onmousedown = () => startDrag(cell);
-      cell.onmouseover = () => dragOver(cell);
-      cell.onmouseup = endDrag;
-
-      schedules.forEach(s => {
-        if (
-          s.date === cell.dataset.date &&
-          s.row == r
-        ) {
-          const b = document.createElement("div");
-          b.className = "block " + s.type;
-          b.innerText = s.type[0].toUpperCase();
-          cell.appendChild(b);
-        }
-      });
-
-      grid.appendChild(cell);
-    });
-  }
-}
-
-function startDrag(cell){
-  selectedCells=[cell];
-  cell.classList.add("dragging");
-}
-
-function dragOver(cell){
-  if(selectedCells.length){
-    if(!selectedCells.includes(cell)){
-      selectedCells.push(cell);
-      cell.classList.add("dragging");
-    }
-  }
-}
-
-function endDrag(){
-  if(!selectedCells.length) return;
-  assignContext=selectedCells;
-  new bootstrap.Modal(assignModal).show();
-}
-
-function saveAssignment() {
-  const type = document.getElementById("assignType").value;
-  const emp = document.getElementById("employeeFilter").value;
-
-assignContext.forEach(cell => {
-  schedules.push({
-    employeeId: emp,
-    date: cell.dataset.date,
-    row: cell.dataset.row,
-    type
-  });
+function renderScheduler(){
+const grid=document.getElementById("schedulerGrid");
+grid.innerHTML="";
+const days=getWeekDates();
+document.getElementById("weekLabel").innerText=days[0].toDateString()+" - "+days[6].toDateString();
+days.forEach(d=>{
+let h=document.createElement("div");
+h.className="scheduler-header";
+h.innerText=d.toLocaleDateString("en",{weekday:"short"});
+grid.appendChild(h);
 });
+for(let r=0;r<6;r++){
+days.forEach(d=>{
+let c=document.createElement("div");
+c.className="scheduler-cell";
+c.dataset.date=d.toISOString().slice(0,10);
+c.dataset.row=r;
+c.onmousedown=()=>{selectedCells=[c];c.classList.add("dragging");};
+c.onmouseup=()=>{assignContext=[...selectedCells];new bootstrap.Modal(assignModal).show();};
+grid.appendChild(c);
+});
+}
+}
 
-  saveStorage();
-  selectedCells = [];
-  bootstrap.Modal.getInstance(assignModal).hide();
-  renderScheduler();
-  });
+function saveAssignment(){
+assignContext.forEach(c=>{
+schedules.push({date:c.dataset.date,row:c.dataset.row,type:assignType.value});
+});
+localStorage.setItem("schedules",JSON.stringify(schedules));
+bootstrap.Modal.getInstance(assignModal).hide();
+renderScheduler();
+}
+
+function prevWeek(){currentWeek--;renderScheduler();}
+function nextWeek(){currentWeek++;renderScheduler();}
+
 renderTable();
+renderScheduler();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
