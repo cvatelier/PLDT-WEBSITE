@@ -94,41 +94,51 @@ main {
     transform: translateX(0);
   }
 }
+/* ===== Matrix Scheduler (No Time) ===== */
+
 .scheduler-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  user-select: none;
+  grid-template-columns: repeat(7, 36px);
+  gap: 6px;
+  padding: 16px;
+  justify-content: start;
 }
 
 .scheduler-header {
-  background: #f1f3f5;
-  text-align: center;
+  font-size: 12px;
   font-weight: 600;
-  font-size: 13px;
-  border: 1px solid #dee2e6;
-  padding: 8px;
+  text-align: center;
+  color: #555;
 }
 
 .scheduler-cell {
-  border: 1px solid #dee2e6;
-  height: 70px;
+  width: 36px;
+  height: 36px;
+  background: #f1f3f5;
+  border-radius: 6px;
   cursor: pointer;
   position: relative;
+  transition: .15s;
+}
+
+.scheduler-cell:hover {
+  background: #e9ecef;
 }
 
 .scheduler-cell.dragging {
-  background: #e7f1ff;
+  outline: 2px solid #0d6efd;
 }
 
 .block {
   position: absolute;
-  inset: 6px;
-  border-radius: 8px;
-  font-size: 12px;
-  color: #fff;
+  inset: 4px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #fff;
 }
 
 .block.shift { background: #198754; }
@@ -425,6 +435,8 @@ function populateEmployeeDropdown() {
 document.addEventListener("DOMContentLoaded", () => {
   populateEmployeeDropdown();
   initCalendar();
+  renderEmployeeFilter();
+  renderScheduler();
 });
 
 function initCalendar() {
@@ -528,39 +540,46 @@ function renderScheduler() {
   grid.innerHTML = "";
 
   const days = getWeekDates();
+  const rows = 6; // number of slot rows per week (visual only)
 
   document.getElementById("weekLabel").innerText =
     days[0].toDateString() + " – " + days[6].toDateString();
 
-  // Headers
+  // Day headers
   days.forEach(d => {
     const h = document.createElement("div");
     h.className = "scheduler-header";
-    h.innerText = d.toDateString().slice(0, 10);
+    h.innerText = d.toLocaleDateString("en-US", { weekday: "short", day: "numeric" });
     grid.appendChild(h);
   });
 
-  // Day cells
-  days.forEach(d => {
-    const cell = document.createElement("div");
-    cell.className = "scheduler-cell";
-    cell.dataset.date = d.toISOString().slice(0, 10);
+  // Slot rows
+  for (let r = 0; r < rows; r++) {
+    days.forEach(d => {
+      const cell = document.createElement("div");
+      cell.className = "scheduler-cell";
+      cell.dataset.date = d.toISOString().slice(0,10);
+      cell.dataset.row = r;
 
-    cell.onmousedown = () => startDrag(cell);
-    cell.onmouseover = () => dragOver(cell);
-    cell.onmouseup = endDrag;
+      cell.onmousedown = () => startDrag(cell);
+      cell.onmouseover = () => dragOver(cell);
+      cell.onmouseup = endDrag;
 
-    schedules.forEach(s => {
-      if (s.date === cell.dataset.date) {
-        const b = document.createElement("div");
-        b.className = "block " + s.type;
-        b.innerText = s.type;
-        cell.appendChild(b);
-      }
+      schedules.forEach(s => {
+        if (
+          s.date === cell.dataset.date &&
+          s.row == r
+        ) {
+          const b = document.createElement("div");
+          b.className = "block " + s.type;
+          b.innerText = s.type[0].toUpperCase();
+          cell.appendChild(b);
+        }
+      });
+
+      grid.appendChild(cell);
     });
-
-    grid.appendChild(cell);
-  });
+  }
 }
 
 function startDrag(cell){
@@ -587,13 +606,15 @@ function saveAssignment() {
   const type = document.getElementById("assignType").value;
   const emp = document.getElementById("employeeFilter").value;
 
-  assignContext.forEach(cell => {
-    schedules.push({
-      employeeId: emp,
-      date: cell.dataset.date,
-      type
-    });
+assignContext.forEach(cell => {
+  schedules.push({
+    employeeId: emp,
+    date: cell.dataset.date,
+    row: cell.dataset.row,
+    type
   });
+});
+
   saveStorage();
   selectedCells = [];
   bootstrap.Modal.getInstance(assignModal).hide();
@@ -603,6 +624,7 @@ renderTable();
 </script>
 </body>
 </html>
+
 
 
 
