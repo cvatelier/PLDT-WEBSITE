@@ -96,25 +96,24 @@ main {
 }
 .scheduler-grid {
   display: grid;
-  grid-template-columns: 80px repeat(7, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   user-select: none;
 }
 
-.scheduler-header,
-.scheduler-time {
+.scheduler-header {
   background: #f1f3f5;
   text-align: center;
   font-weight: 600;
-  font-size: 12px;
+  font-size: 13px;
   border: 1px solid #dee2e6;
-  padding: 6px;
+  padding: 8px;
 }
 
 .scheduler-cell {
   border: 1px solid #dee2e6;
-  height: 38px;
-  position: relative;
+  height: 70px;
   cursor: pointer;
+  position: relative;
 }
 
 .scheduler-cell.dragging {
@@ -123,9 +122,9 @@ main {
 
 .block {
   position: absolute;
-  inset: 4px;
-  border-radius: 6px;
-  font-size: 11px;
+  inset: 6px;
+  border-radius: 8px;
+  font-size: 12px;
   color: #fff;
   display: flex;
   align-items: center;
@@ -524,49 +523,43 @@ function renderEmployeeFilter(){
   });
 }
 
-function renderScheduler(){
-  const grid=document.getElementById("schedulerGrid");
-  grid.innerHTML="";
-  const days=getWeekDates();
+function renderScheduler() {
+  const grid = document.getElementById("schedulerGrid");
+  grid.innerHTML = "";
+
+  const days = getWeekDates();
 
   document.getElementById("weekLabel").innerText =
-    days[0].toDateString()+" – "+days[6].toDateString();
+    days[0].toDateString() + " – " + days[6].toDateString();
 
-  grid.appendChild(document.createElement("div"));
-  days.forEach(d=>{
-    const h=document.createElement("div");
-    h.className="scheduler-header";
-    h.innerText=d.toDateString().slice(0,10);
+  // Headers
+  days.forEach(d => {
+    const h = document.createElement("div");
+    h.className = "scheduler-header";
+    h.innerText = d.toDateString().slice(0, 10);
     grid.appendChild(h);
   });
 
-  hours.forEach(hr=>{
-    const t=document.createElement("div");
-    t.className="scheduler-time";
-    t.innerText=(hr>12?hr-12:hr)+(hr>=12?" PM":" AM");
-    grid.appendChild(t);
+  // Day cells
+  days.forEach(d => {
+    const cell = document.createElement("div");
+    cell.className = "scheduler-cell";
+    cell.dataset.date = d.toISOString().slice(0, 10);
 
-    days.forEach(d=>{
-      const cell=document.createElement("div");
-      cell.className="scheduler-cell";
-      cell.dataset.date=d.toISOString().slice(0,10);
-      cell.dataset.hour=hr;
+    cell.onmousedown = () => startDrag(cell);
+    cell.onmouseover = () => dragOver(cell);
+    cell.onmouseup = endDrag;
 
-      cell.onmousedown=()=>startDrag(cell);
-      cell.onmouseover=()=>dragOver(cell);
-      cell.onmouseup=endDrag;
-
-      schedules.forEach(s=>{
-        if(s.date===cell.dataset.date && hr>=s.start && hr<s.end){
-          const b=document.createElement("div");
-          b.className="block "+s.type;
-          b.innerText=s.type;
-          cell.appendChild(b);
-        }
-      });
-
-      grid.appendChild(cell);
+    schedules.forEach(s => {
+      if (s.date === cell.dataset.date) {
+        const b = document.createElement("div");
+        b.className = "block " + s.type;
+        b.innerText = s.type;
+        cell.appendChild(b);
+      }
     });
+
+    grid.appendChild(cell);
   });
 }
 
@@ -590,35 +583,27 @@ function endDrag(){
   new bootstrap.Modal(assignModal).show();
 }
 
-function saveAssignment(){
-  const type=document.getElementById("assignType").value;
-  const emp=document.getElementById("employeeFilter").value;
-  const date=assignContext[0].dataset.date;
-  const hrs=assignContext.map(c=>+c.dataset.hour);
-  schedules.push({
-    employeeId: emp,
-    date,
-    start: Math.min(...hrs),
-    end: Math.max(...hrs)+1,
-    type
+function saveAssignment() {
+  const type = document.getElementById("assignType").value;
+  const emp = document.getElementById("employeeFilter").value;
+
+  assignContext.forEach(cell => {
+    schedules.push({
+      employeeId: emp,
+      date: cell.dataset.date,
+      type
+    });
   });
   saveStorage();
-  selectedCells=[];
+  selectedCells = [];
   bootstrap.Modal.getInstance(assignModal).hide();
   renderScheduler();
 }
-
-function prevWeek(){ currentWeek--; renderScheduler(); }
-function nextWeek(){ currentWeek++; renderScheduler(); }
-
-document.addEventListener("DOMContentLoaded",()=>{
-  renderEmployeeFilter();
-  renderScheduler();
-});
 renderTable();
 </script>
 </body>
 </html>
+
 
 
 
