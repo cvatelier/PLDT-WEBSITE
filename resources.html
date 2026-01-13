@@ -92,25 +92,9 @@ body{
 <!-- MAIN -->
 <main class="flex-fill p-4">
 
-<h3>Employee Scheduler</h3>
-
+<h3>Schedule</h3>
 <div class="d-flex justify-content-between mb-3">
-  <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editModal" onclick="openAddModal()">
-    <i class="bi bi-plus-circle"></i> Add Employee
-  </button>
   <input id="searchInput" class="form-control w-25" placeholder="Search name" onkeyup="renderTable()">
-</div>
-
-<!-- TABLE -->
-<div class="table-responsive bg-white shadow-sm rounded">
-<table class="table mb-0">
-<thead class="table-light">
-<tr>
-<th>Name</th><th>Role</th><th>Cluster</th><th>Rest Days</th><th>Status</th><th>Actions</th>
-</tr>
-</thead>
-<tbody id="employeeTable"></tbody>
-</table>
 </div>
 
 <!-- SCHEDULER -->
@@ -267,4 +251,5 @@ renderScheduler();
 </script>
 </body>
 </html>
+
 
