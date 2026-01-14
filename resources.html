@@ -15,21 +15,33 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 
 <style>
-body{
-  font-family:"Segoe UI",sans-serif;
-  background:#f8f9fa;
-}
+      body {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 14px;
+      background: #f8f9fa;
+      color: #495057;
+      }
+      /* Sidebar */
+      #sidebar {
+      min-width: 220px;
+      max-width: 220px;
+      height: 100vh;
+      background: #343a40;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      }
 
-/* Sidebar */
-#sidebar{
-  width:220px;
-  background:#343a40;
-  color:#fff;
-  min-height:100vh;
-}
-#sidebar .nav-link{color:#adb5bd}
-#sidebar .nav-link:hover{color:#fff}
+      #sidebar .nav-link {
+      color: #adb5bd;
+      border-radius: 6px;
+      padding: .45rem .75rem;
+      margin-bottom: 6px;
+      transition: .2s;
+      }
 
+      #sidebar .nav-link:hover{color:#fff}
+  
 /* Status */
 .status-Active{background:#d4edda;color:#155724;padding:4px 6px;border-radius:4px}
 .status-Vacation{background:#fff3cd;color:#856404;padding:4px 6px;border-radius:4px}
@@ -289,4 +301,5 @@ renderScheduler();
 </script>
 </body>
 </html>
+
 
