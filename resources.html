@@ -158,6 +158,31 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 <script>
+
+// Track which week is currently displayed
+let currentWeek = 0;
+
+// Sample employees
+const employees = [
+  { name: "Alice" },
+  { name: "Bob" },
+  { name: "Charlie" }
+];
+
+// Load schedules from localStorage or initialize empty array
+let schedules = JSON.parse(localStorage.getItem("schedules")) || [];
+
+// Functions to navigate weeks
+function prevWeek() {
+  currentWeek--;
+  renderScheduler();
+}
+
+function nextWeek() {
+  currentWeek++;
+  renderScheduler();
+}
+
 function getWeekDates(){
   const today = new Date();
   const start = new Date(today);
@@ -237,6 +262,7 @@ renderScheduler();
 </script>
 </body>
 </html>
+
 
 
 
