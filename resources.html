@@ -80,12 +80,34 @@ body{
 <div class="d-flex">
 
 <!-- SIDEBAR -->
-<aside id="sidebar" class="p-3">
-  <h5 class="text-white mb-3">PLDT</h5>
-  <ul class="nav flex-column">
-    <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
-    <li class="nav-item"><a class="nav-link" href="#">Resources</a></li>
-    <li class="nav-item"><a class="nav-link active" href="#">Scheduler</a></li>
+<aside id="sidebar" class="d-flex flex-column p-3">
+  <a href="index.html" class="d-flex align-items-center mb-3 text-decoration-none">
+    <img src="logo.png" alt="Logo"
+      style="height:40px;width:30px;object-fit:contain" class="me-2">
+    <span class="fs-5 fw-bold text-white">PLDT</span>
+  </a>
+
+  <ul class="nav nav-pills flex-column mb-auto">
+    <li class="nav-item">
+      <a class="nav-link" href="index.html">
+        <i class="bi bi-speedometer2 me-2"></i>
+        Dashboard
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" href="resources.html">
+        <i class="bi bi-person-lines-fill me-2"></i>
+        Resources
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" href="scheduler.html">
+        <i class="bi bi-calendar-week me-2"></i>
+        Scheduler
+      </a>
+    </li>
   </ul>
 </aside>
 
@@ -267,3 +289,4 @@ renderScheduler();
 </script>
 </body>
 </html>
+
