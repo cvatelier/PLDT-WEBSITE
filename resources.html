@@ -135,27 +135,33 @@ body {
     </ul>
   </aside>
 
-  <!-- MAIN -->
-  <main class="flex-fill p-4">
-    <h3>Schedule</h3>
-    <div class="d-flex justify-content-between mb-3">
-      
-      <!-- Week Selector -->
-    <div class="d-flex gap-2 mb-3" id="weekSelector"></div>
-      <input id="searchInput" class="form-control w-25" placeholder="Search name" onkeyup="renderScheduler()">
-    </div>
+<main class="flex-fill p-4">
+  <h3>Schedule</h3>
 
-    <div class="card mt-4">
-      <div class="card-header d-flex justify-content-between">
-        <div class="d-flex gap-2">
-          <button class="btn btn-sm btn-outline-secondary" onclick="prevWeek()">‹</button>
-          <span id="weekLabel"></span>
-          <button class="btn btn-sm btn-outline-secondary" onclick="nextWeek()">›</button>
-        </div>
+  <!-- Week / Month toggle -->
+  <div class="d-flex gap-2 mb-3">
+    <button id="weekViewBtn" class="btn btn-sm btn-outline-primary active">Week</button>
+    <button id="monthViewBtn" class="btn btn-sm btn-outline-primary">Month</button>
+  </div>
+
+  <!-- Week selector + search -->
+  <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex gap-2" id="weekSelector"></div>
+    <input id="searchInput" class="form-control w-25" placeholder="Search name" onkeyup="renderScheduler()">
+  </div>
+
+  <!-- Scheduler card -->
+  <div class="card mt-4">
+    <div class="card-header d-flex justify-content-between">
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary" onclick="prevWeek()">‹</button>
+        <span id="weekLabel"></span>
+        <button class="btn btn-sm btn-outline-secondary" onclick="nextWeek()">›</button>
       </div>
-      <div id="schedulerGrid" class="scheduler-grid"></div>
     </div>
-  </main>
+    <div id="schedulerGrid" class="scheduler-grid"></div>
+  </div>
+</main>
 </div>
 
 <!-- Scripts -->
@@ -304,6 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
