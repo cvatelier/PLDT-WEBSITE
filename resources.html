@@ -50,26 +50,32 @@
 /* Scheduler */
 .scheduler-grid{
   display:grid;
-  grid-template-columns:repeat(7,36px);
+  grid-template-columns: 220px repeat(7, 1fr);
   gap:6px;
   padding:16px;
 }
+
 .scheduler-header{
   font-size:12px;
   text-align:center;
   font-weight:600;
 }
+
+.employee-name{
+  font-weight:600;
+  background:#f1f3f5;
+  padding:8px;
+  border-radius:6px;
+}
+
 .scheduler-cell{
-  width:36px;
-  height:36px;
+  height:40px;
   background:#e9ecef;
   border-radius:6px;
   cursor:pointer;
   position:relative;
 }
-.scheduler-cell.dragging{
-  outline:2px solid #0d6efd;
-}
+
 .block{
   position:absolute;
   inset:4px;
@@ -81,6 +87,7 @@
   align-items:center;
   justify-content:center;
 }
+
 .block.shift{background:#198754}
 .block.vacation{background:#ffc107;color:#000}
 .block.rest{background:#dc3545}
@@ -151,83 +158,86 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 <script>
-let employees=[
-{name:"Romero, Caesar",role:"WMA",cluster:"CLUSTER 2",restDays:["Sunday"],status:"Active"}
-];
-
-let schedules=JSON.parse(localStorage.getItem("schedules"))||[];
-let currentWeek=0,selectedCells=[],assignContext=[];
-const assignModal=document.getElementById("assignModal");
-
-function renderTable(){
-const tbody=document.getElementById("employeeTable");
-tbody.innerHTML="";
-employees.forEach((e,i)=>{
-tbody.innerHTML+=`
-<tr>
-<td>${e.name}</td>
-<td>${e.role}</td>
-<td>${e.cluster}</td>
-<td>${e.restDays.join(", ")}</td>
-<td><span class="status-${e.status}">${e.status}</span></td>
-<td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
-</tr>`;
-});
-}
-
-function openAddModal(){}
-function saveEmployee(){
-bootstrap.Modal.getInstance(editModal).hide();
-renderTable();
-}
-
 function getWeekDates(){
-const start=new Date();
-start.setDate(start.getDate()-start.getDay()+1+currentWeek*7);
-return [...Array(7)].map((_,i)=>{let d=new Date(start);d.setDate(start.getDate()+i);return d;});
+  const today = new Date();
+  const start = new Date(today);
+  // get Monday of current week
+  start.setDate(today.getDate() - today.getDay() + 1 + currentWeek * 7);
+  
+  return [...Array(7)].map((_, i) => {
+    const d = new Date(start);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
 }
 
 function renderScheduler(){
-const grid=document.getElementById("schedulerGrid");
-grid.innerHTML="";
-const days=getWeekDates();
-document.getElementById("weekLabel").innerText=days[0].toDateString()+" - "+days[6].toDateString();
-days.forEach(d=>{
-let h=document.createElement("div");
-h.className="scheduler-header";
-h.innerText=d.toLocaleDateString("en",{weekday:"short"});
-grid.appendChild(h);
-});
-for(let r=0;r<6;r++){
-days.forEach(d=>{
-let c=document.createElement("div");
-c.className="scheduler-cell";
-c.dataset.date=d.toISOString().slice(0,10);
-c.dataset.row=r;
-c.onmousedown=()=>{selectedCells=[c];c.classList.add("dragging");};
-c.onmouseup=()=>{assignContext=[...selectedCells];new bootstrap.Modal(assignModal).show();};
-grid.appendChild(c);
-});
-}
-}
+  const grid=document.getElementById("schedulerGrid");
+  grid.innerHTML="";
 
-function saveAssignment(){
-assignContext.forEach(c=>{
-schedules.push({date:c.dataset.date,row:c.dataset.row,type:assignType.value});
-});
-localStorage.setItem("schedules",JSON.stringify(schedules));
-bootstrap.Modal.getInstance(assignModal).hide();
-renderScheduler();
+  const days=getWeekDates();
+  document.getElementById("weekLabel").innerText=
+    days[0].toDateString()+" - "+days[6].toDateString();
+
+  /* EMPTY TOP-LEFT CELL */
+  grid.appendChild(document.createElement("div"));
+
+  /* WEEK HEADERS */
+  days.forEach(d=>{
+    const h=document.createElement("div");
+    h.className="scheduler-header";
+    h.innerText=d.toLocaleDateString("en",{weekday:"short",day:"numeric"});
+    grid.appendChild(h);
+  });
+
+  /* EMPLOYEE ROWS */
+  employees.forEach((emp,empIndex)=>{
+    /* EMPLOYEE NAME */
+    const nameCell=document.createElement("div");
+    nameCell.className="employee-name";
+    nameCell.innerText=emp.name;
+    grid.appendChild(nameCell);
+
+    /* DAY CELLS */
+    days.forEach(d=>{
+      const cell=document.createElement("div");
+      cell.className="scheduler-cell";
+      cell.dataset.employee=empIndex;
+      cell.dataset.date=d.toISOString().slice(0,10);
+
+      /* render saved schedules */
+      schedules
+        .filter(s=>s.employee==empIndex && s.date==cell.dataset.date)
+        .forEach(s=>{
+          const block=document.createElement("div");
+          block.className="block "+s.type;
+          block.innerText=s.type.toUpperCase();
+          cell.appendChild(block);
+        });
+
+      cell.onclick=()=>{
+        const type=prompt("Enter: shift / vacation / rest / job");
+        if(!type) return;
+
+        schedules.push({
+          employee:empIndex,
+          date:cell.dataset.date,
+          type:type
+        });
+
+        localStorage.setItem("schedules",JSON.stringify(schedules));
+        renderScheduler();
+      };
+
+      grid.appendChild(cell);
+    });
+  });
 }
-
-function prevWeek(){currentWeek--;renderScheduler();}
-function nextWeek(){currentWeek++;renderScheduler();}
-
-renderTable();
 renderScheduler();
 </script>
 </body>
 </html>
+
 
 
 
