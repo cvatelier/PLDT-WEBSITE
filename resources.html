@@ -90,7 +90,33 @@ body {
 .block.vacation { background:#ffc107; color:#000 }
 .block.rest { background:#dc3545 }
 .block.job { background:#0d6efd }
+/* Week buttons */
+.week-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  background: #f8f9fa;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
 
+.week-btn.active {
+  background: #212529;
+  color: #fff;
+  font-weight: 600;
+}
+
+.week-day {
+  font-size: 11px;
+  text-align: center;
+  margin-top: 2px;
+  color: #495057;
+}
+.week-day.today {
+  font-weight: 700;
+  color: #0d6efd;
+}
 </style>
 </head>
 <body>
@@ -113,6 +139,9 @@ body {
   <main class="flex-fill p-4">
     <h3>Schedule</h3>
     <div class="d-flex justify-content-between mb-3">
+      
+      <!-- Week Selector -->
+    <div class="d-flex gap-2 mb-3" id="weekSelector"></div>
       <input id="searchInput" class="form-control w-25" placeholder="Search name" onkeyup="renderScheduler()">
     </div>
 
@@ -133,6 +162,38 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+  function renderWeekSelector() {
+  const weekContainer = document.getElementById("weekSelector");
+  weekContainer.innerHTML = "";
+  const today = new Date();
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+  
+  const weeks = [];
+  for (let i = 1; i <= lastDate; i += 7) {
+    weeks.push(i);
+  }
+
+  weeks.forEach((startDay, index) => {
+    const btn = document.createElement("div");
+    btn.className = "week-btn" + (index === currentWeek ? " active" : "");
+    btn.innerHTML = `Week ${index + 1}`;
+    
+    const days = [...Array(7)].map((_, i) => startDay + i).filter(d => d <= lastDate);
+    const dayHtml = days.map(d => {
+      const isToday = d === today.getDate();
+      return `<div class="week-day${isToday ? " today" : ""}">${d}</div>`;
+    }).join("");
+    
+    btn.innerHTML += `<div class="d-flex gap-1 mt-1">${dayHtml}</div>`;
+    
+    btn.onclick = () => { currentWeek = index; renderScheduler(); renderWeekSelector(); };
+    weekContainer.appendChild(btn);
+  });
+}
+
+renderWeekSelector();
+
 let currentWeek = 0;
 const employees = [
   { name: "Aquino, Ralph Allen P." },
@@ -231,5 +292,6 @@ renderScheduler();
 </script>
 </body>
 </html>
+
 
 
