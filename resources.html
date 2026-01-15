@@ -152,13 +152,17 @@ body {
   background: #e9ecef;
 }
 
-/* Schedule cell colors */
-.schedule-cell.shift { background:#198754; color:#fff; }
-.schedule-cell.rest { background:#dc3545; color:#fff; }
-.schedule-cell.vacation { background:#ffc107; color:#000; }
-.schedule-cell.holiday { background:#0d6efd; color:#fff; }
+/* Schedule cell colors for each code */
+.schedule-cell.RD { background:#dc3545; color:#fff; }       /* REST DAY */
+.schedule-cell.VL { background:#ffc107; color:#000; }       /* VACATION LEAVE */
+.schedule-cell.SL { background:#fd7e14; color:#fff; }       /* SICK LEAVE */
+.schedule-cell.PL { background:#0d6efd; color:#fff; }       /* PATERNITY LEAVE */
+.schedule-cell.ML { background:#6f42c1; color:#fff; }       /* MATERNITY LEAVE */
+.schedule-cell.HO { background:#20c997; color:#fff; }       /* HOLIDAY OFF */
+.schedule-cell.LA { background:#adb5bd; color:#000; }       /* LEAVE OF ABSENCE */
+.schedule-cell.D  { background:#198754; color:#fff; }       /* DUTY */
+.schedule-cell.T  { background:#fd149f; color:#fff; }       /* TRAINING */
 
-/* Optional: smaller font for codes */
 .schedule-cell { font-size:11px; text-align:center; cursor:pointer; }
 
 /* Position row accent */
@@ -230,6 +234,7 @@ body {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
+  // Buttons
   const weekBtn = document.getElementById("weekViewBtn");
   const monthBtn = document.getElementById("monthViewBtn");
 
@@ -245,6 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMonth();
   };
 
+  // Employees
   const employees = [
     { cluster:"CLUSTER 2", name:"Aquino, Ralph Allen P.", position:"CXSDA" },
     { cluster:"CLUSTER 2", name:"Abalos, Jose III Q.", position:"CXSDA" },
@@ -263,23 +269,14 @@ document.addEventListener("DOMContentLoaded", () => {
     { cluster:"CLUSTER 2", name:"Mostoles, Aries V.", position:"WMS" }
   ];
 
+  // State
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
   const weekDays = ["M","T","W","T","F","S","S"];
   const totalCells = 35; // 5 weeks
 
-  // Schedule codes and their classes
-  const scheduleOptions = {
-    "RD":"rest", 
-    "VL":"vacation", 
-    "SL":"vacation", 
-    "PL":"vacation", 
-    "ML":"vacation", 
-    "HO":"holiday", 
-    "LA":"vacation", 
-    "D":"shift", 
-    "T":"shift"
-  };
+  // All schedule codes
+  const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
 
   // Month navigation
   window.changeMonth = dir => {
@@ -334,12 +331,12 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${emp.cluster}</td>
         <td class="text-start">${emp.name}</td>
         <td>${emp.position}</td>`;
-      
+
       for(let i=0;i<totalCells;i++){
         const day = i - startOffset +1;
         const id = `${empIndex}-${day}`;
         const value = schedules[key]?.[id];
-        tr += `<td class="schedule-cell ${value ? scheduleOptions[value] : ""}" 
+        tr += `<td class="schedule-cell ${value || ""}" 
                    data-key="${key}" 
                    data-id="${day>0 && day<=daysInMonth ? id : ""}">
                  ${value || ""}
@@ -357,28 +354,27 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".schedule-cell").forEach(cell=>{
       cell.onclick = () => {
         if(!cell.dataset.id) return;
-
-        if(cell.querySelector("select")) return; // prevent multiple selects
+        if(cell.querySelector("select")) return;
 
         const select = document.createElement("select");
-        select.style.width = "100%";
-        select.style.height = "100%";
-        select.style.fontSize = "10px";
-        select.style.textAlign = "center";
-        select.style.border = "none";
-        select.style.background = "transparent";
+        select.style.width="100%";
+        select.style.height="100%";
+        select.style.fontSize="10px";
+        select.style.textAlign="center";
+        select.style.border="none";
+        select.style.background="transparent";
 
         const emptyOpt = document.createElement("option");
         emptyOpt.value="";
         emptyOpt.innerText="";
         select.appendChild(emptyOpt);
 
-        for(let code in scheduleOptions){
+        scheduleOptions.forEach(code=>{
           const opt = document.createElement("option");
           opt.value = code;
           opt.innerText = code;
           select.appendChild(opt);
-        }
+        });
 
         cell.innerText="";
         cell.appendChild(select);
@@ -387,15 +383,14 @@ document.addEventListener("DOMContentLoaded", () => {
         select.onchange = ()=>{
           const key = cell.dataset.key;
           schedules[key] ??= {};
-          Object.values(scheduleOptions).forEach(cls => cell.classList.remove(cls));
+          scheduleOptions.forEach(c => cell.classList.remove(c));
 
           const val = select.value;
           if(!val){
             delete schedules[key][cell.dataset.id];
             cell.innerText="";
           } else {
-            const cls = scheduleOptions[val];
-            cell.classList.add(cls);
+            cell.classList.add(val);
             cell.innerText=val;
             schedules[key][cell.dataset.id] = val;
           }
@@ -408,18 +403,19 @@ document.addEventListener("DOMContentLoaded", () => {
           const key = cell.dataset.key;
           const val = schedules[key]?.[cell.dataset.id];
           cell.innerText = val || "";
-          if(val) cell.classList.add(scheduleOptions[val]);
+          if(val) cell.classList.add(val);
         };
       };
     });
   }
 
-  // Initial render
   renderMonth();
+
 });
 </script>
 </body>
 </html>
+
 
 
 
