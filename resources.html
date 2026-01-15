@@ -211,7 +211,7 @@ body {
   
   <!-- Week selector + search -->
   <div class="d-flex justify-content-between mb-3">
-    <input id="searchInput" class="form-control w-25" placeholder="Search name" onkeyup="renderScheduler()">
+    <input type="text" id="searchInput"class="form-control form-control-sm"placeholder="Search name / position / cluster">
   </div>
 </div>
   <div class="d-flex gap-2" id="weekSelector"></div>
@@ -257,6 +257,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const weekBtn  = document.getElementById("weekViewBtn");
   const monthBtn = document.getElementById("monthViewBtn");
+
+  const searchInput = document.getElementById("searchInput");
+
+  searchInput.addEventListener("input", () => {
+  applySearchFilter(searchInput.value);
+  });
 
   /* ================= HELPERS ================= */
   function save() {
@@ -363,6 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     bindClicks();
+    applySearchFilter(searchInput.value);
   }
 
   /* ================= WEEK VIEW ================= */
@@ -416,8 +423,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     bindClicks();
+    applySearchFilter(searchInput.value);
   }
+  
+  function applySearchFilter(keyword) {
+  const term = keyword.toLowerCase();
 
+  document.querySelectorAll("#monthBody tr").forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(term) ? "" : "none";
+  });
+}
+  
   /* ================= CELL DROPDOWN ================= */
   function bindClicks() {
     document.querySelectorAll(".schedule-cell").forEach(cell => {
@@ -473,6 +490,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
