@@ -238,6 +238,7 @@ body {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
+  /* ================= DATA ================= */
   const employees = [
     { cluster:"CLUSTER 2", name:"Aquino, Ralph Allen P.", position:"CXSDA" },
     { cluster:"CLUSTER 2", name:"Abalos, Jose III Q.", position:"CXSDA" },
@@ -248,28 +249,69 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
+  const weekDays = ["M","T","W","T","F","S","S"];
+
+  let viewMode = "week"; // week | month
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
 
-  function save() { localStorage.setItem("monthSchedules", JSON.stringify(schedules)); }
+  const weekBtn  = document.getElementById("weekViewBtn");
+  const monthBtn = document.getElementById("monthViewBtn");
 
-  window.changeMonth = (dir) => { currentDate.setMonth(currentDate.getMonth() + dir); renderMonth(); }
-
-  function getWeeksInMonth(year, month) {
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const startOffset = (firstDay + 6) % 7; // Monday = 0
-    return Math.ceil((daysInMonth + startOffset) / 7);
+  /* ================= HELPERS ================= */
+  function save() {
+    localStorage.setItem("monthSchedules", JSON.stringify(schedules));
   }
 
+  function mondayOfWeek(date) {
+    const d = new Date(date);
+    const day = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() - day);
+    return d;
+  }
+
+  function weeksInMonth(year, month) {
+    const first = new Date(year, month, 1).getDay();
+    const days = new Date(year, month + 1, 0).getDate();
+    const offset = (first + 6) % 7;
+    return Math.ceil((days + offset) / 7);
+  }
+
+  /* ================= NAVIGATION ================= */
+  window.changeMonth = (dir) => {
+    if (viewMode === "month") {
+      currentDate.setMonth(currentDate.getMonth() + dir);
+      renderMonth();
+    } else {
+      currentDate.setDate(currentDate.getDate() + dir * 7);
+      renderWeek();
+    }
+  };
+
+  weekBtn.onclick = () => {
+    viewMode = "week";
+    weekBtn.classList.add("active");
+    monthBtn.classList.remove("active");
+    renderWeek();
+  };
+
+  monthBtn.onclick = () => {
+    viewMode = "month";
+    currentDate.setDate(1); // IMPORTANT
+    monthBtn.classList.add("active");
+    weekBtn.classList.remove("active");
+    renderMonth();
+  };
+
+  /* ================= MONTH VIEW ================= */
   function renderMonth() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
-    const startOffset = (firstDay + 6) % 7; // Monday = 0
-    const weeksInMonth = getWeeksInMonth(year, month);
-    const totalCells = weeksInMonth * 7;
+    const startOffset = (firstDay + 6) % 7;
+    const weeks = weeksInMonth(year, month);
+    const totalCells = weeks * 7;
     const key = `${year}-${month}`;
 
     document.getElementById("monthLabel").innerText =
@@ -280,39 +322,41 @@ document.addEventListener("DOMContentLoaded", () => {
     head.innerHTML = "";
     body.innerHTML = "";
 
-    // Header rows
+    /* Headers */
     let r1 = `<tr>
       <th rowspan="3">CLUSTER</th>
       <th rowspan="3">NAME</th>
       <th rowspan="3">POSITION</th>`;
-    for(let w=1; w<=weeksInMonth; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
+    for (let w = 1; w <= weeks; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
     r1 += `</tr>`;
 
     let r2 = `<tr>`;
-    const weekDays = ["M","T","W","T","F","S","S"];
-    for(let i=0;i<totalCells;i++) r2 += `<th>${weekDays[i%7]}</th>`;
+    for (let i = 0; i < totalCells; i++) r2 += `<th>${weekDays[i % 7]}</th>`;
     r2 += `</tr>`;
 
     let r3 = `<tr>`;
-    for(let i=0;i<totalCells;i++){
+    for (let i = 0; i < totalCells; i++) {
       const day = i - startOffset + 1;
-      r3 += `<th>${day>0 && day<=daysInMonth ? day : ""}</th>`;
+      r3 += `<th>${day > 0 && day <= daysInMonth ? day : ""}</th>`;
     }
     r3 += `</tr>`;
 
     head.innerHTML = r1 + r2 + r3;
 
-    // Body
     employees.forEach((emp, empIndex) => {
       let tr = `<tr class="pos-${emp.position}">
         <td>${emp.cluster}</td>
         <td class="text-start">${emp.name}</td>
         <td>${emp.position}</td>`;
-      for(let i=0;i<totalCells;i++){
+
+      for (let i = 0; i < totalCells; i++) {
         const day = i - startOffset + 1;
-        const id = `${empIndex}-${day}`;
-        const value = schedules[key]?.[id];
-        tr += `<td class="schedule-cell ${value||""}" data-key="${key}" data-id="${day>0 && day<=daysInMonth ? id : ''}">${value||""}</td>`;
+        const id = (day > 0 && day <= daysInMonth) ? `${empIndex}-${day}` : "";
+        const val = id ? schedules[key]?.[id] || "" : "";
+
+        tr += `<td class="schedule-cell ${val}"
+          data-key="${key}"
+          data-id="${id}">${val}</td>`;
       }
       tr += `</tr>`;
       body.insertAdjacentHTML("beforeend", tr);
@@ -321,71 +365,115 @@ document.addEventListener("DOMContentLoaded", () => {
     bindClicks();
   }
 
-  function bindClicks(){
-    document.querySelectorAll(".schedule-cell").forEach(cell=>{
-      cell.onclick = ()=>{
-        if(!cell.dataset.id) return;
-        if(cell.querySelector("select")) return;
+  /* ================= WEEK VIEW ================= */
+  function renderWeek() {
+    const start = mondayOfWeek(currentDate);
+    const key = `${start.getFullYear()}-${start.getMonth()}`;
+
+    document.getElementById("monthLabel").innerText =
+      `Week of ${start.toLocaleDateString()}`;
+
+    const head = document.getElementById("monthHead");
+    const body = document.getElementById("monthBody");
+    head.innerHTML = "";
+    body.innerHTML = "";
+
+    let h1 = `<tr>
+      <th>CLUSTER</th>
+      <th>NAME</th>
+      <th>POSITION</th>`;
+    for (let i = 0; i < 7; i++) h1 += `<th>${weekDays[i]}</th>`;
+    h1 += `</tr>`;
+
+    let h2 = `<tr><th></th><th></th><th></th>`;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      h2 += `<th>${d.getDate()}</th>`;
+    }
+    h2 += `</tr>`;
+
+    head.innerHTML = h1 + h2;
+
+    employees.forEach((emp, empIndex) => {
+      let tr = `<tr class="pos-${emp.position}">
+        <td>${emp.cluster}</td>
+        <td class="text-start">${emp.name}</td>
+        <td>${emp.position}</td>`;
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        const id = `${empIndex}-${d.getDate()}`;
+        const val = schedules[key]?.[id] || "";
+
+        tr += `<td class="schedule-cell ${val}"
+          data-key="${key}"
+          data-id="${id}">${val}</td>`;
+      }
+      tr += `</tr>`;
+      body.insertAdjacentHTML("beforeend", tr);
+    });
+
+    bindClicks();
+  }
+
+  /* ================= CELL DROPDOWN ================= */
+  function bindClicks() {
+    document.querySelectorAll(".schedule-cell").forEach(cell => {
+      cell.onclick = () => {
+        if (!cell.dataset.id || cell.querySelector("select")) return;
 
         const select = document.createElement("select");
-        select.style.width="100%";
-        select.style.height="100%";
-        select.style.fontSize="10px";
-        select.style.textAlign="center";
-        select.style.border="none";
-        select.style.background="transparent";
+        select.style.width = "100%";
+        select.style.height = "100%";
+        select.style.border = "none";
+        select.style.background = "transparent";
+        select.style.fontSize = "11px";
 
-        const emptyOpt = document.createElement("option");
-        emptyOpt.value="";
-        emptyOpt.innerText="";
-        select.appendChild(emptyOpt);
+        select.innerHTML =
+          `<option value=""></option>` +
+          scheduleOptions.map(o => `<option>${o}</option>`).join("");
 
-        scheduleOptions.forEach(code=>{
-          const opt = document.createElement("option");
-          opt.value = code;
-          opt.innerText = code;
-          select.appendChild(opt);
-        });
-
-        cell.innerText="";
+        cell.innerText = "";
         cell.appendChild(select);
         select.focus();
 
-        select.onchange = ()=>{
+        select.onchange = () => {
           const key = cell.dataset.key;
           schedules[key] ??= {};
           scheduleOptions.forEach(c => cell.classList.remove(c));
 
-          const val = select.value;
-          if(!val){
+          if (!select.value) {
             delete schedules[key][cell.dataset.id];
-            cell.innerText="";
-          } else{
-            cell.classList.add(val);
-            cell.innerText = val;
-            schedules[key][cell.dataset.id] = val;
+            cell.innerText = "";
+          } else {
+            schedules[key][cell.dataset.id] = select.value;
+            cell.classList.add(select.value);
+            cell.innerText = select.value;
           }
           save();
-          cell.removeChild(select);
+          select.remove();
         };
 
-        select.onblur = ()=>{
-          cell.removeChild(select);
-          const key = cell.dataset.key;
-          const val = schedules[key]?.[cell.dataset.id];
+        select.onblur = () => {
+          select.remove();
+          const val = schedules[cell.dataset.key]?.[cell.dataset.id];
           cell.innerText = val || "";
-          if(val) cell.classList.add(val);
+          if (val) cell.classList.add(val);
         };
       };
     });
   }
 
-  renderMonth();
+  /* ================= INIT ================= */
+  renderWeek(); // ONLY initial render
 
 });
 </script>
 </body>
 </html>
+
 
 
 
