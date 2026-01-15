@@ -246,23 +246,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
-
   const weekDays = ["M","T","W","T","F","S","S"];
-  const totalCells = 35;
+  const totalCells = 35; // 5 weeks
 
   window.changeMonth = dir => {
     currentDate.setMonth(currentDate.getMonth() + dir);
-    renderMonthTable();
+    renderMonth();
   };
 
   function save() {
     localStorage.setItem("monthSchedules", JSON.stringify(schedules));
   }
 
-  function renderMonthTable() {
+  function renderMonth() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay(); // 0 = Sun
+    const startOffset = (firstDay + 6) % 7; // Convert to Mon = 0
     const key = `${year}-${month}`;
 
     document.getElementById("monthLabel").innerText =
@@ -273,7 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
     head.innerHTML = "";
     body.innerHTML = "";
 
-    /* HEADER */
+    /* ===== HEADERS ===== */
     let r1 = `<tr>
       <th rowspan="3">CLUSTER</th>
       <th rowspan="3">NAME</th>
@@ -286,27 +287,34 @@ document.addEventListener("DOMContentLoaded", () => {
     r2 += `</tr>`;
 
     let r3 = `<tr>`;
-    for (let d=1; d<=totalCells; d++) r3 += `<th>${d<=daysInMonth?d:""}</th>`;
+    for (let i=0;i<totalCells;i++) {
+      const day = i - startOffset + 1;
+      r3 += `<th>${day > 0 && day <= daysInMonth ? day : ""}</th>`;
+    }
     r3 += `</tr>`;
 
     head.innerHTML = r1 + r2 + r3;
 
-    /* BODY */
+    /* ===== BODY ===== */
     employees.forEach((emp, empIndex) => {
       let tr = `<tr class="pos-${emp.position}">
         <td>${emp.cluster}</td>
         <td class="text-start">${emp.name}</td>
         <td>${emp.position}</td>`;
 
-      for (let d=1; d<=totalCells; d++) {
-        const value = schedules[key]?.[`${empIndex}-${d}`] || "";
+      for (let i=0;i<totalCells;i++) {
+        const day = i - startOffset + 1;
+        const id = `${empIndex}-${day}`;
+        const value = schedules[key]?.[id];
+
         tr += `
-          <td class="schedule-cell ${value}"
+          <td class="schedule-cell ${value || ""}"
               data-key="${key}"
-              data-id="${empIndex}-${d}">
+              data-id="${day > 0 && day <= daysInMonth ? id : ""}">
             ${value ? value[0].toUpperCase() : ""}
           </td>`;
       }
+
       tr += `</tr>`;
       body.insertAdjacentHTML("beforeend", tr);
     });
@@ -319,14 +327,15 @@ document.addEventListener("DOMContentLoaded", () => {
       cell.onclick = () => {
         if (!cell.dataset.id) return;
 
-        const value = prompt("SHIFT / REST / VACATION (leave blank to clear)", cell.classList.contains("shift") ? "SHIFT" : "");
+        const value = prompt("SHIFT / REST / VACATION (leave blank to clear)");
         const key = cell.dataset.key;
-        schedules[key] ??= {};
 
+        schedules[key] ??= {};
         cell.classList.remove("shift","rest","vacation");
 
         if (!value) {
           delete schedules[key][cell.dataset.id];
+          cell.innerText = "";
         } else {
           const v = value.toLowerCase();
           if (!["shift","rest","vacation"].includes(v)) return;
@@ -334,17 +343,17 @@ document.addEventListener("DOMContentLoaded", () => {
           cell.classList.add(v);
           cell.innerText = v[0].toUpperCase();
         }
-
         save();
       };
     });
   }
 
-  renderMonthTable();
+  renderMonth();
 });
 </script>
 </body>
 </html>
+
 
 
 
