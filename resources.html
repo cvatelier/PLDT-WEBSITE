@@ -202,12 +202,19 @@ body {
     </div>
   </div>
 
-  <!-- Right: Month navigation -->
-  <div class="d-flex align-items-center gap-2">
-    <button class="btn btn-sm btn-outline-secondary" onclick="prevWeek()">‹</button>
-    <span id="monthLabel" class="fw-semibold"></span>
-    <button class="btn btn-sm btn-outline-secondary" onclick="nextWeek()">›</button>
-  </div>
+<!-- Month Navigation Controls -->
+<div class="d-flex align-items-center gap-2 mb-2">
+  <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(-1)">‹</button>
+  <span id="monthLabel" class="fw-semibold"></span>
+  <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(1)">›</button>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-bordered text-center align-middle small" id="monthTable">
+    <thead id="monthHead"></thead>
+    <tbody id="monthBody"></tbody>
+  </table>
+</div>
   
   <!-- Week selector + search -->
   <div class="d-flex justify-content-between mb-3">
@@ -238,7 +245,6 @@ body {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Employees
   const employees = [
     { cluster:"CLUSTER 2", name:"Aquino, Ralph Allen P.", position:"CXSDA" },
     { cluster:"CLUSTER 2", name:"Abalos, Jose III Q.", position:"CXSDA" },
@@ -257,74 +263,74 @@ document.addEventListener("DOMContentLoaded", () => {
     { cluster:"CLUSTER 2", name:"Mostoles, Aries V.", position:"WMS" }
   ];
 
+  const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
+  const totalCells = 35; // 5 weeks
+  const weekDays = ["M","T","W","T","F","S","S"];
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
-  const weekDays = ["M","T","W","T","F","S","S"];
-  const totalCells = 35; // 5 weeks
 
-  const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
-
-  // Month navigation
-  window.changeMonth = dir=>{
-    currentDate.setMonth(currentDate.getMonth()+dir);
+  // Function exposed to window so buttons can call it
+  window.changeMonth = (dir) => {
+    currentDate.setMonth(currentDate.getMonth() + dir);
     renderMonth();
   };
 
-  function save(){
+  function save() {
     localStorage.setItem("monthSchedules", JSON.stringify(schedules));
   }
 
-  function renderMonth(){
+  function renderMonth() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const daysInMonth = new Date(year, month+1,0).getDate();
-    const firstDay = new Date(year, month,1).getDay();
-    const startOffset = (firstDay+6)%7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    const startOffset = (firstDay + 6) % 7; // Monday = 0
     const key = `${year}-${month}`;
 
     document.getElementById("monthLabel").innerText =
-      currentDate.toLocaleDateString("en",{month:"long", year:"numeric"});
+      currentDate.toLocaleDateString("en", { month: "long", year: "numeric" });
 
     const head = document.getElementById("monthHead");
     const body = document.getElementById("monthBody");
-    head.innerHTML="";
-    body.innerHTML="";
+    head.innerHTML = "";
+    body.innerHTML = "";
 
-    // Headers
-    let r1=`<tr>
+    // Header rows
+    let r1 = `<tr>
       <th rowspan="3">CLUSTER</th>
       <th rowspan="3">NAME</th>
       <th rowspan="3">POSITION</th>`;
-    for(let w=1;w<=5;w++) r1+=`<th colspan="7">WEEK ${w}</th>`;
-    r1+=`</tr>`;
+    for(let w=1; w<=5; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
+    r1 += `</tr>`;
 
-    let r2=`<tr>`;
-    for(let i=0;i<totalCells;i++) r2+=`<th>${weekDays[i%7]}</th>`;
-    r2+=`</tr>`;
+    let r2 = `<tr>`;
+    for(let i=0; i<totalCells; i++) r2 += `<th>${weekDays[i%7]}</th>`;
+    r2 += `</tr>`;
 
-    let r3=`<tr>`;
-    for(let i=0;i<totalCells;i++){
-      const day = i-startOffset+1;
-      r3+=`<th>${day>0 && day<=daysInMonth? day:""}</th>`;
+    let r3 = `<tr>`;
+    for(let i=0; i<totalCells; i++){
+      const day = i - startOffset + 1;
+      r3 += `<th>${day > 0 && day <= daysInMonth ? day : ""}</th>`;
     }
-    r3+=`</tr>`;
+    r3 += `</tr>`;
 
-    head.innerHTML=r1+r2+r3;
+    head.innerHTML = r1 + r2 + r3;
 
     // Body
-    employees.forEach((emp,empIndex)=>{
-      let tr=`<tr class="pos-${emp.position}">
+    employees.forEach((emp, empIndex) => {
+      let tr = `<tr class="pos-${emp.position}">
         <td>${emp.cluster}</td>
         <td class="text-start">${emp.name}</td>
         <td>${emp.position}</td>`;
+
       for(let i=0;i<totalCells;i++){
-        const day = i-startOffset+1;
-        const id=`${empIndex}-${day}`;
+        const day = i - startOffset +1;
+        const id = `${empIndex}-${day}`;
         const value = schedules[key]?.[id];
-        tr+=`<td class="schedule-cell ${value||""}" data-key="${key}" data-id="${day>0 && day<=daysInMonth?id:""}">${value||""}</td>`;
+        tr += `<td class="schedule-cell ${value||""}" data-key="${key}" data-id="${day>0 && day<=daysInMonth?id:""}">${value||""}</td>`;
       }
-      tr+=`</tr>`;
-      body.insertAdjacentHTML("beforeend",tr);
+      tr += `</tr>`;
+      body.insertAdjacentHTML("beforeend", tr);
     });
 
     bindClicks();
@@ -336,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(!cell.dataset.id) return;
         if(cell.querySelector("select")) return;
 
-        const select=document.createElement("select");
+        const select = document.createElement("select");
         select.style.width="100%";
         select.style.height="100%";
         select.style.fontSize="10px";
@@ -344,15 +350,15 @@ document.addEventListener("DOMContentLoaded", () => {
         select.style.border="none";
         select.style.background="transparent";
 
-        const emptyOpt=document.createElement("option");
+        const emptyOpt = document.createElement("option");
         emptyOpt.value="";
         emptyOpt.innerText="";
         select.appendChild(emptyOpt);
 
         scheduleOptions.forEach(code=>{
-          const opt=document.createElement("option");
-          opt.value=code;
-          opt.innerText=code;
+          const opt = document.createElement("option");
+          opt.value = code;
+          opt.innerText = code;
           select.appendChild(opt);
         });
 
@@ -360,41 +366,42 @@ document.addEventListener("DOMContentLoaded", () => {
         cell.appendChild(select);
         select.focus();
 
-        select.onchange=()=>{
-          const key=cell.dataset.key;
-          schedules[key]??={};
-          scheduleOptions.forEach(c=>cell.classList.remove(c));
+        select.onchange = ()=>{
+          const key = cell.dataset.key;
+          schedules[key] ??= {};
+          scheduleOptions.forEach(c => cell.classList.remove(c));
 
-          const val=select.value;
+          const val = select.value;
           if(!val){
             delete schedules[key][cell.dataset.id];
             cell.innerText="";
           } else{
             cell.classList.add(val);
-            cell.innerText=val;
-            schedules[key][cell.dataset.id]=val;
+            cell.innerText = val;
+            schedules[key][cell.dataset.id] = val;
           }
           save();
           cell.removeChild(select);
         };
 
-        select.onblur=()=>{
+        select.onblur = ()=>{
           cell.removeChild(select);
-          const key=cell.dataset.key;
-          const val=schedules[key]?.[cell.dataset.id];
-          cell.innerText=val||"";
+          const key = cell.dataset.key;
+          const val = schedules[key]?.[cell.dataset.id];
+          cell.innerText = val || "";
           if(val) cell.classList.add(val);
         };
       };
     });
   }
 
+  // Initial render
   renderMonth();
-
 });
 </script>
 </body>
 </html>
+
 
 
 
