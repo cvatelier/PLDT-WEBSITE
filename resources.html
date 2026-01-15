@@ -136,13 +136,26 @@ body {
   </aside>
 
 <main class="flex-fill p-4">
-  <h3>Schedule</h3>
+<div class="d-flex align-items-center justify-content-between mb-3">
+  
+  <!-- Left: Schedule + Week | Month -->
+  <div class="d-flex align-items-center gap-3">
+    <h3 class="mb-0">Schedule</h3>
 
-  <!-- Week / Month toggle -->
-  <div class="d-flex gap-2 mb-3">
-    <button id="weekViewBtn" class="btn btn-sm btn-outline-primary active">Week</button>
-    <button id="monthViewBtn" class="btn btn-sm btn-outline-primary">Month</button>
+    <div class="btn-group btn-group-sm">
+      <button id="weekViewBtn" class="btn btn-outline-secondary active">Week</button>
+      <button id="monthViewBtn" class="btn btn-outline-secondary">Month</button>
+    </div>
   </div>
+
+  <!-- Right: Month navigation -->
+  <div class="d-flex align-items-center gap-2">
+    <button class="btn btn-sm btn-outline-secondary" onclick="prevWeek()">‹</button>
+    <span id="monthLabel" class="fw-semibold"></span>
+    <button class="btn btn-sm btn-outline-secondary" onclick="nextWeek()">›</button>
+  </div>
+
+</div>
 
   <!-- Week selector + search -->
   <div class="d-flex justify-content-between mb-3">
@@ -241,66 +254,91 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Render scheduler ---
-  function renderScheduler() {
-    const grid = document.getElementById("schedulerGrid");
-    grid.innerHTML = "";
+// --- Render scheduler ---
+function renderScheduler() {
 
-    const days = getWeekDates();
-    document.getElementById("weekLabel").innerText =
-      days[0].toLocaleDateString("en",{month:"short",day:"numeric"}) +
-      " - " +
-      days[6].toLocaleDateString("en",{month:"short",day:"numeric"});
+  const days = getWeekDates(); // ✅ MUST be first
 
-    // Top-left empty cell
-    grid.appendChild(document.createElement("div"));
+  // Month label (January 2026)
+  document.getElementById("monthLabel").innerText =
+    days[0].toLocaleDateString("en", { month: "long", year: "numeric" });
 
-    // Week headers
+  const grid = document.getElementById("schedulerGrid");
+  grid.innerHTML = "";
+
+  // Week range label
+  document.getElementById("weekLabel").innerText =
+    days[0].toLocaleDateString("en", { month: "short", day: "numeric" }) +
+    " - " +
+    days[6].toLocaleDateString("en", { month: "short", day: "numeric" });
+
+  // Top-left empty cell
+  grid.appendChild(document.createElement("div"));
+
+  // Week headers
+  days.forEach(d => {
+    const h = document.createElement("div");
+    h.className = "scheduler-header";
+    h.innerText = d.toLocaleDateString("en", {
+      weekday: "short",
+      day: "numeric"
+    });
+    grid.appendChild(h);
+  });
+
+  // Employee rows
+  employees.forEach((emp, empIndex) => {
+    const searchValue = document
+      .getElementById("searchInput")
+      .value
+      .toLowerCase();
+
+    if (!emp.name.toLowerCase().includes(searchValue)) return;
+
+    const nameCell = document.createElement("div");
+    nameCell.className = "employee-name";
+    nameCell.innerText = emp.name;
+    grid.appendChild(nameCell);
+
     days.forEach(d => {
-      const h = document.createElement("div");
-      h.className = "scheduler-header";
-      h.innerText = d.toLocaleDateString("en",{weekday:"short",day:"numeric"});
-      grid.appendChild(h);
+      const cell = document.createElement("div");
+      cell.className = "scheduler-cell";
+      cell.dataset.employee = empIndex;
+      cell.dataset.date = d.toISOString().slice(0, 10);
+
+      schedules
+        .filter(s => s.employee == empIndex && s.date == cell.dataset.date)
+        .forEach(s => {
+          const block = document.createElement("div");
+          block.className = "block " + s.type;
+          block.innerText = s.type.toUpperCase();
+          cell.appendChild(block);
+        });
+
+      cell.onclick = () => {
+        let type = prompt(
+          "Enter: shift / vacation / rest / job"
+        )?.toLowerCase();
+
+        if (!validTypes.includes(type)) {
+          alert("Invalid type! Must be shift / vacation / rest / job");
+          return;
+        }
+
+        schedules.push({
+          employee: empIndex,
+          date: cell.dataset.date,
+          type
+        });
+
+        localStorage.setItem("schedules", JSON.stringify(schedules));
+        renderScheduler();
+      };
+
+      grid.appendChild(cell);
     });
-
-    // Employee rows
-    employees.forEach((emp, empIndex) => {
-      const searchValue = document.getElementById("searchInput").value.toLowerCase();
-      if(!emp.name.toLowerCase().includes(searchValue)) return;
-
-      const nameCell = document.createElement("div");
-      nameCell.className = "employee-name";
-      nameCell.innerText = emp.name;
-      grid.appendChild(nameCell);
-
-      days.forEach(d => {
-        const cell = document.createElement("div");
-        cell.className = "scheduler-cell";
-        cell.dataset.employee = empIndex;
-        cell.dataset.date = d.toISOString().slice(0,10);
-
-        schedules
-          .filter(s => s.employee == empIndex && s.date == cell.dataset.date)
-          .forEach(s => {
-            const block = document.createElement("div");
-            block.className = "block " + s.type;
-            block.innerText = s.type.toUpperCase();
-            cell.appendChild(block);
-          });
-
-        cell.onclick = () => {
-          let type = prompt("Enter: shift / vacation / rest / job").toLowerCase();
-          if(!validTypes.includes(type)) return alert("Invalid type! Must be shift / vacation / rest / job");
-
-          schedules.push({ employee: empIndex, date: cell.dataset.date, type });
-          localStorage.setItem("schedules", JSON.stringify(schedules));
-          renderScheduler();
-        };
-
-        grid.appendChild(cell);
-      });
-    });
-  }
+  });
+}
 
   // --- Initial render ---
   renderWeekSelector();
@@ -310,6 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
