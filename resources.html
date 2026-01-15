@@ -226,6 +226,23 @@ body {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
+  // Buttons
+  const weekBtn = document.getElementById("weekViewBtn");
+  const monthBtn = document.getElementById("monthViewBtn");
+
+  weekBtn.onclick = () => {
+    weekBtn.classList.add("active");
+    monthBtn.classList.remove("active");
+    alert("Week view not implemented yet");
+  };
+
+  monthBtn.onclick = () => {
+    monthBtn.classList.add("active");
+    weekBtn.classList.remove("active");
+    renderMonth();
+  };
+
+  // Employees
   const employees = [
     { cluster:"CLUSTER 2", name:"Aquino, Ralph Allen P.", position:"CXSDA" },
     { cluster:"CLUSTER 2", name:"Abalos, Jose III Q.", position:"CXSDA" },
@@ -244,20 +261,24 @@ document.addEventListener("DOMContentLoaded", () => {
     { cluster:"CLUSTER 2", name:"Mostoles, Aries V.", position:"WMS" }
   ];
 
+  // State
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
   const weekDays = ["M","T","W","T","F","S","S"];
   const totalCells = 35; // 5 weeks
 
+  // Expose for navigation buttons
   window.changeMonth = dir => {
     currentDate.setMonth(currentDate.getMonth() + dir);
     renderMonth();
   };
 
+  // Save schedules
   function save() {
     localStorage.setItem("monthSchedules", JSON.stringify(schedules));
   }
 
+  // Render month calendar
   function renderMonth() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -266,6 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const startOffset = (firstDay + 6) % 7; // Convert to Mon = 0
     const key = `${year}-${month}`;
 
+    // Month label
     document.getElementById("monthLabel").innerText =
       currentDate.toLocaleDateString("en", { month:"long", year:"numeric" });
 
@@ -322,6 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
     bindClicks();
   }
 
+  // Cell click to set schedule
   function bindClicks() {
     document.querySelectorAll(".schedule-cell").forEach(cell => {
       cell.onclick = () => {
@@ -348,11 +371,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Initial render
   renderMonth();
+
 });
 </script>
 </body>
 </html>
+
 
 
 
