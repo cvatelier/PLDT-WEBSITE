@@ -152,10 +152,14 @@ body {
   background: #e9ecef;
 }
 
-/* Shift colors */
-.shift { background: #198754 !important; color:#fff; }
-.rest { background: #dc3545 !important; color:#fff; }
-.vacation { background: #ffc107 !important; color:#000; }
+/* Schedule cell colors */
+.schedule-cell.shift { background:#198754; color:#fff; }
+.schedule-cell.rest { background:#dc3545; color:#fff; }
+.schedule-cell.vacation { background:#ffc107; color:#000; }
+.schedule-cell.holiday { background:#0d6efd; color:#fff; }
+
+/* Optional: smaller font for codes */
+.schedule-cell { font-size:11px; text-align:center; cursor:pointer; }
 
 /* Position row accent */
 .pos-CXSDA { border-left: 4px solid #0d6efd; }
@@ -226,7 +230,6 @@ body {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Buttons
   const weekBtn = document.getElementById("weekViewBtn");
   const monthBtn = document.getElementById("monthViewBtn");
 
@@ -242,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMonth();
   };
 
-  // Employees
   const employees = [
     { cluster:"CLUSTER 2", name:"Aquino, Ralph Allen P.", position:"CXSDA" },
     { cluster:"CLUSTER 2", name:"Abalos, Jose III Q.", position:"CXSDA" },
@@ -261,46 +263,42 @@ document.addEventListener("DOMContentLoaded", () => {
     { cluster:"CLUSTER 2", name:"Mostoles, Aries V.", position:"WMS" }
   ];
 
-  // State
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
   const weekDays = ["M","T","W","T","F","S","S"];
   const totalCells = 35; // 5 weeks
 
-  // Schedule options with colors
+  // Schedule codes and their classes
   const scheduleOptions = {
-    "RD": "rest",
-    "VL": "vacation",
-    "SL": "vacation",
-    "PL": "vacation",
-    "ML": "vacation",
-    "HO": "holiday",
-    "LA": "vacation",
-    "D": "shift",
-    "T": "shift"
+    "RD":"rest", 
+    "VL":"vacation", 
+    "SL":"vacation", 
+    "PL":"vacation", 
+    "ML":"vacation", 
+    "HO":"holiday", 
+    "LA":"vacation", 
+    "D":"shift", 
+    "T":"shift"
   };
 
-  // Expose for navigation buttons
+  // Month navigation
   window.changeMonth = dir => {
     currentDate.setMonth(currentDate.getMonth() + dir);
     renderMonth();
   };
 
-  // Save schedules
   function save() {
     localStorage.setItem("monthSchedules", JSON.stringify(schedules));
   }
 
-  // Render month calendar
   function renderMonth() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay(); // 0 = Sun
-    const startOffset = (firstDay + 6) % 7; // Convert to Mon = 0
+    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+    const startOffset = (firstDay + 6) % 7; // Mon=0
     const key = `${year}-${month}`;
 
-    // Month label
     document.getElementById("monthLabel").innerText =
       currentDate.toLocaleDateString("en", { month:"long", year:"numeric" });
 
@@ -309,45 +307,43 @@ document.addEventListener("DOMContentLoaded", () => {
     head.innerHTML = "";
     body.innerHTML = "";
 
-    /* ===== HEADERS ===== */
+    // Headers
     let r1 = `<tr>
       <th rowspan="3">CLUSTER</th>
       <th rowspan="3">NAME</th>
       <th rowspan="3">POSITION</th>`;
-    for (let w=1; w<=5; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
+    for(let w=1; w<=5; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
     r1 += `</tr>`;
 
     let r2 = `<tr>`;
-    for (let i=0;i<totalCells;i++) r2 += `<th>${weekDays[i%7]}</th>`;
+    for(let i=0;i<totalCells;i++) r2 += `<th>${weekDays[i%7]}</th>`;
     r2 += `</tr>`;
 
     let r3 = `<tr>`;
-    for (let i=0;i<totalCells;i++) {
-      const day = i - startOffset + 1;
-      r3 += `<th>${day > 0 && day <= daysInMonth ? day : ""}</th>`;
+    for(let i=0;i<totalCells;i++){
+      const day = i - startOffset +1;
+      r3 += `<th>${day>0 && day<=daysInMonth ? day : ""}</th>`;
     }
     r3 += `</tr>`;
 
-    head.innerHTML = r1 + r2 + r3;
+    head.innerHTML = r1+r2+r3;
 
-    /* ===== BODY ===== */
-    employees.forEach((emp, empIndex) => {
+    // Body
+    employees.forEach((emp, empIndex)=>{
       let tr = `<tr class="pos-${emp.position}">
         <td>${emp.cluster}</td>
         <td class="text-start">${emp.name}</td>
         <td>${emp.position}</td>`;
-
-      for (let i=0;i<totalCells;i++) {
-        const day = i - startOffset + 1;
+      
+      for(let i=0;i<totalCells;i++){
+        const day = i - startOffset +1;
         const id = `${empIndex}-${day}`;
         const value = schedules[key]?.[id];
-
-        tr += `
-          <td class="schedule-cell ${value || ""}"
-              data-key="${key}"
-              data-id="${day > 0 && day <= daysInMonth ? id : ""}">
-            ${value || ""}
-          </td>`;
+        tr += `<td class="schedule-cell ${value ? scheduleOptions[value] : ""}" 
+                   data-key="${key}" 
+                   data-id="${day>0 && day<=daysInMonth ? id : ""}">
+                 ${value || ""}
+               </td>`;
       }
 
       tr += `</tr>`;
@@ -357,17 +353,13 @@ document.addEventListener("DOMContentLoaded", () => {
     bindClicks();
   }
 
-  // Cell click to set schedule with dropdown
   function bindClicks() {
-    document.querySelectorAll(".schedule-cell").forEach(cell => {
-      cell.onclick = (e) => {
-        if (!cell.dataset.id) return;
+    document.querySelectorAll(".schedule-cell").forEach(cell=>{
+      cell.onclick = () => {
+        if(!cell.dataset.id) return;
 
-        // Remove old select if exists
-        const existing = cell.querySelector("select");
-        if (existing) return;
+        if(cell.querySelector("select")) return; // prevent multiple selects
 
-        // Create dropdown
         const select = document.createElement("select");
         select.style.width = "100%";
         select.style.height = "100%";
@@ -376,51 +368,47 @@ document.addEventListener("DOMContentLoaded", () => {
         select.style.border = "none";
         select.style.background = "transparent";
 
-        const emptyOption = document.createElement("option");
-        emptyOption.value = "";
-        emptyOption.innerText = "";
-        select.appendChild(emptyOption);
+        const emptyOpt = document.createElement("option");
+        emptyOpt.value="";
+        emptyOpt.innerText="";
+        select.appendChild(emptyOpt);
 
-        for (let code in scheduleOptions) {
-          const option = document.createElement("option");
-          option.value = code;
-          option.innerText = code;
-          select.appendChild(option);
+        for(let code in scheduleOptions){
+          const opt = document.createElement("option");
+          opt.value = code;
+          opt.innerText = code;
+          select.appendChild(opt);
         }
 
-        cell.innerText = "";
+        cell.innerText="";
         cell.appendChild(select);
         select.focus();
 
-        select.onchange = () => {
+        select.onchange = ()=>{
           const key = cell.dataset.key;
           schedules[key] ??= {};
-
-          // Remove previous class
           Object.values(scheduleOptions).forEach(cls => cell.classList.remove(cls));
 
           const val = select.value;
-          if (!val) {
+          if(!val){
             delete schedules[key][cell.dataset.id];
-            cell.innerText = "";
+            cell.innerText="";
           } else {
             const cls = scheduleOptions[val];
             cell.classList.add(cls);
-            cell.innerText = val;
+            cell.innerText=val;
             schedules[key][cell.dataset.id] = val;
           }
-
           save();
           cell.removeChild(select);
         };
 
-        // Remove dropdown if clicked outside
-        select.onblur = () => {
+        select.onblur = ()=>{
           cell.removeChild(select);
           const key = cell.dataset.key;
           const val = schedules[key]?.[cell.dataset.id];
           cell.innerText = val || "";
-          if (val) cell.classList.add(scheduleOptions[val]);
+          if(val) cell.classList.add(scheduleOptions[val]);
         };
       };
     });
@@ -428,11 +416,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial render
   renderMonth();
-
 });
 </script>
 </body>
 </html>
+
 
 
 
