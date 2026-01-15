@@ -267,6 +267,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const weekDays = ["M","T","W","T","F","S","S"];
   const totalCells = 35; // 5 weeks
 
+  // Schedule options with colors
+  const scheduleOptions = {
+    "RD": "rest",
+    "VL": "vacation",
+    "SL": "vacation",
+    "PL": "vacation",
+    "ML": "vacation",
+    "HO": "holiday",
+    "LA": "vacation",
+    "D": "shift",
+    "T": "shift"
+  };
+
   // Expose for navigation buttons
   window.changeMonth = dir => {
     currentDate.setMonth(currentDate.getMonth() + dir);
@@ -333,7 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td class="schedule-cell ${value || ""}"
               data-key="${key}"
               data-id="${day > 0 && day <= daysInMonth ? id : ""}">
-            ${value ? value[0].toUpperCase() : ""}
+            ${value || ""}
           </td>`;
       }
 
@@ -344,29 +357,71 @@ document.addEventListener("DOMContentLoaded", () => {
     bindClicks();
   }
 
-  // Cell click to set schedule
+  // Cell click to set schedule with dropdown
   function bindClicks() {
     document.querySelectorAll(".schedule-cell").forEach(cell => {
-      cell.onclick = () => {
+      cell.onclick = (e) => {
         if (!cell.dataset.id) return;
 
-        const value = prompt("SHIFT / REST / VACATION (leave blank to clear)");
-        const key = cell.dataset.key;
+        // Remove old select if exists
+        const existing = cell.querySelector("select");
+        if (existing) return;
 
-        schedules[key] ??= {};
-        cell.classList.remove("shift","rest","vacation");
+        // Create dropdown
+        const select = document.createElement("select");
+        select.style.width = "100%";
+        select.style.height = "100%";
+        select.style.fontSize = "10px";
+        select.style.textAlign = "center";
+        select.style.border = "none";
+        select.style.background = "transparent";
 
-        if (!value) {
-          delete schedules[key][cell.dataset.id];
-          cell.innerText = "";
-        } else {
-          const v = value.toLowerCase();
-          if (!["shift","rest","vacation"].includes(v)) return;
-          schedules[key][cell.dataset.id] = v;
-          cell.classList.add(v);
-          cell.innerText = v[0].toUpperCase();
+        const emptyOption = document.createElement("option");
+        emptyOption.value = "";
+        emptyOption.innerText = "";
+        select.appendChild(emptyOption);
+
+        for (let code in scheduleOptions) {
+          const option = document.createElement("option");
+          option.value = code;
+          option.innerText = code;
+          select.appendChild(option);
         }
-        save();
+
+        cell.innerText = "";
+        cell.appendChild(select);
+        select.focus();
+
+        select.onchange = () => {
+          const key = cell.dataset.key;
+          schedules[key] ??= {};
+
+          // Remove previous class
+          Object.values(scheduleOptions).forEach(cls => cell.classList.remove(cls));
+
+          const val = select.value;
+          if (!val) {
+            delete schedules[key][cell.dataset.id];
+            cell.innerText = "";
+          } else {
+            const cls = scheduleOptions[val];
+            cell.classList.add(cls);
+            cell.innerText = val;
+            schedules[key][cell.dataset.id] = val;
+          }
+
+          save();
+          cell.removeChild(select);
+        };
+
+        // Remove dropdown if clicked outside
+        select.onblur = () => {
+          cell.removeChild(select);
+          const key = cell.dataset.key;
+          const val = schedules[key]?.[cell.dataset.id];
+          cell.innerText = val || "";
+          if (val) cell.classList.add(scheduleOptions[val]);
+        };
       };
     });
   }
@@ -378,6 +433,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
