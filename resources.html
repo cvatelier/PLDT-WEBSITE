@@ -240,12 +240,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= DATA ================= */
   const employees = [
-    { cluster:"Cluster 2", id:"", name:"Aquino, Ralph Allen P.", position:"CXSDA", vl:"" },
-    { cluster:"Cluster 2", id:"", name:"Abalos, Jose III Q.", position:"CXSDA", vl:"" },
-    { cluster:"Cluster 2", id:"", name:"Cabiles, Raymond V.", position:"CXSDA", vl:""  },
-    { cluster:"Cluster 2", id:"", name:"Alanzalon, Jenine Mae G.", position:"WMA", vl:""  },
-    { cluster:"Cluster 2", id:"", name:"Romero, Caesar Jim V.", position:"WMA", vl:""  },
-    { cluster:"Cluster 2", id:"", name:"Mostoles, Aries V.", position:"WMS", vl:""  }
+    { cluster:"Cluster 2", id:"548578", name:"Aquino, Ralph Allen P.", position:"CXSDA", vl:"" },
+    { cluster:"Cluster 2", id:"548576", name:"Abalos, Jose III Q.", position:"CXSDA", vl:"" },
+    { cluster:"Cluster 2", id:"548581", name:"Cabiles, Raymond V.", position:"CXSDA", vl:""  },
+    { cluster:"Cluster 2", id:"546523", name:"Alanzalon, Jenine Mae G.", position:"WMA", vl:""  },
+    { cluster:"Cluster 2", id:"548595", name:"Romero, Caesar Jim V.", position:"WMA", vl:""  },
+    { cluster:"Cluster 2", id:"541691", name:"Mostoles, Aries V.", position:"WMS", vl:""  }
   ];
 
   const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
@@ -388,9 +388,11 @@ document.addEventListener("DOMContentLoaded", () => {
     body.innerHTML = "";
 
     let h1 = `<tr>
-      <th>CLUSTER</th>
-      <th>NAME</th>
-      <th>POSITION</th>`;
+      <th>Cluster</th>
+      <th>ID Number</th>
+      <th>Name</th>
+      <th>Position</th>
+      <th>VL Count</th>`;
     for (let i = 0; i < 7; i++) h1 += `<th>${weekDays[i]}</th>`;
     h1 += `</tr>`;
 
@@ -492,6 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
