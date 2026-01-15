@@ -240,12 +240,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= DATA ================= */
   const employees = [
-    { cluster:"CLUSTER 2", name:"Aquino, Ralph Allen P.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Abalos, Jose III Q.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Cabiles, Raymond V.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Alanzalon, Jenine Mae G.", position:"WMA" },
-    { cluster:"CLUSTER 2", name:"Romero, Caesar Jim V.", position:"WMA" },
-    { cluster:"CLUSTER 2", name:"Mostoles, Aries V.", position:"WMS" }
+    { cluster:"Cluster 2", id:"", name:"Aquino, Ralph Allen P.", position:"CXSDA", vl:"" },
+    { cluster:"Cluster 2", id:"", name:"Abalos, Jose III Q.", position:"CXSDA", vl:"" },
+    { cluster:"Cluster 2", id:"", name:"Cabiles, Raymond V.", position:"CXSDA", vl:""  },
+    { cluster:"Cluster 2", id:"", name:"Alanzalon, Jenine Mae G.", position:"WMA", vl:""  },
+    { cluster:"Cluster 2", id:"", name:"Romero, Caesar Jim V.", position:"WMA", vl:""  },
+    { cluster:"Cluster 2", id:"", name:"Mostoles, Aries V.", position:"WMS", vl:""  }
   ];
 
   const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
@@ -330,9 +330,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* Headers */
     let r1 = `<tr>
-      <th rowspan="3">CLUSTER</th>
-      <th rowspan="3">NAME</th>
-      <th rowspan="3">POSITION</th>`;
+      <th rowspan="3">Cluster</th>
+      <th rowspan="3">ID Number</th>
+      <th rowspan="3">Name</th>
+      <th rowspan="3">Position</th>
+      <th rowspan="3">VL Count</th>`;
     for (let w = 1; w <= weeks; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
     r1 += `</tr>`;
 
@@ -490,6 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
