@@ -153,17 +153,20 @@ body {
 }
 
 /* Schedule cell colors for each code */
-.schedule-cell.RD { background:#dc3545; color:#fff; }       /* REST DAY */
-.schedule-cell.VL { background:#ffc107; color:#000; }       /* VACATION LEAVE */
-.schedule-cell.SL { background:#fd7e14; color:#fff; }       /* SICK LEAVE */
-.schedule-cell.PL { background:#0d6efd; color:#fff; }       /* PATERNITY LEAVE */
-.schedule-cell.ML { background:#6f42c1; color:#fff; }       /* MATERNITY LEAVE */
-.schedule-cell.HO { background:#20c997; color:#fff; }       /* HOLIDAY OFF */
-.schedule-cell.LA { background:#adb5bd; color:#000; }       /* LEAVE OF ABSENCE */
-.schedule-cell.D  { background:#198754; color:#fff; }       /* DUTY */
-.schedule-cell.T  { background:#fd149f; color:#fff; }       /* TRAINING */
+.schedule-cell.RD { background:#dc3545; color:#fff; }
+.schedule-cell.VL { background:#ffc107; color:#000; }
+.schedule-cell.SL { background:#fd7e14; color:#fff; }
+.schedule-cell.PL { background:#0d6efd; color:#fff; }
+.schedule-cell.ML { background:#6f42c1; color:#fff; }
+.schedule-cell.HO { background:#20c997; color:#fff; }
+.schedule-cell.LA { background:#adb5bd; color:#000; }
+.schedule-cell.D  { background:#198754; color:#fff; }
+.schedule-cell.T  { background:#fd149f; color:#fff; }
 
 .schedule-cell { font-size:11px; text-align:center; cursor:pointer; }
+.legend { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+.legend-item { display:flex; align-items:center; gap:4px; font-size:12px; }
+.legend-color { width:16px; height:16px; border-radius:4px; display:inline-block; }
 
 /* Position row accent */
 .pos-CXSDA { border-left: 4px solid #0d6efd; }
@@ -218,6 +221,10 @@ body {
   <div class="card-header fw-semibold">
     Monthly Schedule
   </div>
+
+  <!-- LEGEND: Place here, above the table -->
+  <div class="legend" id="colorLegend"></div>
+
   <div class="table-responsive">
     <table class="table table-bordered text-center align-middle small" id="monthTable">
       <thead id="monthHead"></thead>
@@ -233,22 +240,6 @@ body {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-
-  // Buttons
-  const weekBtn = document.getElementById("weekViewBtn");
-  const monthBtn = document.getElementById("monthViewBtn");
-
-  weekBtn.onclick = () => {
-    weekBtn.classList.add("active");
-    monthBtn.classList.remove("active");
-    alert("Week view not implemented yet");
-  };
-
-  monthBtn.onclick = () => {
-    monthBtn.classList.add("active");
-    weekBtn.classList.remove("active");
-    renderMonth();
-  };
 
   // Employees
   const employees = [
@@ -269,94 +260,112 @@ document.addEventListener("DOMContentLoaded", () => {
     { cluster:"CLUSTER 2", name:"Mostoles, Aries V.", position:"WMS" }
   ];
 
-  // State
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
   const weekDays = ["M","T","W","T","F","S","S"];
   const totalCells = 35; // 5 weeks
 
-  // All schedule codes
   const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
 
+  // Legend
+  const legendColors = {
+    "RD":"#dc3545",
+    "VL":"#ffc107",
+    "SL":"#fd7e14",
+    "PL":"#0d6efd",
+    "ML":"#6f42c1",
+    "HO":"#20c997",
+    "LA":"#adb5bd",
+    "D":"#198754",
+    "T":"#fd149f"
+  };
+
+  function renderLegend(){
+    const container = document.getElementById("colorLegend");
+    container.innerHTML="";
+    for(const code of scheduleOptions){
+      const item = document.createElement("div");
+      item.classList.add("legend-item");
+      item.innerHTML = `<span class="legend-color" style="background:${legendColors[code]}"></span>${code}`;
+      container.appendChild(item);
+    }
+  }
+
+  renderLegend();
+
   // Month navigation
-  window.changeMonth = dir => {
-    currentDate.setMonth(currentDate.getMonth() + dir);
+  window.changeMonth = dir=>{
+    currentDate.setMonth(currentDate.getMonth()+dir);
     renderMonth();
   };
 
-  function save() {
+  function save(){
     localStorage.setItem("monthSchedules", JSON.stringify(schedules));
   }
 
-  function renderMonth() {
+  function renderMonth(){
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
-    const startOffset = (firstDay + 6) % 7; // Mon=0
+    const daysInMonth = new Date(year, month+1,0).getDate();
+    const firstDay = new Date(year, month,1).getDay();
+    const startOffset = (firstDay+6)%7;
     const key = `${year}-${month}`;
 
     document.getElementById("monthLabel").innerText =
-      currentDate.toLocaleDateString("en", { month:"long", year:"numeric" });
+      currentDate.toLocaleDateString("en",{month:"long", year:"numeric"});
 
     const head = document.getElementById("monthHead");
     const body = document.getElementById("monthBody");
-    head.innerHTML = "";
-    body.innerHTML = "";
+    head.innerHTML="";
+    body.innerHTML="";
 
     // Headers
-    let r1 = `<tr>
+    let r1=`<tr>
       <th rowspan="3">CLUSTER</th>
       <th rowspan="3">NAME</th>
       <th rowspan="3">POSITION</th>`;
-    for(let w=1; w<=5; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
-    r1 += `</tr>`;
+    for(let w=1;w<=5;w++) r1+=`<th colspan="7">WEEK ${w}</th>`;
+    r1+=`</tr>`;
 
-    let r2 = `<tr>`;
-    for(let i=0;i<totalCells;i++) r2 += `<th>${weekDays[i%7]}</th>`;
-    r2 += `</tr>`;
+    let r2=`<tr>`;
+    for(let i=0;i<totalCells;i++) r2+=`<th>${weekDays[i%7]}</th>`;
+    r2+=`</tr>`;
 
-    let r3 = `<tr>`;
+    let r3=`<tr>`;
     for(let i=0;i<totalCells;i++){
-      const day = i - startOffset +1;
-      r3 += `<th>${day>0 && day<=daysInMonth ? day : ""}</th>`;
+      const day = i-startOffset+1;
+      r3+=`<th>${day>0 && day<=daysInMonth? day:""}</th>`;
     }
-    r3 += `</tr>`;
+    r3+=`</tr>`;
 
-    head.innerHTML = r1+r2+r3;
+    head.innerHTML=r1+r2+r3;
 
     // Body
-    employees.forEach((emp, empIndex)=>{
-      let tr = `<tr class="pos-${emp.position}">
+    employees.forEach((emp,empIndex)=>{
+      let tr=`<tr class="pos-${emp.position}">
         <td>${emp.cluster}</td>
         <td class="text-start">${emp.name}</td>
         <td>${emp.position}</td>`;
-
       for(let i=0;i<totalCells;i++){
-        const day = i - startOffset +1;
-        const id = `${empIndex}-${day}`;
+        const day = i-startOffset+1;
+        const id=`${empIndex}-${day}`;
         const value = schedules[key]?.[id];
-        tr += `<td class="schedule-cell ${value || ""}" 
-                   data-key="${key}" 
-                   data-id="${day>0 && day<=daysInMonth ? id : ""}">
-                 ${value || ""}
-               </td>`;
+        tr+=`<td class="schedule-cell ${value||""}" data-key="${key}" data-id="${day>0 && day<=daysInMonth?id:""}">${value||""}</td>`;
       }
-
-      tr += `</tr>`;
-      body.insertAdjacentHTML("beforeend", tr);
+      tr+=`</tr>`;
+      body.insertAdjacentHTML("beforeend",tr);
     });
 
     bindClicks();
   }
 
-  function bindClicks() {
+  function bindClicks(){
     document.querySelectorAll(".schedule-cell").forEach(cell=>{
-      cell.onclick = () => {
+      cell.onclick = ()=>{
         if(!cell.dataset.id) return;
         if(cell.querySelector("select")) return;
 
-        const select = document.createElement("select");
+        const select=document.createElement("select");
         select.style.width="100%";
         select.style.height="100%";
         select.style.fontSize="10px";
@@ -364,15 +373,15 @@ document.addEventListener("DOMContentLoaded", () => {
         select.style.border="none";
         select.style.background="transparent";
 
-        const emptyOpt = document.createElement("option");
+        const emptyOpt=document.createElement("option");
         emptyOpt.value="";
         emptyOpt.innerText="";
         select.appendChild(emptyOpt);
 
         scheduleOptions.forEach(code=>{
-          const opt = document.createElement("option");
-          opt.value = code;
-          opt.innerText = code;
+          const opt=document.createElement("option");
+          opt.value=code;
+          opt.innerText=code;
           select.appendChild(opt);
         });
 
@@ -380,29 +389,29 @@ document.addEventListener("DOMContentLoaded", () => {
         cell.appendChild(select);
         select.focus();
 
-        select.onchange = ()=>{
-          const key = cell.dataset.key;
-          schedules[key] ??= {};
-          scheduleOptions.forEach(c => cell.classList.remove(c));
+        select.onchange=()=>{
+          const key=cell.dataset.key;
+          schedules[key]??={};
+          scheduleOptions.forEach(c=>cell.classList.remove(c));
 
-          const val = select.value;
+          const val=select.value;
           if(!val){
             delete schedules[key][cell.dataset.id];
             cell.innerText="";
-          } else {
+          } else{
             cell.classList.add(val);
             cell.innerText=val;
-            schedules[key][cell.dataset.id] = val;
+            schedules[key][cell.dataset.id]=val;
           }
           save();
           cell.removeChild(select);
         };
 
-        select.onblur = ()=>{
+        select.onblur=()=>{
           cell.removeChild(select);
-          const key = cell.dataset.key;
-          const val = schedules[key]?.[cell.dataset.id];
-          cell.innerText = val || "";
+          const key=cell.dataset.key;
+          const val=schedules[key]?.[cell.dataset.id];
+          cell.innerText=val||"";
           if(val) cell.classList.add(val);
         };
       };
@@ -415,6 +424,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
