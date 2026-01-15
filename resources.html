@@ -237,91 +237,68 @@ body {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-
-  /* ================= DATA ================= */
+  /* ========== DATA ========== */
   const employees = [
     { cluster:"Cluster 2", id:"548578", name:"Aquino, Ralph Allen P.", position:"CXSDA", vl:"" },
     { cluster:"Cluster 2", id:"548576", name:"Abalos, Jose III Q.", position:"CXSDA", vl:"" },
-    { cluster:"Cluster 2", id:"548581", name:"Cabiles, Raymond V.", position:"CXSDA", vl:""  },
-    { cluster:"Cluster 2", id:"546523", name:"Alanzalon, Jenine Mae G.", position:"WMA", vl:""  },
-    { cluster:"Cluster 2", id:"548595", name:"Romero, Caesar Jim V.", position:"WMA", vl:""  },
-    { cluster:"Cluster 2", id:"541691", name:"Mostoles, Aries V.", position:"WMS", vl:""  }
+    { cluster:"Cluster 2", id:"548581", name:"Cabiles, Raymond V.", position:"CXSDA", vl:"" },
+    { cluster:"Cluster 2", id:"546523", name:"Alanzalon, Jenine Mae G.", position:"WMA", vl:"" },
+    { cluster:"Cluster 2", id:"548595", name:"Romero, Caesar Jim V.", position:"WMA", vl:"" },
+    { cluster:"Cluster 2", id:"541691", name:"Mostoles, Aries V.", position:"WMS", vl:"" }
   ];
 
   const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
   const weekDays = ["M","T","W","T","F","S","S"];
 
-  let viewMode = "week"; // week | month
+  let viewMode = "week";
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
 
   const weekBtn  = document.getElementById("weekViewBtn");
   const monthBtn = document.getElementById("monthViewBtn");
-
   const searchInput = document.getElementById("searchInput");
 
-  searchInput.addEventListener("input", () => {
-  applySearchFilter(searchInput.value);
-  });
+  searchInput.addEventListener("input", () => { applySearchFilter(searchInput.value); });
 
-  /* ================= HELPERS ================= */
-  function save() {
-    localStorage.setItem("monthSchedules", JSON.stringify(schedules));
-  }
+  /* ========== HELPERS ========== */
+  function save() { localStorage.setItem("monthSchedules", JSON.stringify(schedules)); }
 
   function mondayOfWeek(date) {
     const d = new Date(date);
-    const day = (d.getDay() + 6) % 7;
-    d.setDate(d.getDate() - day);
+    const day = (d.getDay()+6)%7;
+    d.setDate(d.getDate()-day);
     return d;
   }
 
   function weeksInMonth(year, month) {
     const first = new Date(year, month, 1).getDay();
-    const days = new Date(year, month + 1, 0).getDate();
-    const offset = (first + 6) % 7;
-    return Math.ceil((days + offset) / 7);
+    const days = new Date(year, month+1,0).getDate();
+    const offset = (first+6)%7;
+    return Math.ceil((days+offset)/7);
   }
 
-  /* ================= NAVIGATION ================= */
-  window.changeMonth = (dir) => {
-    if (viewMode === "month") {
-      currentDate.setMonth(currentDate.getMonth() + dir);
-      renderMonth();
-    } else {
-      currentDate.setDate(currentDate.getDate() + dir * 7);
-      renderWeek();
-    }
+  /* ========== NAVIGATION ========== */
+  window.changeMonth = dir => {
+    if(viewMode==="month"){ currentDate.setMonth(currentDate.getMonth()+dir); renderMonth(); }
+    else { currentDate.setDate(currentDate.getDate()+dir*7); renderWeek(); }
   };
 
-  weekBtn.onclick = () => {
-    viewMode = "week";
-    weekBtn.classList.add("active");
-    monthBtn.classList.remove("active");
-    renderWeek();
-  };
+  weekBtn.onclick = () => { viewMode="week"; weekBtn.classList.add("active"); monthBtn.classList.remove("active"); renderWeek(); };
+  monthBtn.onclick = () => { viewMode="month"; currentDate.setDate(1); monthBtn.classList.add("active"); weekBtn.classList.remove("active"); renderMonth(); };
 
-  monthBtn.onclick = () => {
-    viewMode = "month";
-    currentDate.setDate(1); // IMPORTANT
-    monthBtn.classList.add("active");
-    weekBtn.classList.remove("active");
-    renderMonth();
-  };
-
-  /* ================= MONTH VIEW ================= */
-  function renderMonth() {
+  /* ========== MONTH VIEW ========== */
+  function renderMonth(){
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay();
-    const startOffset = (firstDay + 6) % 7;
+    const daysInMonth = new Date(year, month+1,0).getDate();
+    const firstDay = new Date(year, month,1).getDay();
+    const startOffset = (firstDay+6)%7;
     const weeks = weeksInMonth(year, month);
-    const totalCells = weeks * 7;
+    const totalCells = weeks*7;
     const key = `${year}-${month}`;
 
     document.getElementById("monthLabel").innerText =
-      currentDate.toLocaleDateString("en", { month:"long", year:"numeric" });
+      currentDate.toLocaleDateString("en",{month:"long",year:"numeric"});
 
     const head = document.getElementById("monthHead");
     const body = document.getElementById("monthBody");
@@ -335,165 +312,116 @@ document.addEventListener("DOMContentLoaded", () => {
       <th rowspan="3">Name</th>
       <th rowspan="3">Position</th>
       <th rowspan="3">VL Count</th>`;
-    for (let w = 1; w <= weeks; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
-    r1 += `</tr>`;
+    for(let w=1; w<=weeks; w++) r1+=`<th colspan="7">WEEK ${w}</th>`;
+    r1+=`</tr>`;
 
-    let r2 = `<tr>`;
-    for (let i = 0; i < totalCells; i++) r2 += `<th>${weekDays[i % 7]}</th>`;
-    r2 += `</tr>`;
+    let r2 = `<tr>`; for(let i=0;i<totalCells;i++) r2+=`<th>${weekDays[i%7]}</th>`; r2+=`</tr>`;
+    let r3 = `<tr>`; for(let i=0;i<totalCells;i++){ const day=i-startOffset+1; r3+=`<th>${day>0&&day<=daysInMonth?day:""}</th>`;} r3+=`</tr>`;
+    head.innerHTML = r1+r2+r3;
 
-    let r3 = `<tr>`;
-    for (let i = 0; i < totalCells; i++) {
-      const day = i - startOffset + 1;
-      r3 += `<th>${day > 0 && day <= daysInMonth ? day : ""}</th>`;
-    }
-    r3 += `</tr>`;
-
-    head.innerHTML = r1 + r2 + r3;
-
-    employees.forEach((emp, empIndex) => {
-      let tr = `<tr class="pos-${emp.position}">
+    employees.forEach((emp,empIndex)=>{
+      const vlCount = Object.values(schedules[key]||{}).filter(v=>v==="VL"&&v.startsWith(`${empIndex}-`)).length;
+      let tr=`<tr class="pos-${emp.position}">
         <td>${emp.cluster}</td>
+        <td>${emp.id}</td>
         <td class="text-start">${emp.name}</td>
-        <td>${emp.position}</td>`;
-
-      for (let i = 0; i < totalCells; i++) {
-        const day = i - startOffset + 1;
-        const id = (day > 0 && day <= daysInMonth) ? `${empIndex}-${day}` : "";
-        const val = id ? schedules[key]?.[id] || "" : "";
-
-        tr += `<td class="schedule-cell ${val}"
-          data-key="${key}"
-          data-id="${id}">${val}</td>`;
+        <td>${emp.position}</td>
+        <td class="fw-semibold">${vlCount}</td>`;
+      for(let i=0;i<totalCells;i++){
+        const day=i-startOffset+1;
+        const id=(day>0&&day<=daysInMonth)?`${empIndex}-${day}`:"";
+        const val=id?schedules[key]?.[id]||"":"";
+        tr+=`<td class="schedule-cell ${val}" data-key="${key}" data-id="${id}">${val}</td>`;
       }
-      tr += `</tr>`;
-      body.insertAdjacentHTML("beforeend", tr);
+      tr+=`</tr>`;
+      body.insertAdjacentHTML("beforeend",tr);
     });
-
     bindClicks();
     applySearchFilter(searchInput.value);
   }
 
-  /* ================= WEEK VIEW ================= */
-  function renderWeek() {
+  /* ========== WEEK VIEW ========== */
+  function renderWeek(){
     const start = mondayOfWeek(currentDate);
     const key = `${start.getFullYear()}-${start.getMonth()}`;
+    document.getElementById("monthLabel").innerText=`Week of ${start.toLocaleDateString()}`;
 
-    document.getElementById("monthLabel").innerText =
-      `Week of ${start.toLocaleDateString()}`;
+    const head=document.getElementById("monthHead");
+    const body=document.getElementById("monthBody");
+    head.innerHTML=""; body.innerHTML="";
 
-    const head = document.getElementById("monthHead");
-    const body = document.getElementById("monthBody");
-    head.innerHTML = "";
-    body.innerHTML = "";
+    let h1=`<tr>
+      <th>Cluster</th><th>ID Number</th><th>Name</th><th>Position</th><th>VL Count</th>`;
+    for(let i=0;i<7;i++) h1+=`<th>${weekDays[i]}</th>`; h1+=`</tr>`;
 
-    let h1 = `<tr>
-      <th>Cluster</th>
-      <th>ID Number</th>
-      <th>Name</th>
-      <th>Position</th>
-      <th>VL Count</th>`;
-    for (let i = 0; i < 7; i++) h1 += `<th>${weekDays[i]}</th>`;
-    h1 += `</tr>`;
+    let h2=`<tr><th></th><th></th><th></th><th></th><th></th>`;
+    for(let i=0;i<7;i++){ const d=new Date(start); d.setDate(start.getDate()+i); h2+=`<th>${d.getDate()}</th>`; }
+    h2+=`</tr>`; head.innerHTML=h1+h2;
 
-    let h2 = `<tr><th></th><th></th><th></th>`;
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      h2 += `<th>${d.getDate()}</th>`;
-    }
-    h2 += `</tr>`;
-
-    head.innerHTML = h1 + h2;
-
-    employees.forEach((emp, empIndex) => {
-      let tr = `<tr class="pos-${emp.position}">
-        <td>${emp.cluster}</td>
-        <td class="text-start">${emp.name}</td>
-        <td>${emp.position}</td>`;
-
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(start);
-        d.setDate(start.getDate() + i);
-        const id = `${empIndex}-${d.getDate()}`;
-        const val = schedules[key]?.[id] || "";
-
-        tr += `<td class="schedule-cell ${val}"
-          data-key="${key}"
-          data-id="${id}">${val}</td>`;
+    employees.forEach((emp,empIndex)=>{
+      const vlCount = Object.values(schedules[key]||{}).filter(v=>v==="VL"&&v.startsWith(`${empIndex}-`)).length;
+      let tr=`<tr class="pos-${emp.position}">
+        <td>${emp.cluster}</td><td>${emp.id}</td><td class="text-start">${emp.name}</td><td>${emp.position}</td><td class="fw-semibold">${vlCount}</td>`;
+      for(let i=0;i<7;i++){
+        const d=new Date(start); d.setDate(start.getDate()+i);
+        const id=`${empIndex}-${d.getDate()}`;
+        const val=schedules[key]?.[id]||"";
+        tr+=`<td class="schedule-cell ${val}" data-key="${key}" data-id="${id}">${val}</td>`;
       }
-      tr += `</tr>`;
-      body.insertAdjacentHTML("beforeend", tr);
+      tr+=`</tr>`; body.insertAdjacentHTML("beforeend",tr);
     });
-
     bindClicks();
     applySearchFilter(searchInput.value);
   }
-  
-  function applySearchFilter(keyword) {
-  const term = keyword.toLowerCase();
 
-  document.querySelectorAll("#monthBody tr").forEach(row => {
-    const text = row.innerText.toLowerCase();
-    row.style.display = text.includes(term) ? "" : "none";
-  });
-}
-  
-  /* ================= CELL DROPDOWN ================= */
-  function bindClicks() {
-    document.querySelectorAll(".schedule-cell").forEach(cell => {
-      cell.onclick = () => {
-        if (!cell.dataset.id || cell.querySelector("select")) return;
+  /* ========== SEARCH FILTER ========== */
+  function applySearchFilter(keyword){
+    const term=keyword.toLowerCase();
+    document.querySelectorAll("#monthBody tr").forEach(row=>{
+      const text=row.innerText.toLowerCase();
+      row.style.display=text.includes(term)?"":"none";
+    });
+  }
 
-        const select = document.createElement("select");
-        select.style.width = "100%";
-        select.style.height = "100%";
-        select.style.border = "none";
-        select.style.background = "transparent";
-        select.style.fontSize = "11px";
+  /* ========== CELL DROPDOWN ========== */
+  function bindClicks(){
+    document.querySelectorAll(".schedule-cell").forEach(cell=>{
+      cell.onclick=()=>{
+        if(!cell.dataset.id||cell.querySelector("select")) return;
+        const select=document.createElement("select");
+        select.style.width="100%";
+        select.style.height="100%";
+        select.style.border="none";
+        select.style.background="transparent";
+        select.style.fontSize="11px";
+        select.innerHTML=`<option value=""></option>`+scheduleOptions.map(o=>`<option>${o}</option>`).join("");
+        cell.innerText=""; cell.appendChild(select); select.focus();
 
-        select.innerHTML =
-          `<option value=""></option>` +
-          scheduleOptions.map(o => `<option>${o}</option>`).join("");
-
-        cell.innerText = "";
-        cell.appendChild(select);
-        select.focus();
-
-        select.onchange = () => {
-          const key = cell.dataset.key;
-          schedules[key] ??= {};
-          scheduleOptions.forEach(c => cell.classList.remove(c));
-
-          if (!select.value) {
-            delete schedules[key][cell.dataset.id];
-            cell.innerText = "";
-          } else {
-            schedules[key][cell.dataset.id] = select.value;
-            cell.classList.add(select.value);
-            cell.innerText = select.value;
-          }
-          save();
-          select.remove();
+        select.onchange=()=>{
+          const key=cell.dataset.key;
+          schedules[key]??={};
+          scheduleOptions.forEach(c=>cell.classList.remove(c));
+          if(!select.value){ delete schedules[key][cell.dataset.id]; cell.innerText=""; }
+          else{ schedules[key][cell.dataset.id]=select.value; cell.classList.add(select.value); cell.innerText=select.value; }
+          save(); select.remove();
         };
-
-        select.onblur = () => {
+        select.onblur=()=>{
           select.remove();
-          const val = schedules[cell.dataset.key]?.[cell.dataset.id];
-          cell.innerText = val || "";
-          if (val) cell.classList.add(val);
+          const val=schedules[cell.dataset.key]?.[cell.dataset.id];
+          cell.innerText=val||"";
+          if(val) cell.classList.add(val);
         };
       };
     });
   }
 
-  /* ================= INIT ================= */
-  renderWeek(); // ONLY initial render
-
+  /* ========== INIT ========== */
+  renderWeek();
 });
 </script>
 </body>
 </html>
+
 
 
 
