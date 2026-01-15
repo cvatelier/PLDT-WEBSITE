@@ -242,34 +242,24 @@ document.addEventListener("DOMContentLoaded", () => {
     { cluster:"CLUSTER 2", name:"Aquino, Ralph Allen P.", position:"CXSDA" },
     { cluster:"CLUSTER 2", name:"Abalos, Jose III Q.", position:"CXSDA" },
     { cluster:"CLUSTER 2", name:"Cabiles, Raymond V.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Dacanay, Jayson R.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Dacasin, Edgen Derek C.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"De Guzman, Antonio Jr. Z.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Festejo, Jan Rainier B.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Idio, Christian Kenneth C.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Langit, Timothy C.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Loresco, Allan John S.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Parayno, Armel King F.", position:"CXSDA" },
-    { cluster:"CLUSTER 2", name:"Viado, Don Maurice C.", position:"CXSDA" },
     { cluster:"CLUSTER 2", name:"Alanzalon, Jenine Mae G.", position:"WMA" },
     { cluster:"CLUSTER 2", name:"Romero, Caesar Jim V.", position:"WMA" },
     { cluster:"CLUSTER 2", name:"Mostoles, Aries V.", position:"WMS" }
   ];
 
   const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
-  const totalCells = 35; // 5 weeks
-  const weekDays = ["M","T","W","T","F","S","S"];
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
 
-  // Function exposed to window so buttons can call it
-  window.changeMonth = (dir) => {
-    currentDate.setMonth(currentDate.getMonth() + dir);
-    renderMonth();
-  };
+  function save() { localStorage.setItem("monthSchedules", JSON.stringify(schedules)); }
 
-  function save() {
-    localStorage.setItem("monthSchedules", JSON.stringify(schedules));
+  window.changeMonth = (dir) => { currentDate.setMonth(currentDate.getMonth() + dir); renderMonth(); }
+
+  function getWeeksInMonth(year, month) {
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const startOffset = (firstDay + 6) % 7; // Monday = 0
+    return Math.ceil((daysInMonth + startOffset) / 7);
   }
 
   function renderMonth() {
@@ -278,10 +268,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
     const startOffset = (firstDay + 6) % 7; // Monday = 0
+    const weeksInMonth = getWeeksInMonth(year, month);
+    const totalCells = weeksInMonth * 7;
     const key = `${year}-${month}`;
 
     document.getElementById("monthLabel").innerText =
-      currentDate.toLocaleDateString("en", { month: "long", year: "numeric" });
+      currentDate.toLocaleDateString("en", { month:"long", year:"numeric" });
 
     const head = document.getElementById("monthHead");
     const body = document.getElementById("monthBody");
@@ -293,17 +285,18 @@ document.addEventListener("DOMContentLoaded", () => {
       <th rowspan="3">CLUSTER</th>
       <th rowspan="3">NAME</th>
       <th rowspan="3">POSITION</th>`;
-    for(let w=1; w<=5; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
+    for(let w=1; w<=weeksInMonth; w++) r1 += `<th colspan="7">WEEK ${w}</th>`;
     r1 += `</tr>`;
 
     let r2 = `<tr>`;
-    for(let i=0; i<totalCells; i++) r2 += `<th>${weekDays[i%7]}</th>`;
+    const weekDays = ["M","T","W","T","F","S","S"];
+    for(let i=0;i<totalCells;i++) r2 += `<th>${weekDays[i%7]}</th>`;
     r2 += `</tr>`;
 
     let r3 = `<tr>`;
-    for(let i=0; i<totalCells; i++){
+    for(let i=0;i<totalCells;i++){
       const day = i - startOffset + 1;
-      r3 += `<th>${day > 0 && day <= daysInMonth ? day : ""}</th>`;
+      r3 += `<th>${day>0 && day<=daysInMonth ? day : ""}</th>`;
     }
     r3 += `</tr>`;
 
@@ -315,12 +308,11 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${emp.cluster}</td>
         <td class="text-start">${emp.name}</td>
         <td>${emp.position}</td>`;
-
       for(let i=0;i<totalCells;i++){
-        const day = i - startOffset +1;
+        const day = i - startOffset + 1;
         const id = `${empIndex}-${day}`;
         const value = schedules[key]?.[id];
-        tr += `<td class="schedule-cell ${value||""}" data-key="${key}" data-id="${day>0 && day<=daysInMonth?id:""}">${value||""}</td>`;
+        tr += `<td class="schedule-cell ${value||""}" data-key="${key}" data-id="${day>0 && day<=daysInMonth ? id : ''}">${value||""}</td>`;
       }
       tr += `</tr>`;
       body.insertAdjacentHTML("beforeend", tr);
@@ -388,12 +380,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Initial render
   renderMonth();
+
 });
 </script>
 </body>
 </html>
+
 
 
 
