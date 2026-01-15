@@ -222,9 +222,6 @@ body {
     Monthly Schedule
   </div>
 
-  <!-- LEGEND: Place here, above the table -->
-  <div class="legend" id="colorLegend"></div>
-
   <div class="table-responsive">
     <table class="table table-bordered text-center align-middle small" id="monthTable">
       <thead id="monthHead"></thead>
@@ -266,32 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const totalCells = 35; // 5 weeks
 
   const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
-
-  // Legend
-  const legendColors = {
-    "RD":"#dc3545",
-    "VL":"#ffc107",
-    "SL":"#fd7e14",
-    "PL":"#0d6efd",
-    "ML":"#6f42c1",
-    "HO":"#20c997",
-    "LA":"#adb5bd",
-    "D":"#198754",
-    "T":"#fd149f"
-  };
-
-  function renderLegend(){
-    const container = document.getElementById("colorLegend");
-    container.innerHTML="";
-    for(const code of scheduleOptions){
-      const item = document.createElement("div");
-      item.classList.add("legend-item");
-      item.innerHTML = `<span class="legend-color" style="background:${legendColors[code]}"></span>${code}`;
-      container.appendChild(item);
-    }
-  }
-
-  renderLegend();
 
   // Month navigation
   window.changeMonth = dir=>{
@@ -424,6 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
