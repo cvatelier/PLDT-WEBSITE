@@ -612,14 +612,18 @@ refreshDeleteEmployees();
   localStorage.setItem("employees", JSON.stringify(employees));
   localStorage.setItem("monthSchedules", JSON.stringify(schedules));
 
-  // Refresh UI
-  refreshBulkEmployees();
-  refreshDeleteEmployees();
-  viewMode === "month" ? renderMonth() : renderWeek();
+// Refresh UI
+refreshBulkEmployees();
+refreshDeleteEmployees();
 
-  bootstrap.Modal.getInstance(
-    document.getElementById("deleteEmployeeModal")
-  ).hide();
+viewMode === "month" ? renderMonth() : renderWeek();
+
+// ✅ RE-APPLY SEARCH
+applySearchFilter(searchInput.value);
+
+bootstrap.Modal.getInstance(
+  document.getElementById("deleteEmployeeModal")
+).hide();
 };
   /* ========== WEEK VIEW ========== */
   function renderWeek(){
@@ -702,6 +706,7 @@ refreshDeleteEmployees();
 </script>
 </body>
 </html>
+
 
 
 
