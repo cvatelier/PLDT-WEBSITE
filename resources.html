@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <th rowspan="3">Name</th>
       <th rowspan="3">Position</th>
       <th rowspan="3">VL Count</th>`;
-    for(let w=1; w<=weeks; w++) r1+=`<th colspan="7">WEEK ${w}</th>`;
+    for(let w=1; w<=weeks; w++) r1+=`<th colspan="7">Week ${w}</th>`;
     r1+=`</tr>`;
 
     let r2 = `<tr>`; for(let i=0;i<totalCells;i++) r2+=`<th>${weekDays[i%7]}</th>`; r2+=`</tr>`;
@@ -416,6 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
