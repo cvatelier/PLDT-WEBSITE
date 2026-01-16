@@ -334,7 +334,7 @@ body {
           </div>
           <div class="col-12">
             <label class="form-label">VL Count</label>
-            <input id="empName" class="form-control">
+            <input id="empVL" class="form-control">
           </div>
         </div>
       </div>
@@ -558,7 +558,6 @@ window.addEmployee = () => {
 
   empCluster.value = empId.value = empName.value = "";
 };
-  refreshDeleteEmployees();
 const deleteEmployeeSelect = document.getElementById("deleteEmployeeSelect");
 window.deleteEmployee = () => {
   const index = deleteEmployeeSelect.value;
@@ -579,6 +578,18 @@ window.deleteEmployee = () => {
       }
     });
   });
+  const deleteEmployeeSelect = document.getElementById("deleteEmployeeSelect");
+
+function refreshDeleteEmployees(){
+  deleteEmployeeSelect.innerHTML = "";
+  employees.forEach((e,i)=>{
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = `${e.name} (${e.position})`;
+    deleteEmployeeSelect.appendChild(opt);
+  });
+}
+
 refreshDeleteEmployees();
 
   // Re-map schedule keys (important!)
@@ -690,6 +701,7 @@ refreshDeleteEmployees();
 </script>
 </body>
 </html>
+
 
 
 
