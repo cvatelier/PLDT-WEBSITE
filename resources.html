@@ -200,21 +200,19 @@ body {
       <button id="weekViewBtn" class="btn btn-outline-secondary active">Week</button>
       <button id="monthViewBtn" class="btn btn-outline-secondary">Month</button>
     </div>
-  </div>
-      <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#bulkModal">
+          <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#bulkModal">
   <i class="bi bi-pencil-square"></i> Bulk Edit
 </button>
     <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
   <i class="bi bi-person-plus"></i> Add Employee
 </button>
-
 <!-- Month Navigation Controls -->
 <div class="d-flex align-items-center gap-2 mb-2">
   <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(-1)">‹</button>
   <span id="monthLabel" class="fw-semibold"></span>
   <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(1)">›</button>
 </div>
-  
+    </div>
   <!-- Week selector + search -->
   <div class="d-flex justify-content-between mb-3">
     <input type="text" id="searchInput"class="form-control form-control-sm"placeholder="Search employee, position, or cluster">
@@ -604,6 +602,7 @@ window.addEmployee = () => {
 </script>
 </body>
 </html>
+
 
 
 
