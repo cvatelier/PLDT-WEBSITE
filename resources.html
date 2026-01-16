@@ -221,6 +221,9 @@ body {
       <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
         <i class="bi bi-person-plus"></i>
       </button>
+      <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#bulkAddEmployeeModal">
+      <i class="bi bi-people-fill"></i>
+      </button>
       <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal">
         <i class="bi bi-person-x"></i>
       </button>
@@ -345,6 +348,38 @@ body {
       </div>
 </div>
 </div>
+</div>
+  
+  <div class="modal fade" id="bulkAddEmployeeModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Bulk Add Employees</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <p class="small text-muted mb-2">
+          One employee per line (CSV format):
+        </p>
+        <pre class="small bg-light p-2 rounded">
+Cluster 2,548600,Doe, John A.,CXSDA
+Cluster 2,548601,Smith, Jane B.,WMA
+        </pre>
+
+        <textarea id="bulkEmployeeText"
+          class="form-control"
+          rows="8"
+          placeholder="Cluster,ID,Name,Position"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="bulkAddEmployees()">Add Employees</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ✅ DELETE EMPLOYEE MODAL (SEPARATE) -->
@@ -569,6 +604,52 @@ window.applyBulkEdit = () => {
     empCluster.value = empId.value = empName.value = "";
   };
 
+  /* ========== BULK ADD EMPLOYEE ========== */
+  window.bulkAddEmployees = () => {
+  const text = document.getElementById("bulkEmployeeText").value.trim();
+  if (!text) {
+    alert("No data provided.");
+    return;
+  }
+
+  const lines = text.split("\n");
+  let added = 0;
+
+  lines.forEach(line => {
+    const parts = line.split(",").map(p => p.trim());
+    if (parts.length < 4) return;
+
+    const [cluster, id, ...rest] = parts;
+    const position = rest.pop();
+    const name = rest.join(","); // supports comma in name
+
+    if (!cluster || !id || !name || !position) return;
+
+    employees.push({ cluster, id, name, position });
+    added++;
+  });
+
+  if (!added) {
+    alert("No valid employees found.");
+    return;
+  }
+
+  save();
+  refreshBulkEmployees();
+  refreshDeleteEmployees();
+
+  viewMode === "month" ? renderMonth() : renderWeek();
+
+  document.getElementById("bulkEmployeeText").value = "";
+
+  bootstrap.Modal.getInstance(
+    document.getElementById("bulkAddEmployeeModal")
+  ).hide();
+
+  alert(`${added} employees added successfully.`);
+};
+
+
   /* ========== DELETE EMPLOYEE ========== */
   window.deleteEmployee = () => {
     const index = deleteEmployeeSelect.value;
@@ -773,6 +854,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
