@@ -685,13 +685,24 @@ document.addEventListener("DOMContentLoaded", () => {
         cell.appendChild(select);
         select.focus();
 
-        select.onchange=()=>{
-          schedules[cell.dataset.key]??={};
-          if(select.value) schedules[cell.dataset.key][cell.dataset.id]=select.value;
-          else delete schedules[cell.dataset.key][cell.dataset.id];
-          save();
-          renderMonth();
-        };
+select.onchange = () => {
+  schedules[cell.dataset.key] ??= {};
+
+  if (select.value) {
+    schedules[cell.dataset.key][cell.dataset.id] = select.value;
+  } else {
+    delete schedules[cell.dataset.key][cell.dataset.id];
+  }
+
+  save();
+
+  // ✅ re-render based on current view
+  if (viewMode === "month") {
+    renderMonth();
+  } else {
+    renderWeek();
+  }
+};
       };
     });
   }
@@ -703,6 +714,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
