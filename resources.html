@@ -216,10 +216,13 @@ body {
     <!-- Employee Actions BELOW schedule -->
     <div class="card-body d-flex justify-content-end gap-2">
       <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#bulkModal">
-        <i class="bi bi-pencil-square"></i> Edit Schedule
+        <i class="bi bi-pencil-square"></i>
       </button>
       <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
-        <i class="bi bi-person-plus"></i> Add Employee
+        <i class="bi bi-person-plus"></i>
+      </button>
+      <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal">
+        <i class="bi bi-person-x"></i>
       </button>
     </div>
 <!-- Schedule Section -->
@@ -329,7 +332,10 @@ body {
               <option>WMS</option>
             </select>
           </div>
-
+          <div class="col-12">
+            <label class="form-label">VL Count</label>
+            <input id="empName" class="form-control">
+          </div>
         </div>
       </div>
 
@@ -337,6 +343,32 @@ body {
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-success" onclick="addEmployee()">Add</button>
       </div>
+<div class="modal fade" id="deleteEmployeeModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title text-danger">Delete Employee</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <label class="form-label fw-semibold">Select Employee</label>
+        <select id="deleteEmployeeSelect" class="form-select"></select>
+
+        <div class="alert alert-warning mt-3 small">
+          This action will permanently remove the employee and their schedules.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-danger" onclick="deleteEmployee()">Delete</button>
+      </div>
+
+    </div>
+  </div>
+</div>
 
     </div>
   </div>
@@ -526,7 +558,57 @@ window.addEmployee = () => {
 
   empCluster.value = empId.value = empName.value = "";
 };
+  refreshDeleteEmployees();
+const deleteEmployeeSelect = document.getElementById("deleteEmployeeSelect");
+window.deleteEmployee = () => {
+  const index = deleteEmployeeSelect.value;
+  if(index === "") return;
 
+  const emp = employees[index];
+
+  if(!confirm(`Delete ${emp.name}? This cannot be undone.`)) return;
+
+  // Remove employee
+  employees.splice(index,1);
+
+  // Remove schedules linked to employee index
+  Object.keys(schedules).forEach(monthKey=>{
+    Object.keys(schedules[monthKey]).forEach(k=>{
+      if(k.startsWith(index + "-")){
+        delete schedules[monthKey][k];
+      }
+    });
+  });
+refreshDeleteEmployees();
+
+  // Re-map schedule keys (important!)
+  const newSchedules = {};
+  Object.keys(schedules).forEach(monthKey=>{
+    newSchedules[monthKey] = {};
+    Object.keys(schedules[monthKey]).forEach(k=>{
+      const [empIdx, day] = k.split("-");
+      if(empIdx > index){
+        newSchedules[monthKey][`${empIdx-1}-${day}`] = schedules[monthKey][k];
+      } else if(empIdx < index){
+        newSchedules[monthKey][k] = schedules[monthKey][k];
+      }
+    });
+  });
+  schedules = newSchedules;
+
+  // Save
+  localStorage.setItem("employees", JSON.stringify(employees));
+  localStorage.setItem("monthSchedules", JSON.stringify(schedules));
+
+  // Refresh UI
+  refreshBulkEmployees();
+  refreshDeleteEmployees();
+  viewMode === "month" ? renderMonth() : renderWeek();
+
+  bootstrap.Modal.getInstance(
+    document.getElementById("deleteEmployeeModal")
+  ).hide();
+};
   /* ========== WEEK VIEW ========== */
   function renderWeek(){
     const start = mondayOfWeek(currentDate);
@@ -608,6 +690,7 @@ window.addEmployee = () => {
 </script>
 </body>
 </html>
+
 
 
 
