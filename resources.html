@@ -203,6 +203,10 @@ body {
     <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#bulkModal">
   <i class="bi bi-pencil-square"></i> Bulk Edit
 </button>
+    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+  <i class="bi bi-person-plus"></i> Add Employee
+</button>
+
   </div>
 
 <!-- Month Navigation Controls -->
@@ -287,7 +291,53 @@ body {
     </div>
   </div>
 </div>
+<div class="modal fade" id="addEmployeeModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
 
+      <div class="modal-header">
+        <h5 class="modal-title">Add Employee</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <div class="col-12">
+            <label class="form-label">Cluster</label>
+            <input id="empCluster" class="form-control">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">ID Number</label>
+            <input id="empId" class="form-control">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Name</label>
+            <input id="empName" class="form-control">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Position</label>
+            <select id="empPosition" class="form-select">
+              <option>CXSDA</option>
+              <option>WMA</option>
+              <option>WMS</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="addEmployee()">Add</button>
+      </div>
+
+    </div>
+  </div>
+</div>
   
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -295,14 +345,14 @@ body {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   /* ========== DATA ========== */
-  const employees = [
-    { cluster:"Cluster 2", id:"548578", name:"Aquino, Ralph Allen P.", position:"CXSDA", vl:"" },
-    { cluster:"Cluster 2", id:"548576", name:"Abalos, Jose III Q.", position:"CXSDA", vl:"" },
-    { cluster:"Cluster 2", id:"548581", name:"Cabiles, Raymond V.", position:"CXSDA", vl:"" },
-    { cluster:"Cluster 2", id:"546523", name:"Alanzalon, Jenine Mae G.", position:"WMA", vl:"" },
-    { cluster:"Cluster 2", id:"548595", name:"Romero, Caesar Jim V.", position:"WMA", vl:"" },
-    { cluster:"Cluster 2", id:"541691", name:"Mostoles, Aries V.", position:"WMS", vl:"" }
-  ];
+let employees = JSON.parse(localStorage.getItem("employees")) || [
+  { cluster:"Cluster 2", id:"548578", name:"Aquino, Ralph Allen P.", position:"CXSDA" },
+  { cluster:"Cluster 2", id:"548576", name:"Abalos, Jose III Q.", position:"CXSDA" },
+  { cluster:"Cluster 2", id:"548581", name:"Cabiles, Raymond V.", position:"CXSDA" },
+  { cluster:"Cluster 2", id:"546523", name:"Alanzalon, Jenine Mae G.", position:"WMA" },
+  { cluster:"Cluster 2", id:"548595", name:"Romero, Caesar Jim V.", position:"WMA" },
+  { cluster:"Cluster 2", id:"541691", name:"Mostoles, Aries V.", position:"WMS" }
+];
 
   const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
   const weekDays = ["M","T","W","T","F","S","S"];
@@ -438,6 +488,41 @@ window.applyBulkEdit = () => {
     bindClicks();
     applySearchFilter(searchInput.value);
   }
+function refreshBulkEmployees(){
+  bulkEmployees.innerHTML = "";
+  employees.forEach((e,i)=>{
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = `${e.name} (${e.position})`;
+    bulkEmployees.appendChild(opt);
+  });
+}
+refreshBulkEmployees();
+window.addEmployee = () => {
+  const cluster = empCluster.value.trim();
+  const id = empId.value.trim();
+  const name = empName.value.trim();
+  const position = empPosition.value;
+
+  if(!cluster || !id || !name){
+    alert("Please complete all fields.");
+    return;
+  }
+
+  employees.push({ cluster, id, name, position });
+
+  localStorage.setItem("employees", JSON.stringify(employees));
+
+  refreshBulkEmployees();
+
+  viewMode === "month" ? renderMonth() : renderWeek();
+
+  bootstrap.Modal.getInstance(
+    document.getElementById("addEmployeeModal")
+  ).hide();
+
+  empCluster.value = empId.value = empName.value = "";
+};
 
   /* ========== WEEK VIEW ========== */
   function renderWeek(){
@@ -520,6 +605,7 @@ window.applyBulkEdit = () => {
 </script>
 </body>
 </html>
+
 
 
 
