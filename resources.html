@@ -200,6 +200,9 @@ body {
       <button id="weekViewBtn" class="btn btn-outline-secondary active">Week</button>
       <button id="monthViewBtn" class="btn btn-outline-secondary">Month</button>
     </div>
+    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#bulkModal">
+  <i class="bi bi-pencil-square"></i> Bulk Edit
+</button>
   </div>
 
 <!-- Month Navigation Controls -->
@@ -226,6 +229,65 @@ body {
 </div>
 </main> 
 </div>
+  <div class="modal fade" id="bulkModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Bulk Schedule Edit</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <!-- Employees -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Employees</label>
+            <select id="bulkEmployees" class="form-select" multiple size="8"></select>
+            <small class="text-muted">Ctrl / Shift to select multiple</small>
+          </div>
+
+          <!-- Schedule -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Schedule Code</label>
+            <select id="bulkCode" class="form-select">
+              <option value="">-- Select --</option>
+              <option>RD</option>
+              <option>VL</option>
+              <option>SL</option>
+              <option>PL</option>
+              <option>ML</option>
+              <option>HO</option>
+              <option>LA</option>
+              <option>D</option>
+              <option>T</option>
+            </select>
+          </div>
+
+          <!-- Date Range -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">From</label>
+            <input type="date" id="bulkFrom" class="form-control">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">To</label>
+            <input type="date" id="bulkTo" class="form-control">
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="applyBulkEdit()">Apply</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
   
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -252,6 +314,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const weekBtn  = document.getElementById("weekViewBtn");
   const monthBtn = document.getElementById("monthViewBtn");
   const searchInput = document.getElementById("searchInput");
+
+  const bulkEmployees = document.getElementById("bulkEmployees");
+
+employees.forEach((e,i)=>{
+  const opt = document.createElement("option");
+  opt.value = i;
+  opt.textContent = `${e.name} (${e.position})`;
+  bulkEmployees.appendChild(opt);
+});
+
 
   searchInput.addEventListener("input", () => { applySearchFilter(searchInput.value); });
 
@@ -280,6 +352,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
   weekBtn.onclick = () => { viewMode="week"; weekBtn.classList.add("active"); monthBtn.classList.remove("active"); renderWeek(); };
   monthBtn.onclick = () => { viewMode="month"; currentDate.setDate(1); monthBtn.classList.add("active"); weekBtn.classList.remove("active"); renderMonth(); };
+window.applyBulkEdit = () => {
+  const empIndexes = [...bulkEmployees.selectedOptions].map(o=>o.value);
+  const code = document.getElementById("bulkCode").value;
+  const from = new Date(document.getElementById("bulkFrom").value);
+  const to = new Date(document.getElementById("bulkTo").value);
+
+  if(!empIndexes.length || !code || !from || !to){
+    alert("Please complete all fields.");
+    return;
+  }
+
+  let d = new Date(from);
+
+  while(d <= to){
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    schedules[key] ??= {};
+
+    empIndexes.forEach(emp=>{
+      const id = `${emp}-${d.getDate()}`;
+      schedules[key][id] = code;
+    });
+
+    d.setDate(d.getDate()+1);
+  }
+
+  save();
+
+  // Refresh current view
+  viewMode==="month" ? renderMonth() : renderWeek();
+
+  bootstrap.Modal.getInstance(document.getElementById("bulkModal")).hide();
+};
 
   /* ========== MONTH VIEW ========== */
   function renderMonth(){
@@ -416,6 +520,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
