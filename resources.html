@@ -152,17 +152,6 @@ body {
   background: #e9ecef;
 }
 
-/* Schedule cell colors for each code */
-.schedule-cell.RD { background:#dc3545; color:#fff; }
-.schedule-cell.VL { background:#ffc107; color:#000; }
-.schedule-cell.SL { background:#fd7e14; color:#fff; }
-.schedule-cell.PL { background:#0d6efd; color:#fff; }
-.schedule-cell.ML { background:#6f42c1; color:#fff; }
-.schedule-cell.HO { background:#20c997; color:#fff; }
-.schedule-cell.LA { background:#adb5bd; color:#000; }
-.schedule-cell.D  { background:#198754; color:#fff; }
-.schedule-cell.T  { background:#fd149f; color:#fff; }
-
 .schedule-cell { font-size:11px; text-align:center; cursor:pointer; }
 .legend { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
 .legend-item { display:flex; align-items:center; gap:4px; font-size:12px; }
@@ -172,6 +161,17 @@ body {
 .pos-CXSDA { border-left: 4px solid #0d6efd; }
 .pos-WMA   { border-left: 4px solid #6f42c1; }
 .pos-WMS   { border-left: 4px solid #fd7e14; }  
+
+/* Schedule cell colors */
+#monthTable td.schedule-cell.RD { background:#dc3545; color:#fff; }
+#monthTable td.schedule-cell.VL { background:#ffc107; color:#000; }
+#monthTable td.schedule-cell.SL { background:#fd7e14; color:#fff; }
+#monthTable td.schedule-cell.PL { background:#0d6efd; color:#fff; }
+#monthTable td.schedule-cell.ML { background:#6f42c1; color:#fff; }
+#monthTable td.schedule-cell.HO { background:#20c997; color:#fff; }
+#monthTable td.schedule-cell.LA { background:#adb5bd; color:#000; }
+#monthTable td.schedule-cell.D  { background:#198754; color:#fff; }
+#monthTable td.schedule-cell.T  { background:#fd149f; color:#fff; }  
 </style>
 </head>
 <body>
@@ -520,6 +520,7 @@ window.applyBulkEdit = () => {
 </script>
 </body>
 </html>
+
 
 
 
