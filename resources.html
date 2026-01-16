@@ -675,51 +675,60 @@ window.applyBulkEdit = () => {
   }
 
   /* ========== WEEK VIEW ========== */
-  function renderWeek(){
-    const start = mondayOfWeek(currentDate);
-    const key = `${start.getFullYear()}-${start.getMonth()}`;
+function renderWeek(){
+  const start = mondayOfWeek(currentDate);
 
-    document.getElementById("monthLabel").innerText =
-      `Week of ${start.toLocaleDateString()}`;
+  document.getElementById("monthLabel").innerText =
+    `Week of ${start.toLocaleDateString()}`;
 
-    const head=document.getElementById("monthHead");
-    const body=document.getElementById("monthBody");
-    head.innerHTML=""; body.innerHTML="";
+  const head = document.getElementById("monthHead");
+  const body = document.getElementById("monthBody");
+  head.innerHTML = "";
+  body.innerHTML = "";
 
-    let h1=`<tr>
-      <th>Cluster</th><th>ID</th><th>Name</th><th>Position</th><th>VL</th>`;
-    for(let i=0;i<7;i++) h1+=`<th>${weekDays[i]}</th>`;
-    h1+=`</tr>`;
+  let h1 = `<tr>
+    <th>Cluster</th><th>ID</th><th>Name</th><th>Position</th><th>VL</th>`;
+  for (let i = 0; i < 7; i++) h1 += `<th>${weekDays[i]}</th>`;
+  h1 += `</tr>`;
 
-    let h2=`<tr><th></th><th></th><th></th><th></th><th></th>`;
-    for(let i=0;i<7;i++){
-      const d=new Date(start); d.setDate(start.getDate()+i);
-      h2+=`<th>${d.getDate()}</th>`;
-    }
-    h2+=`</tr>`;
-
-    head.innerHTML=h1+h2;
-
-    employees.forEach((emp,empIndex)=>{
-      let tr=`<tr>
-        <td>${emp.cluster}</td>
-        <td>${emp.id}</td>
-        <td class="text-start">${emp.name}</td>
-        <td>${emp.position}</td>
-        <td></td>`;
-      for(let i=0;i<7;i++){
-        const d=new Date(start); d.setDate(start.getDate()+i);
-        const id=`${empIndex}-${d.getDate()}`;
-        const val=schedules[key]?.[id]||"";
-        tr+=`<td class="schedule-cell ${val}" data-key="${key}" data-id="${id}">${val}</td>`;
-      }
-      tr+=`</tr>`;
-      body.insertAdjacentHTML("beforeend", tr);
-    });
-
-    bindClicks();
-    applySearchFilter(searchInput.value);
+  let h2 = `<tr><th></th><th></th><th></th><th></th><th></th>`;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    h2 += `<th>${d.getDate()}</th>`;
   }
+  h2 += `</tr>`;
+
+  head.innerHTML = h1 + h2;
+
+  employees.forEach((emp, empIndex) => {
+    let tr = `<tr>
+      <td>${emp.cluster}</td>
+      <td>${emp.id}</td>
+      <td class="text-start">${emp.name}</td>
+      <td>${emp.position}</td>
+      <td></td>`;
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+
+      const key = `${d.getFullYear()}-${d.getMonth()}`; // ✅ FIX
+      const id  = `${empIndex}-${d.getDate()}`;
+      const val = schedules[key]?.[id] || "";
+
+      tr += `<td class="schedule-cell ${val}"
+               data-key="${key}"
+               data-id="${id}">${val}</td>`;
+    }
+
+    tr += `</tr>`;
+    body.insertAdjacentHTML("beforeend", tr);
+  });
+
+  bindClicks();
+  applySearchFilter(searchInput.value);
+}
 
   /* ========== CELL EDITING ========== */
   function bindClicks(){
@@ -764,6 +773,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
