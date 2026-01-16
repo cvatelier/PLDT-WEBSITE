@@ -492,6 +492,56 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMonth();
   };
 
+  /* ========== BULK EDIT ========== */
+window.applyBulkEdit = () => {
+  const selectedEmployees = Array.from(bulkEmployees.selectedOptions)
+    .map(opt => Number(opt.value));
+
+  const code = document.getElementById("bulkCode").value;
+  const from = document.getElementById("bulkFrom").value;
+  const to   = document.getElementById("bulkTo").value;
+
+  if (!selectedEmployees.length || !code || !from || !to) {
+    alert("Please select employees, schedule code, and date range.");
+    return;
+  }
+
+  const start = new Date(from);
+  const end   = new Date(to);
+
+  if (start > end) {
+    alert("Invalid date range.");
+    return;
+  }
+
+  let d = new Date(start);
+  while (d <= end) {
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    schedules[key] ??= {};
+
+    selectedEmployees.forEach(empIndex => {
+      const id = `${empIndex}-${d.getDate()}`;
+      schedules[key][id] = code;
+    });
+
+    d.setDate(d.getDate() + 1);
+  }
+
+  save();
+
+  // re-render current view
+  if (viewMode === "month") {
+    renderMonth();
+  } else {
+    renderWeek();
+  }
+
+  // close modal
+  bootstrap.Modal.getInstance(
+    document.getElementById("bulkModal")
+  ).hide();
+};
+
   /* ========== ADD EMPLOYEE ========== */
   window.addEmployee = () => {
     const cluster = empCluster.value.trim();
@@ -714,6 +764,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
