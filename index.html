@@ -57,22 +57,41 @@ main {
   min-width: 220px;
   max-width: 220px;
   height: 100vh;
-  background: #343a40;
-  color: #fff;
+  background: #fff; /* light sidebar */
+  color: #495057;
   position: sticky;
   top: 0;
+  border-right: 1px solid #dee2e6;
 }
 
 #sidebar .nav-link {
-  color: #adb5bd;
+  color: #495057;
   border-radius: 6px;
-  padding: .45rem .75rem;
+  padding: .5rem .75rem;
   margin-bottom: 6px;
   transition: .2s;
+  display: flex;
+  align-items: center;
+}
+
+#sidebar .nav-link i {
+  font-size: 1.1rem;
 }
 
 #sidebar .nav-link:hover {
-  color: #fff;
+  background: #f1f5f9;
+  color: #0d6efd;
+}
+
+#sidebar .nav-link.active {
+  background: #e7f1ff;
+  color: #0d6efd;
+  border-left: 4px solid #0d6efd;
+  font-weight: 600;
+}
+
+#sidebar .nav-link.active i {
+  color: #0d6efd;
 }
 
 /* ================== NAVBAR ================== */
@@ -271,7 +290,7 @@ main {
     </li>
 
     <li class="nav-item">
-      <a class="nav-link" href="scheduler.html">
+      <a class="nav-link active" href="scheduler.html">
         <i class="bi bi-calendar-week me-2"></i>
         Scheduler
       </a>
@@ -1218,6 +1237,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
