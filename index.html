@@ -265,7 +265,43 @@ main {
       #sidebar > a {
   color: #000 !important;
 }
+/* ================== MAIN NAVBAR MATCH SIDEBAR ================== */
+.navbar {
+  background: #fff;
+  border: 1px solid #dee2e6; /* like sidebar */
+  border-radius: 14px;        /* match sidebar card rounding */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04); /* match sidebar subtle shadow */
+  padding: 0.5rem 1rem;
+}
 
+.navbar .controls > * {
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.navbar .controls input.form-control,
+.navbar .controls select.form-select {
+  border: 1px solid #e9ecef;
+  background: #ffffff;
+}
+
+.navbar .controls input.form-control:focus,
+.navbar .controls select.form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: none;
+}
+
+.navbar .dashboard-btn {
+  background: #f8f9fa;
+  color: #495057;
+  border: 1px solid #e9ecef;
+}
+
+.navbar .dashboard-btn:hover {
+  background: #e7f1ff;
+  color: #0d6efd;
+  border-color: #0d6efd;
+}
     </style>
   </head>
   <body>
@@ -1242,6 +1278,7 @@ rawRecords = json.map(r => ({
     </script>
   </body>
 </html>
+
 
 
 
