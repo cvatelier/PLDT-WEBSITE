@@ -19,26 +19,93 @@ body {
   color: #495057;
 }
 
-/* Sidebar */
+/* ========== LIGHT SIDEBAR ========== */
 #sidebar {
   min-width: 220px;
   max-width: 220px;
   height: 100vh;
-  background: #343a40;
-  color: #fff;
+  background: #ffffff;
+  border-right: 1px solid #e9ecef;
   position: sticky;
   top: 0;
 }
 
-#sidebar .nav-link {
-  color: #adb5bd;
-  border-radius: 6px;
-  padding: .45rem .75rem;
-  margin-bottom: 6px;
-  transition: .2s;
+/* Logo / Brand */
+.sidebar-brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: #212529;
 }
 
-#sidebar .nav-link:hover { color:#fff; }
+.sidebar-brand span {
+  color: #0d6efd;
+}
+
+/* Nav links */
+#sidebar .nav-link {
+  color: #495057;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+#sidebar .nav-link i {
+  font-size: 16px;
+  color: #6c757d;
+}
+
+/* Hover */
+#sidebar .nav-link:hover {
+  background: #f8f9fa;
+  color: #0d6efd;
+}
+
+#sidebar .nav-link:hover i {
+  color: #0d6efd;
+}
+
+/* Active */
+#sidebar .nav-link.active {
+  background: #eef4ff;
+  color: #0d6efd;
+  font-weight: 600;
+  position: relative;
+}
+
+#sidebar .nav-link.active::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  background: #0d6efd;
+  border-radius: 4px;
+}
+
+/* User profile */
+.sidebar-user {
+  border-top: 1px solid #e9ecef;
+  padding-top: 12px;
+  margin-top: auto;
+}
+
+.sidebar-user img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sidebar-user small {
+  font-size: 12px;
+  color: #6c757d;
+}
 
 /* Scheduler */
 .scheduler-grid {
@@ -854,6 +921,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
