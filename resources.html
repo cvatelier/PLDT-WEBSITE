@@ -411,6 +411,32 @@ body {
     font-size: 14px;
   }
 }  
+
+/* =========================
+   MONTH VIEW SCROLL FIX
+   ========================= */
+
+/* Wrapper that scrolls only the calendar */
+.month-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
+/* Smooth scrolling on touch devices */
+.month-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Month table wide, week table normal */
+.month-scroll #monthTable {
+  min-width: 1200px; /* forces internal scroll */
+}
+
+/* In WEEK view, no horizontal scroll needed */
+.week-view .month-scroll #monthTable {
+  min-width: unset;
+}  
 </style>
 </head>
 <body>
@@ -485,9 +511,9 @@ body {
     </div>
 <!-- Schedule Section -->
 <div class="mt-4">
-  <div class="card">
-    <div class="table-responsive">
-      <table class="table table-bordered text-center align-middle small" id="monthTable">
+<div class="card">
+  <div class="month-scroll">
+    <table class="table table-bordered text-center align-middle small" id="monthTable">
         <thead id="monthHead"></thead>
         <tbody id="monthBody"></tbody>
       </table>
@@ -817,20 +843,30 @@ function refreshDeleteEmployees(){
     }
   };
 
-  weekBtn.onclick = () => {
-    viewMode="week";
-    weekBtn.classList.add("active");
-    monthBtn.classList.remove("active");
-    renderWeek();
-  };
+weekBtn.onclick = () => {
+  viewMode = "week";
 
-  monthBtn.onclick = () => {
-    viewMode="month";
-    currentDate.setDate(1);
-    monthBtn.classList.add("active");
-    weekBtn.classList.remove("active");
-    renderMonth();
-  };
+  weekBtn.classList.add("active");
+  monthBtn.classList.remove("active");
+
+  document.body.classList.remove("month-view");
+  document.body.classList.add("week-view");
+
+  renderWeek();
+};
+
+monthBtn.onclick = () => {
+  viewMode = "month";
+  currentDate.setDate(1);
+
+  monthBtn.classList.add("active");
+  weekBtn.classList.remove("active");
+
+  document.body.classList.remove("week-view");
+  document.body.classList.add("month-view");
+
+  renderMonth();
+};
 
   /* ========== BULK EDIT ========== */
 window.applyBulkEdit = () => {
@@ -1169,6 +1205,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
