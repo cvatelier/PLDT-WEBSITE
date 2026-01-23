@@ -357,9 +357,6 @@ body {
       <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
         <i class="bi bi-person-plus"></i>
       </button>
-      <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#bulkAddEmployeeModal">
-      <i class="bi bi-people-fill"></i>
-      </button>
       <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal">
         <i class="bi bi-person-x"></i>
       </button>
@@ -436,56 +433,95 @@ body {
     </div>
   </div>
 </div>
-<div class="modal fade" id="addEmployeeModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="employeeModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title">Add Employee</h5>
+        <h5 class="modal-title">Add Employees</h5>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
-        <div class="row g-3">
 
-          <div class="col-12">
-            <label class="form-label">Cluster</label>
-            <input id="empCluster" class="form-control">
+        <!-- Tabs -->
+        <ul class="nav nav-pills mb-3">
+          <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#singleAdd">
+              Single Add
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#bulkAdd">
+              Bulk Add
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+
+          <!-- ✅ SINGLE ADD -->
+          <div class="tab-pane fade show active" id="singleAdd">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Cluster</label>
+                <input id="empCluster" class="form-control">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">ID Number</label>
+                <input id="empId" class="form-control">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Name</label>
+                <input id="empName" class="form-control">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Position</label>
+                <select id="empPosition" class="form-select">
+                  <option>CXSDA</option>
+                  <option>WMA</option>
+                  <option>WMS</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="text-end mt-3">
+              <button class="btn btn-success" onclick="addEmployee()">Add Employee</button>
+            </div>
           </div>
 
-          <div class="col-12">
-            <label class="form-label">ID Number</label>
-            <input id="empId" class="form-control">
+          <!-- ✅ BULK ADD -->
+          <div class="tab-pane fade" id="bulkAdd">
+            <p class="small text-muted">
+              One employee per line (CSV format):
+            </p>
+
+            <pre class="small bg-light p-2 rounded">
+Cluster 2,548600,Doe, John A.,CXSDA
+Cluster 2,548601,Smith, Jane B.,WMA
+            </pre>
+
+            <textarea id="bulkEmployeeText"
+              class="form-control"
+              rows="8"
+              placeholder="Cluster,ID,Name,Position"></textarea>
+
+            <div class="text-end mt-3">
+              <button class="btn btn-success" onclick="bulkAddEmployees()">
+                Add Employees
+              </button>
+            </div>
           </div>
 
-          <div class="col-12">
-            <label class="form-label">Name</label>
-            <input id="empName" class="form-control">
-          </div>
-
-          <div class="col-12">
-            <label class="form-label">Position</label>
-            <select id="empPosition" class="form-select">
-              <option>CXSDA</option>
-              <option>WMA</option>
-              <option>WMS</option>
-            </select>
-          </div>
-          <div class="col-12">
-            <label class="form-label">VL Count</label>
-            <input id="empVL" class="form-control">
-          </div>
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-success" onclick="addEmployee()">Add</button>
-      </div>
+    </div>
+  </div>
 </div>
-</div>
-</div>
-  
   <div class="modal fade" id="bulkAddEmployeeModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
@@ -733,9 +769,9 @@ window.applyBulkEdit = () => {
 
     viewMode==="month" ? renderMonth() : renderWeek();
 
-    bootstrap.Modal.getInstance(
-      document.getElementById("addEmployeeModal")
-    ).hide();
+bootstrap.Modal.getInstance(
+  document.getElementById("employeeModal")
+).hide();
 
     empCluster.value = empId.value = empName.value = "";
   };
@@ -990,6 +1026,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
