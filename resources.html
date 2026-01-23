@@ -288,7 +288,129 @@ body {
 #monthTable td.schedule-cell.HO { background:#20c997; color:#fff; }
 #monthTable td.schedule-cell.LA { background:#adb5bd; color:#000; }
 #monthTable td.schedule-cell.D  { background:#198754; color:#fff; }
-#monthTable td.schedule-cell.T  { background:#fd149f; color:#fff; }  
+#monthTable td.schedule-cell.T  { background:#fd149f; color:#fff; }
+
+/* =========================
+   RESPONSIVE FIXES
+   ========================= */
+
+/* ----- TABLE RESPONSIVENESS ----- */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent table from squeezing too much */
+#monthTable {
+  min-width: 1000px;
+}
+
+/* ----- MAIN LAYOUT ----- */
+@media (max-width: 992px) {
+
+  /* Sidebar collapse */
+  #sidebar {
+    position: fixed;
+    left: -220px;
+    top: 0;
+    height: 100%;
+    z-index: 1040;
+    transition: left 0.3s ease;
+  }
+
+  #sidebar.show {
+    left: 0;
+  }
+
+  /* Main content full width */
+  main {
+    padding: 16px !important;
+  }
+}
+
+/* ----- MOBILE VIEW ----- */
+@media (max-width: 768px) {
+
+  body {
+    font-size: 13px;
+  }
+
+  /* Stack main bar */
+  .main-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .main-bar h3 {
+    font-size: 16px;
+  }
+
+  /* Controls wrap */
+  .main-bar .btn-group,
+  .main-bar .d-flex {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Search input full width */
+  #searchInput {
+    max-width: 100% !important;
+    width: 100%;
+  }
+
+  /* Action buttons */
+  .card-body {
+    justify-content: center !important;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Reduce table padding */
+  #monthTable th,
+  #monthTable td {
+    padding: 6px;
+    font-size: 10px;
+  }
+
+  /* Employee name readability */
+  #monthTable td.text-start {
+    min-width: 160px;
+  }
+}
+
+/* ----- EXTRA SMALL PHONES ----- */
+@media (max-width: 480px) {
+
+  .main-bar h3 {
+    font-size: 15px;
+  }
+
+  .week-btn {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .legend {
+    font-size: 11px;
+  }
+}
+
+/* =========================
+   OPTIONAL SIDEBAR TOGGLE
+   ========================= */
+.sidebar-toggle {
+  display: none;
+}
+
+@media (max-width: 992px) {
+  .sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+  }
+}  
 </style>
 </head>
 <body>
@@ -592,6 +714,11 @@ Cluster 2,548601,Smith, Jane B.,WMA
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    document.getElementById("sidebar")?.classList.remove("show");
+  }
+});
 document.addEventListener("DOMContentLoaded", () => {
 
   /* ========== DATA ========== */
@@ -1042,6 +1169,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
