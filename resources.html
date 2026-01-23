@@ -814,9 +814,9 @@ bootstrap.Modal.getInstance(
 
   document.getElementById("bulkEmployeeText").value = "";
 
-  bootstrap.Modal.getInstance(
-    document.getElementById("bulkAddEmployeeModal")
-  ).hide();
+bootstrap.Modal.getInstance(
+  document.getElementById("employeeModal")
+).hide();
 
   alert(`${added} employees added successfully.`);
 };
@@ -1026,6 +1026,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
