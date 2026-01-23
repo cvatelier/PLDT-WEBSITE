@@ -556,26 +556,32 @@ Cluster 2,548601,Smith, Jane B.,WMA
 
 <!-- ✅ DELETE EMPLOYEE MODAL (SEPARATE) -->
 <div class="modal fade" id="deleteEmployeeModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title text-danger">Delete Employee</h5>
+        <h5 class="modal-title text-danger">Delete Employee(s)</h5>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
-        <label class="form-label fw-semibold">Select Employee</label>
-        <select id="deleteEmployeeSelect" class="form-select"></select>
+        <label class="form-label fw-semibold">Select Employee(s)</label>
+
+        <!-- MULTI SELECT -->
+        <select id="deleteEmployeeSelect"
+                class="form-select"
+                multiple
+                size="10"></select>
 
         <div class="alert alert-warning mt-3 small">
-          This action will permanently remove the employee and their schedules.
+          ⚠ This will permanently delete the selected employee(s) and
+          <strong>all their schedules</strong>.
         </div>
       </div>
 
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-danger" onclick="deleteEmployee()">Delete</button>
+        <button class="btn btn-danger" onclick="deleteEmployees()">Delete</button>
       </div>
 
     </div>
@@ -628,15 +634,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function refreshDeleteEmployees(){
-    deleteEmployeeSelect.innerHTML = "";
-    employees.forEach((e,i)=>{
-      const opt = document.createElement("option");
-      opt.value = i;
-      opt.textContent = `${e.name} (${e.position})`;
-      deleteEmployeeSelect.appendChild(opt);
-    });
-  }
+function refreshDeleteEmployees(){
+  deleteEmployeeSelect.innerHTML = "";
+  employees.forEach((e,i)=>{
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = `${e.name} (${e.position})`;
+    deleteEmployeeSelect.appendChild(opt);
+  });
+}
 
   refreshBulkEmployees();
   refreshDeleteEmployees();
@@ -823,47 +829,57 @@ bootstrap.Modal.getInstance(
 
 
   /* ========== DELETE EMPLOYEE ========== */
-  window.deleteEmployee = () => {
-    const index = deleteEmployeeSelect.value;
-    if(index === "") return;
+window.deleteEmployees = () => {
+  const selected = Array.from(deleteEmployeeSelect.selectedOptions)
+    .map(o => Number(o.value))
+    .sort((a,b) => b - a); // important: delete from highest index
 
-    const emp = employees[index];
-    if(!confirm(`Delete ${emp.name}? This cannot be undone.`)) return;
+  if (!selected.length) {
+    alert("Please select at least one employee.");
+    return;
+  }
 
-    employees.splice(index,1);
+  const names = selected.map(i => employees[i].name).join("\n");
 
-    Object.keys(schedules).forEach(monthKey=>{
-      Object.keys(schedules[monthKey]).forEach(k=>{
-        if(k.startsWith(index+"-")) delete schedules[monthKey][k];
-      });
-    });
+  if (!confirm(
+    `Delete the following employee(s)?\n\n${names}\n\nThis cannot be undone.`
+  )) return;
 
-    const newSchedules = {};
-    Object.keys(schedules).forEach(monthKey=>{
-      newSchedules[monthKey] = {};
-      Object.keys(schedules[monthKey]).forEach(k=>{
-        const [empIdx, day] = k.split("-");
-        if(empIdx > index){
-          newSchedules[monthKey][`${empIdx-1}-${day}`] = schedules[monthKey][k];
-        } else if(empIdx < index){
-          newSchedules[monthKey][k] = schedules[monthKey][k];
+  selected.forEach(index => {
+    employees.splice(index, 1);
+
+    Object.keys(schedules).forEach(monthKey => {
+      const updated = {};
+
+      Object.keys(schedules[monthKey]).forEach(k => {
+        const [empIdx, day] = k.split("-").map(Number);
+
+        if (empIdx === index) return; // remove schedules
+        if (empIdx > index) {
+          updated[`${empIdx-1}-${day}`] = schedules[monthKey][k];
+        } else {
+          updated[k] = schedules[monthKey][k];
         }
       });
+
+      schedules[monthKey] = updated;
     });
-    schedules = newSchedules;
+  });
 
-    save();
+  save();
 
-    refreshBulkEmployees();
-    refreshDeleteEmployees();
+  refreshBulkEmployees();
+  refreshDeleteEmployees();
 
-    viewMode==="month" ? renderMonth() : renderWeek();
-    applySearchFilter(searchInput.value);
+  viewMode === "month" ? renderMonth() : renderWeek();
+  applySearchFilter(searchInput.value);
 
-    bootstrap.Modal.getInstance(
-      document.getElementById("deleteEmployeeModal")
-    ).hide();
-  };
+  bootstrap.Modal.getInstance(
+    document.getElementById("deleteEmployeeModal")
+  ).hide();
+
+  alert("Employee(s) deleted successfully.");
+};
 
   /* ========== MONTH VIEW ========== */
   function renderMonth(){
@@ -1026,6 +1042,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
