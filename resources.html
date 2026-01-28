@@ -475,6 +475,69 @@ body {
 .today-cell.T {
   filter: brightness(1.05);
 }  
+
+  /* =========================
+   STICKY CALENDAR HEADERS
+   ========================= */
+
+.month-scroll {
+  max-height: calc(100vh - 260px); /* adjust if needed */
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Sticky header rows */
+#monthTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f1f3f5;
+}
+
+/* Second header row (Week days) */
+#monthTable thead tr:nth-child(2) th {
+  top: 34px;
+}
+
+/* Third header row (Dates) */
+#monthTable thead tr:nth-child(3) th {
+  top: 64px;
+}
+
+/* Week view only has 2 header rows */
+.week-view #monthTable thead tr:nth-child(2) th {
+  top: 34px;
+}
+/* =========================
+   COMPACT CALENDAR SIZE
+   ========================= */
+
+/* Month + Week cells */
+#monthTable td,
+#monthTable th {
+  padding: 4px 6px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* Schedule cells */
+.schedule-cell {
+  height: 28px;
+  font-size: 10px;
+}
+
+/* Employee name column */
+#monthTable td.text-start {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Reduce header height */
+#monthTable thead th {
+  height: 30px;
+}
+
 </style>
 </head>
 <body>
@@ -1270,6 +1333,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
