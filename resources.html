@@ -470,10 +470,26 @@ body {
    STICKY CALENDAR HEADERS
    ========================= */
 
+/* Scrollable calendar wrapper */
 .month-scroll {
-  max-height: calc(100vh - 260px); /* adjust if needed */
-  overflow-y: auto;
+  overflow-x: auto;      /* horizontal scroll */
+  overflow-y: auto;      /* vertical scroll */
+  max-width: 100%;       /* fit container width */
+  max-height: calc(100vh - 260px); /* adjust height if needed */
   position: relative;
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on touch devices */
+}
+
+/* Optional: hide scrollbars in Firefox/Chrome if you want a cleaner look */
+/* Scrollbar styling is optional */
+.month-scroll::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.month-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
 }
 
 /* Sticky header rows */
@@ -537,9 +553,9 @@ body {
 /* Sticky VL column (after position column) */
 .sticky-col-vl {
   position: sticky;
-  left: 880px; /* sum of widths of Cluster+ID+Name+Position columns */
+  left: 620px; /* sum of widths of first 4 columns */
   z-index: 4;
-  background: #f1f3f5; /* match table header bg */
+  background: #f1f3f5;
 }
 
 /* Sticky VL cell in body */
@@ -1348,6 +1364,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
