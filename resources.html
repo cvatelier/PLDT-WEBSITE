@@ -534,7 +534,18 @@ body {
 .month-scroll #monthTable {
   min-width: 1200px;
 }
+/* Sticky VL column (after position column) */
+.sticky-col-vl {
+  position: sticky;
+  left: 880px; /* sum of widths of Cluster+ID+Name+Position columns */
+  z-index: 4;
+  background: #f1f3f5; /* match table header bg */
+}
 
+/* Sticky VL cell in body */
+#monthTable td.sticky-col-vl {
+  background: #ffffff; /* match sticky columns */
+}
 </style>
 </head>
 <body>
@@ -1173,7 +1184,7 @@ window.deleteEmployees = () => {
       <th rowspan="3">ID</th>
       <th rowspan="3">Name</th>
       <th rowspan="3">Position</th>
-      <th rowspan="3">VL</th>`;
+      <th rowspan="3" class="sticky-col-vl">VL</th>`;
     for(let w=1; w<=weeks; w++) r1+=`<th colspan="7">Week ${w}</th>`;
     r1+=`</tr>`;
 
@@ -1204,6 +1215,7 @@ employees.forEach((emp, empIndex) => {
     <td>${emp.id}</td>
     <td class="text-start">${emp.name}</td>
     <td>${emp.position}</td>
+    <td class="schedule-cell sticky-col-vl"></td> <!-- VL cell -->
     <td></td>`;
 
   for (let i = 0; i < totalCells; i++) {
@@ -1336,6 +1348,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
