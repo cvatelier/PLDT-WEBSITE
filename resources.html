@@ -1238,9 +1238,8 @@ employees.forEach((emp, empIndex) => {
   }
 
   /* ========== WEEK VIEW ========== */
-function renderWeek(){
+function renderWeek() {
   const start = mondayOfWeek(currentDate);
-
   document.getElementById("monthLabel").innerText =
     `Week of ${start.toLocaleDateString()}`;
 
@@ -1249,6 +1248,7 @@ function renderWeek(){
   head.innerHTML = "";
   body.innerHTML = "";
 
+  // HEADERS
   let h1 = `<tr>
     <th>Cluster</th><th>ID</th><th>Name</th><th>Position</th><th>VL</th>`;
   for (let i = 0; i < 7; i++) h1 += `<th>${weekDays[i]}</th>`;
@@ -1259,39 +1259,36 @@ function renderWeek(){
     const d = new Date(start);
     d.setDate(start.getDate() + i);
     const isT = isToday(d.getFullYear(), d.getMonth(), d.getDate());
-h2 += `
-  <th class="${isT ? "today-header" : ""}">
-    ${isT ? `<span>${d.getDate()}</span>` : d.getDate()}
-  </th>`;
-
+    h2 += `<th class="${isT ? "today-header" : ""}">${
+      isT ? `<span>${d.getDate()}</span>` : d.getDate()
+    }</th>`;
   }
   h2 += `</tr>`;
 
   head.innerHTML = h1 + h2;
 
+  // BODY
   employees.forEach((emp, empIndex) => {
     let tr = `<tr>
-      <td>${emp.cluster}</td>
-      <td>${emp.id}</td>
-      <td class="text-start">${emp.name}</td>
-      <td>${emp.position}</td>
-      <td></td>`;
+      <td rowspan="1">${emp.cluster}</td>
+      <td rowspan="1">${emp.id}</td>
+      <td rowspan="1" class="text-start">${emp.name}</td>
+      <td rowspan="1">${emp.position}</td>
+      <td rowspan="1" class="schedule-cell"></td>`; // VL cell
 
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
 
-      const key = `${d.getFullYear()}-${d.getMonth()}`; // ✅ FIX
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
       const id  = `${empIndex}-${d.getDate()}`;
       const val = schedules[key]?.[id] || "";
+      const todayCol = isToday(d.getFullYear(), d.getMonth(), d.getDate())
+        ? "today-cell"
+        : "";
 
-const todayCol = isToday(d.getFullYear(), d.getMonth(), d.getDate())
-  ? "today-cell"
-  : "";
-
-tr += `<td class="schedule-cell ${val} ${todayCol}"
-         data-key="${key}"
-         data-id="${id}">${val}</td>`;
+      tr += `<td class="schedule-cell ${val} ${todayCol}"
+               data-key="${key}" data-id="${id}">${val}</td>`;
     }
 
     tr += `</tr>`;
@@ -1344,6 +1341,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
