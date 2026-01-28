@@ -436,6 +436,44 @@ body {
 /* In WEEK view, no horizontal scroll needed */
 .week-view .month-scroll #monthTable {
   min-width: unset;
+}
+
+/* ===== TODAY (LIKE SAMPLE IMAGE) ===== */
+
+/* Date number (circle) */
+.today-header {
+  background: none !important;
+}
+
+.today-header span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #0d6efd;
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* Vertical column highlight */
+.today-cell {
+  background: #eef4ff !important;
+}
+
+/* Keep schedule color stronger than highlight */
+.today-cell.RD,
+.today-cell.VL,
+.today-cell.SL,
+.today-cell.PL,
+.today-cell.ML,
+.today-cell.HO,
+.today-cell.LA,
+.today-cell.D,
+.today-cell.T {
+  filter: brightness(1.05);
 }  
 </style>
 </head>
@@ -1043,7 +1081,15 @@ window.deleteEmployees = () => {
 
   alert("Employee(s) deleted successfully.");
 };
-
+  
+  function isToday(year, month, day) {
+  const t = new Date();
+  return (
+    t.getFullYear() === year &&
+    t.getMonth() === month &&
+    t.getDate() === day
+  );
+}
   /* ========== MONTH VIEW ========== */
   function renderMonth(){
     const year = currentDate.getFullYear();
@@ -1079,7 +1125,15 @@ window.deleteEmployees = () => {
     let r3 = `<tr>`;
     for(let i=0;i<totalCells;i++){
       const d=i-startOffset+1;
-      r3+=`<th>${d>0&&d<=daysInMonth?d:""}</th>`;
+      if (d > 0 && d <= daysInMonth) {
+  const isT = isToday(year, month, d);
+  r3 += `
+    <th class="${isT ? "today-header" : ""}">
+      ${isT ? `<span>${d}</span>` : d}
+    </th>`;
+} else {
+  r3 += `<th></th>`;
+}
     }
     r3+=`</tr>`;
 
@@ -1096,7 +1150,10 @@ window.deleteEmployees = () => {
         const day=i-startOffset+1;
         const id=(day>0&&day<=daysInMonth)?`${empIndex}-${day}`:"";
         const val=id?schedules[key]?.[id]||"":"";
-        tr+=`<td class="schedule-cell ${val}" data-key="${key}" data-id="${id}">${val}</td>`;
+        const todayCol = isToday(year, month, day) ? "today-cell" : "";
+        tr+=`<td class="schedule-cell ${val} ${todayCol}"
+        data-key="${key}" data-id="${id}">${val}</td>`;
+
       }
       tr+=`</tr>`;
       body.insertAdjacentHTML("beforeend", tr);
@@ -1127,7 +1184,12 @@ function renderWeek(){
   for (let i = 0; i < 7; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
-    h2 += `<th>${d.getDate()}</th>`;
+    const isT = isToday(d.getFullYear(), d.getMonth(), d.getDate());
+h2 += `
+  <th class="${isT ? "today-header" : ""}">
+    ${isT ? `<span>${d.getDate()}</span>` : d.getDate()}
+  </th>`;
+
   }
   h2 += `</tr>`;
 
@@ -1149,9 +1211,13 @@ function renderWeek(){
       const id  = `${empIndex}-${d.getDate()}`;
       const val = schedules[key]?.[id] || "";
 
-      tr += `<td class="schedule-cell ${val}"
-               data-key="${key}"
-               data-id="${id}">${val}</td>`;
+const todayCol = isToday(d.getFullYear(), d.getMonth(), d.getDate())
+  ? "today-cell"
+  : "";
+
+tr += `<td class="schedule-cell ${val} ${todayCol}"
+         data-key="${key}"
+         data-id="${id}">${val}</td>`;
     }
 
     tr += `</tr>`;
@@ -1197,7 +1263,6 @@ select.onchange = () => {
       };
     });
   }
-
   /* ========== INIT ========== */
   renderWeek();
 
@@ -1205,6 +1270,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
