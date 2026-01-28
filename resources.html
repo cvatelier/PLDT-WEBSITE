@@ -1207,14 +1207,19 @@ employees.forEach((emp, empIndex) => {
     <td>${emp.position}</td>
     <td></td>`;
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    const id = `${empIndex}-${d}`;
-    const val = schedules[key]?.[id] || "";
-    const todayCol = isToday(year, month, d) ? "today-cell" : "";
+  for (let i = 0; i < totalCells; i++) {
+    const day = i - startOffset + 1;
+    let content = "";
+    let classes = "schedule-cell";
 
-    tr += `<td class="schedule-cell ${val} ${todayCol}"
-             data-key="${key}"
-             data-id="${id}">${val}</td>`;
+    if (day > 0 && day <= daysInMonth) {
+      const val = schedules[key]?.[`${empIndex}-${day}`] || "";
+      const todayCol = isToday(year, month, day) ? "today-cell" : "";
+      classes += ` ${val} ${todayCol}`;
+      content = val;
+    }
+
+    tr += `<td class="${classes}" data-key="${key}" data-id="${empIndex}-${day}">${content}</td>`;
   }
 
   tr += `</tr>`;
@@ -1332,6 +1337,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
