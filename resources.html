@@ -256,14 +256,6 @@ body {
   font-size: 11px;
 }
 
-/* Sticky columns */
-.sticky-col,
-.sticky-col-2,
-.sticky-col-3 {
-  background: #ffffff !important;
-  z-index: 3;
-}
-
 /* Hover */
 .schedule-cell:hover {
   background: #e9ecef;
@@ -470,14 +462,13 @@ body {
    STICKY CALENDAR HEADERS
    ========================= */
 
-/* Scrollable calendar wrapper */
 .month-scroll {
-  overflow-x: auto;      /* horizontal scroll */
-  overflow-y: auto;      /* vertical scroll */
-  max-width: 100%;       /* fit container width */
-  max-height: calc(100vh - 260px); /* adjust height if needed */
+  overflow-x: auto;   /* horizontal scroll */
+  overflow-y: auto;   /* vertical scroll */
+  max-width: 100%;
+  max-height: calc(100vh - 260px);
   position: relative;
-  -webkit-overflow-scrolling: touch; /* smooth scrolling on touch devices */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Optional: hide scrollbars in Firefox/Chrome if you want a cleaner look */
@@ -544,24 +535,13 @@ body {
   height: 30px;
 }
 #monthTable {
-  min-width: 1000px;
+  min-width: 1200px;
 }
 
 .month-scroll #monthTable {
   min-width: 1200px;
 }
-/* Sticky VL column (after position column) */
-.sticky-col-vl {
-  position: sticky;
-  left: 620px; /* sum of widths of first 4 columns */
-  z-index: 4;
-  background: #f1f3f5;
-}
 
-/* Sticky VL cell in body */
-#monthTable td.sticky-col-vl {
-  background: #ffffff; /* match sticky columns */
-}
 </style>
 </head>
 <body>
@@ -1364,6 +1344,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
