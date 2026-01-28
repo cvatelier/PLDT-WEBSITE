@@ -300,11 +300,6 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Prevent table from squeezing too much */
-#monthTable {
-  min-width: 1000px;
-}
-
 /* ----- MAIN LAYOUT ----- */
 @media (max-width: 992px) {
 
@@ -428,11 +423,6 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Month table wide, week table normal */
-.month-scroll #monthTable {
-  min-width: 1200px; /* forces internal scroll */
-}
-
 /* In WEEK view, no horizontal scroll needed */
 .week-view .month-scroll #monthTable {
   min-width: unset;
@@ -538,6 +528,29 @@ body {
   height: 30px;
 }
 
+/* =========================
+   MONTH FITS LIKE WEEK VIEW
+   ========================= */
+
+.month-view .month-scroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.month-view #monthTable {
+  width: 100%;
+}
+
+/* Make month rows slightly tighter */
+.month-view #monthTable td {
+  height: 26px;
+  font-size: 10px;
+}
+
+/* Visual separation per week */
+.month-week-separator td {
+  border-bottom: 2px solid #dee2e6;
+}
 </style>
 </head>
 <body>
@@ -1202,25 +1215,39 @@ window.deleteEmployees = () => {
 
     head.innerHTML = r1+r2+r3;
 
-    employees.forEach((emp,empIndex)=>{
-      let tr = `<tr>
-        <td>${emp.cluster}</td>
-        <td>${emp.id}</td>
-        <td class="text-start">${emp.name}</td>
-        <td>${emp.position}</td>
-        <td></td>`;
-      for(let i=0;i<totalCells;i++){
-        const day=i-startOffset+1;
-        const id=(day>0&&day<=daysInMonth)?`${empIndex}-${day}`:"";
-        const val=id?schedules[key]?.[id]||"":"";
-        const todayCol = isToday(year, month, day) ? "today-cell" : "";
-        tr+=`<td class="schedule-cell ${val} ${todayCol}"
-        data-key="${key}" data-id="${id}">${val}</td>`;
+employees.forEach((emp, empIndex) => {
 
+  for (let w = 0; w < weeks; w++) {
+
+    let tr = `<tr class="${w < weeks - 1 ? "month-week-separator" : ""}">
+      <td>${w === 0 ? emp.cluster : ""}</td>
+      <td>${w === 0 ? emp.id : ""}</td>
+      <td class="text-start">${w === 0 ? emp.name : ""}</td>
+      <td>${w === 0 ? emp.position : ""}</td>
+      <td></td>`;
+
+    for (let d = 0; d < 7; d++) {
+      const cellIndex = w * 7 + d;
+      const day = cellIndex - startOffset + 1;
+
+      if (day > 0 && day <= daysInMonth) {
+        const id = `${empIndex}-${day}`;
+        const val = schedules[key]?.[id] || "";
+        const todayCol = isToday(year, month, day) ? "today-cell" : "";
+
+        tr += `<td class="schedule-cell ${val} ${todayCol}"
+                 data-key="${key}"
+                 data-id="${id}">${val}</td>`;
+      } else {
+        tr += `<td></td>`;
       }
-      tr+=`</tr>`;
-      body.insertAdjacentHTML("beforeend", tr);
-    });
+    }
+
+    tr += `</tr>`;
+    body.insertAdjacentHTML("beforeend", tr);
+  }
+
+});
 
     bindClicks();
     applySearchFilter(searchInput.value);
@@ -1333,6 +1360,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
