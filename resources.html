@@ -539,11 +539,17 @@ body {
 }
 
 .month-scroll {
-  width: 100%;
-  overflow-x: hidden;   /* ❌ remove horizontal scroll */
-  overflow-y: auto;     /* ✅ allow vertical scroll only */
-  max-height: calc(100vh - 260px);
-} 
+    width: 100%;
+    overflow-x: auto;      /* horizontal scroll inside */
+    overflow-y: auto;      /* vertical scroll if needed */
+    max-height: calc(100vh - 260px);
+}
+  
+.calendar-container {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;      /* prevent page-level scroll */
+}
 </style>
 </head>
 <body>
@@ -1348,6 +1354,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
