@@ -17,6 +17,7 @@ body {
   font-size: 14px;
   background: #f8f9fa;
   color: #495057;
+  overflow-x: hidden;
 }
 
 /* ========== CLEAN LIGHT SIDEBAR (PICTURE STYLE) ========== */
@@ -400,20 +401,24 @@ body {
 }  
 
 /* =========================
-   MONTH VIEW SCROLL FIX
+   CALENDAR SCROLL CONTAINER
    ========================= */
 
-/* Wrapper that scrolls only the calendar */
 .month-scroll {
-  overflow-x: auto;
-  overflow-y: hidden;
+  width: 100%;
   max-width: 100%;
+  overflow-x: auto;     /* left-right scroll */
+  overflow-y: auto;     /* vertical scroll */
+  max-height: calc(100vh - 250px);
+  border-radius: 12px;
+  position: relative;
 }
 
-/* Smooth scrolling on touch devices */
-.month-scroll {
-  -webkit-overflow-scrolling: touch;
+/* Ensure table is wider than container */
+.month-scroll table {
+  min-width: 1200px;
 }
+
 
 /* In WEEK view, no horizontal scroll needed */
 .week-view .month-scroll #monthTable {
@@ -1346,6 +1351,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
