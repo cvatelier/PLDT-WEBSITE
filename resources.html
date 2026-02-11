@@ -413,12 +413,6 @@ body {
   position: relative;
 }
 
-/* Ensure table is wider than container */
-.month-scroll table {
-  min-width: 1200px;
-}
-
-
 /* In WEEK view, no horizontal scroll needed */
 .week-view .month-scroll #monthTable {
   min-width: unset;
@@ -538,14 +532,18 @@ body {
 #monthTable thead th {
   height: 30px;
 }
+
 #monthTable {
-  min-width: 1200px;
+  width: 100%;
+  table-layout: fixed;
 }
 
-.month-scroll #monthTable {
-  min-width: 1200px;
-}
-
+.month-scroll {
+  width: 100%;
+  overflow-x: hidden;   /* ❌ remove horizontal scroll */
+  overflow-y: auto;     /* ✅ allow vertical scroll only */
+  max-height: calc(100vh - 260px);
+} 
 </style>
 </head>
 <body>
@@ -1350,6 +1348,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
