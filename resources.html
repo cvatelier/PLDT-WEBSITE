@@ -157,165 +157,61 @@ body {
    TABLE / CALENDAR
    ========================= */
 
+/* EXCEL STYLE FREEZE */
+
 #monthTable {
-  min-width: 1400px;
   border-collapse: separate;
-  border-spacing: 0;
 }
-
-#monthTable th {
-  font-weight: 600;
-  font-size: 11px;
-  background: #fafafa;
-  border-bottom: 1px solid var(--border);
-  padding: 6px;
-}
-
-#monthTable td {
-  background: #ffffff;
-  border-bottom: 1px solid var(--border);
-  font-size: 11px;
-  padding: 6px;
-  transition: background 0.15s ease;
-}
-
-#monthTable tr:hover td {
-  background: #fafafa;
-}
-
-/* Compact cells */
-.schedule-cell {
-  height: 28px;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-/* =========================
-   SCHEDULE COLORS (SOFT)
-   ========================= */
-
-#monthTable td.schedule-cell.RD { background:#f8d7da; color:#842029; }
-#monthTable td.schedule-cell.VL { background:#fff3cd; color:#664d03; }
-#monthTable td.schedule-cell.SL { background:#fde2e4; color:#9d0208; }
-#monthTable td.schedule-cell.PL { background:#e7f1ff; color:#084298; }
-#monthTable td.schedule-cell.ML { background:#f3e8ff; color:#4b0082; }
-#monthTable td.schedule-cell.HO { background:#e6fcf5; color:#087f5b; }
-#monthTable td.schedule-cell.LA { background:#f1f3f5; color:#495057; }
-#monthTable td.schedule-cell.D  { background:#d1e7dd; color:#0f5132; }
-#monthTable td.schedule-cell.T  { background:#ffe0f7; color:#8a005c; }
-
-/* =========================
-   TODAY STYLE
-   ========================= */
-
-.today-header span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  background: var(--accent);
-  color: #ffffff;
-  border-radius: 50%;
-  font-weight: 600;
-  font-size: 11px;
-}
-
-.today-cell {
-  background: #f2f2f2 !important;
-}
-
-/* =========================
-   STICKY HEADERS
-   ========================= */
-
-#monthTable thead th {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: #fff;
-}
-
-
-/* =========================
-   STICKY LEFT COLUMNS
-   ========================= */
 
 #monthTable th,
 #monthTable td {
   white-space: nowrap;
 }
 
-/* Column 1 */
+/* Sticky Columns */
+#monthTable th:nth-child(-n+5),
+#monthTable td:nth-child(-n+5) {
+  position: sticky;
+  background: #fff;
+  z-index: 5;
+}
+
+/* Individual Left Positions */
 #monthTable th:nth-child(1),
-#monthTable td:nth-child(1) {
-  position: sticky;
-  left: 0;
-  z-index: 40;
-  background: #fff;
-  min-width: 120px;
-}
+#monthTable td:nth-child(1) { left: 0; min-width:120px; }
 
-/* Column 2 */
 #monthTable th:nth-child(2),
-#monthTable td:nth-child(2) {
-  position: sticky;
-  left: 120px;
-  z-index: 40;
-  background: #fff;
-  min-width: 80px;
-}
+#monthTable td:nth-child(2) { left:120px; min-width:80px; }
 
-/* Column 3 */
 #monthTable th:nth-child(3),
-#monthTable td:nth-child(3) {
-  position: sticky;
-  left: 200px;
-  z-index: 40;
-  background: #fff;
-  min-width: 180px;
-}
+#monthTable td:nth-child(3) { left:200px; min-width:180px; }
 
-/* Column 4 */
 #monthTable th:nth-child(4),
-#monthTable td:nth-child(4) {
-  position: sticky;
-  left: 380px;
-  z-index: 40;
-  background: #fff;
-  min-width: 120px;
-}
+#monthTable td:nth-child(4) { left:380px; min-width:120px; }
 
-/* Column 5 (VL) */
 #monthTable th:nth-child(5),
-#monthTable td:nth-child(5) {
-  position: sticky;
-  left: 500px;
-  z-index: 40;
-  background: #fff;
-  min-width: 70px;
+#monthTable td:nth-child(5) { left:500px; min-width:70px; }
+
+/* Header Above All */
+#monthTable thead th {
+  z-index: 10;
 }
-
-/* =========================
-   SCROLL CONTAINER
-   ========================= */
-
+   
 .month-scroll {
-  width: 100%;
-  overflow: auto;
   position: relative;
 }
 
-/* Clean Scrollbar */
-.month-scroll::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
+.month-scroll::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 570px;
+  width: 15px;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
 }
 
-.month-scroll::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.15);
-  border-radius: 10px;
-}
 
 /* =========================
    MODALS
@@ -334,30 +230,28 @@ body {
   border-top: 1px solid var(--border);
 }
 
-/* =========================
-   RESPONSIVE
-   ========================= */
-
 @media (max-width: 992px) {
+
   #sidebar {
     position: fixed;
-    left: -240px;
-    transition: left 0.3s ease;
+    z-index: 1000;
+    background: #fff;
   }
 
-  #sidebar.show {
-    left: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  body {
-    font-size: 12px;
+  .month-scroll {
+    max-height: 60vh;
   }
 
   #monthTable {
-    min-width: 1200px;
+    font-size: 11px;
+    min-width: 900px;
   }
+
+  .schedule-cell {
+    height: 24px;
+    font-size: 9px;
+  }
+
 }
 </style>
 </head>
@@ -1029,7 +923,9 @@ let tr = `<tr>
   <td>${emp.id}</td>
   <td class="text-start">${emp.name}</td>
   <td>${emp.position}</td>
-  <td class="schedule-cell sticky-col-vl"></td>`;
+  <td class="fw-semibold text-primary">
+  ${countVL(empIndex, year, month)}
+</td>`;
 
   for (let i = 0; i < totalCells; i++) {
     const day = i - startOffset + 1;
@@ -1096,7 +992,13 @@ function renderWeek() {
       <td>${emp.id}</td>
       <td class="text-start">${emp.name}</td>
       <td>${emp.position}</td>
-      <td class="schedule-cell sticky-col-vl"></td>`; // VL cell
+      <td class="fw-semibold text-primary">
+  ${weekDates.filter(d => {
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    return schedules[key]?.[`${empIndex}-${d.getDate()}`] === "VL";
+  }).length}
+</td>
+`; // VL cell
 
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
@@ -1146,13 +1048,17 @@ select.onchange = () => {
 
   save();
 
-  // ✅ re-render based on current view
-  if (viewMode === "month") {
-    renderMonth();
-  } else {
-    renderWeek();
-  }
+  const newVal = select.value;
+  cell.innerHTML = newVal;
+  cell.className = "schedule-cell " + (newVal || "");
+
+  cell.style.transform = "scale(1.05)";
+  cell.style.transition = "0.15s ease";
+  setTimeout(() => {
+    cell.style.transform = "scale(1)";
+  }, 150);
 };
+
       };
     });
   }
@@ -1163,6 +1069,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
