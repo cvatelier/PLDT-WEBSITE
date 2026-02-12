@@ -239,36 +239,54 @@ body {
    STICKY LEFT COLUMNS
    ========================= */
 
+/* Column 1 - Cluster */
 #monthTable th:nth-child(1),
 #monthTable td:nth-child(1) {
   position: sticky;
   left: 0;
-  background: #ffffff;
-  z-index: 20;
+  background: #fff;
+  z-index: 30;
+  width: 120px;
 }
 
+/* Column 2 - ID */
 #monthTable th:nth-child(2),
 #monthTable td:nth-child(2) {
   position: sticky;
   left: 120px;
-  background: #ffffff;
-  z-index: 20;
+  background: #fff;
+  z-index: 30;
+  width: 80px;
 }
 
+/* Column 3 - Name */
 #monthTable th:nth-child(3),
 #monthTable td:nth-child(3) {
   position: sticky;
-  left: 200px;
-  background: #ffffff;
-  z-index: 20;
+  left: 200px; /* 120 + 80 */
+  background: #fff;
+  z-index: 30;
+  width: 180px;
 }
-   
+
+/* Column 4 - Position */
 #monthTable th:nth-child(4),
 #monthTable td:nth-child(4) {
   position: sticky;
-  left: 320px; /* adjust if needed */
-  background: #ffffff;
-  z-index: 20;
+  left: 380px; /* 120 + 80 + 180 */
+  background: #fff;
+  z-index: 30;
+  width: 120px;
+}
+
+/* Column 5 - VL */
+#monthTable th:nth-child(5),
+#monthTable td:nth-child(5) {
+  position: sticky;
+  left: 500px; /* 120 + 80 + 180 + 120 */
+  background: #fff;
+  z-index: 30;
+  width: 70px;
 }
 
 /* =========================
@@ -973,7 +991,8 @@ let r1 = `<tr>
   <th rowspan="3">Cluster</th>
   <th rowspan="3">ID</th>
   <th rowspan="3">Name</th>
-  <th rowspan="3">Position</th>`;
+  <th rowspan="3">Position</th>
+  <th rowspan="3" class="sticky-col-vl">VL</th>;
 
     for(let w=1; w<=weeks; w++) r1+=`<th colspan="7">Week ${w}</th>`;
     r1+=`</tr>`;
@@ -1071,7 +1090,7 @@ function renderWeek() {
       <td>${emp.id}</td>
       <td class="text-start">${emp.name}</td>
       <td>${emp.position}</td>
-      <td></td>`; // VL cell
+      <td class="schedule-cell sticky-col-vl"></td>`; // VL cell
 
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
@@ -1138,6 +1157,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
