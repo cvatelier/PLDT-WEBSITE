@@ -969,12 +969,12 @@ window.deleteEmployees = () => {
     head.innerHTML = "";
     body.innerHTML = "";
 
-    let r1 = `<tr>
-      <th rowspan="3">Cluster</th>
-      <th rowspan="3">ID</th>
-      <th rowspan="3">Name</th>
-      <th rowspan="3">Position</th>
-      <th rowspan="3" class="sticky-col-vl">VL</th>`;
+let r1 = `<tr>
+  <th rowspan="3">Cluster</th>
+  <th rowspan="3">ID</th>
+  <th rowspan="3">Name</th>
+  <th rowspan="3">Position</th>`;
+
     for(let w=1; w<=weeks; w++) r1+=`<th colspan="7">Week ${w}</th>`;
     r1+=`</tr>`;
 
@@ -1004,8 +1004,7 @@ let tr = `<tr>
   <td>${emp.cluster}</td>
   <td>${emp.id}</td>
   <td class="text-start">${emp.name}</td>
-  <td>${emp.position}</td>
-  <td class="schedule-cell sticky-col-vl"></td>`;
+  <td>${emp.position}</td>`;
 
   for (let i = 0; i < totalCells; i++) {
     const day = i - startOffset + 1;
@@ -1139,6 +1138,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
