@@ -1023,7 +1023,8 @@ let tr = `<tr>
   <td>${emp.cluster}</td>
   <td>${emp.id}</td>
   <td class="text-start">${emp.name}</td>
-  <td>${emp.position}</td>`;
+  <td>${emp.position}</td>
+  <td class="schedule-cell sticky-col-vl"></td>`;
 
   for (let i = 0; i < totalCells; i++) {
     const day = i - startOffset + 1;
@@ -1157,6 +1158,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
