@@ -562,6 +562,16 @@ document.addEventListener("keydown", e => {
 });
 document.addEventListener("DOMContentLoaded", () => {
 
+   function countVL(empIndex, year, month) {
+  const key = `${year}-${month}`;
+  if (!schedules[key]) return 0;
+
+  return Object.keys(schedules[key]).filter(k => {
+    const [idx] = k.split("-").map(Number);
+    return idx === empIndex && schedules[key][k] === "VL";
+  }).length;
+}
+
   /* ========== DATA ========== */
   let employees = JSON.parse(localStorage.getItem("employees")) || [
     { cluster:"Cluster 2", id:"548578", name:"Aquino, Ralph Allen P.", position:"CXSDA" },
@@ -949,7 +959,12 @@ let tr = `<tr>
     bindClicks();
     applySearchFilter(searchInput.value);
   }
-
+const weekDates = [];
+for (let i = 0; i < 7; i++) {
+  const d = new Date(start);
+  d.setDate(start.getDate() + i);
+  weekDates.push(d);
+}
   /* ========== WEEK VIEW ========== */
 function renderWeek() {
   const start = mondayOfWeek(currentDate);
@@ -1069,6 +1084,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
