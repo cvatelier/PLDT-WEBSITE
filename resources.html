@@ -239,54 +239,59 @@ body {
    STICKY LEFT COLUMNS
    ========================= */
 
-/* Column 1 - Cluster */
+#monthTable th,
+#monthTable td {
+  white-space: nowrap;
+}
+
+/* Column 1 */
 #monthTable th:nth-child(1),
 #monthTable td:nth-child(1) {
   position: sticky;
   left: 0;
+  z-index: 40;
   background: #fff;
-  z-index: 30;
-  width: 120px;
+  min-width: 120px;
 }
 
-/* Column 2 - ID */
+/* Column 2 */
 #monthTable th:nth-child(2),
 #monthTable td:nth-child(2) {
   position: sticky;
   left: 120px;
+  z-index: 40;
   background: #fff;
-  z-index: 30;
-  width: 80px;
+  min-width: 80px;
 }
 
-/* Column 3 - Name */
+/* Column 3 */
 #monthTable th:nth-child(3),
 #monthTable td:nth-child(3) {
   position: sticky;
-  left: 200px; /* 120 + 80 */
+  left: 200px;
+  z-index: 40;
   background: #fff;
-  z-index: 30;
-  width: 180px;
+  min-width: 180px;
 }
 
-/* Column 4 - Position */
+/* Column 4 */
 #monthTable th:nth-child(4),
 #monthTable td:nth-child(4) {
   position: sticky;
-  left: 380px; /* 120 + 80 + 180 */
+  left: 380px;
+  z-index: 40;
   background: #fff;
-  z-index: 30;
-  width: 120px;
+  min-width: 120px;
 }
 
-/* Column 5 - VL */
+/* Column 5 (VL) */
 #monthTable th:nth-child(5),
 #monthTable td:nth-child(5) {
   position: sticky;
-  left: 500px; /* 120 + 80 + 180 + 120 */
+  left: 500px;
+  z-index: 40;
   background: #fff;
-  z-index: 30;
-  width: 70px;
+  min-width: 70px;
 }
 
 /* =========================
@@ -1158,6 +1163,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
