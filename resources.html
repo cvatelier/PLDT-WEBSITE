@@ -232,8 +232,10 @@ body {
 #monthTable thead th {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 50;
+  background: #fff;
 }
+
 
 /* =========================
    STICKY LEFT COLUMNS
@@ -300,10 +302,8 @@ body {
 
 .month-scroll {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: calc(100vh - 260px);
-  -webkit-overflow-scrolling: touch;
+  overflow: auto;
+  position: relative;
 }
 
 /* Clean Scrollbar */
@@ -1163,6 +1163,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
