@@ -1038,7 +1038,7 @@ function renderWeek() {
     <th rowspan="2">ID</th>
     <th rowspan="2">Name</th>
     <th rowspan="2">Position</th>
-    <th rowspan="2" class="sticky-col-vl">VL</th>
+    <th rowspan="2">VL</th>
     <th colspan="7">Week</th>
   </tr>`;
 
@@ -1063,7 +1063,7 @@ function renderWeek() {
       <td>${emp.id}</td>
       <td class="text-start">${emp.name}</td>
       <td>${emp.position}</td>
-      <td class="schedule-cell sticky-col-vl"></td>`; // VL cell
+      <td></td>`; // VL cell
 
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
@@ -1130,6 +1130,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
