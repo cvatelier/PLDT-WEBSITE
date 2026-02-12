@@ -235,12 +235,7 @@ body {
   font-weight: 700;
   color: #0d6efd;
 }
-/* Clean table */
-#monthTable {
-  border-collapse: separate;
-  border-spacing: 4px;
-}
-
+  
 #monthTable th {
   background: #f1f3f5;
   font-weight: 600;
@@ -405,13 +400,13 @@ body {
 
 .month-scroll {
   width: 100%;
-  max-width: 100%;
-  overflow-x: auto;     /* left-right scroll */
-  overflow-y: auto;     /* vertical scroll */
-  max-height: calc(100vh - 250px);
+  overflow-x: auto;        /* horizontal scroll inside card */
+  overflow-y: auto;        /* vertical scroll */
+  max-height: calc(100vh - 260px);
   border-radius: 12px;
-  position: relative;
+  -webkit-overflow-scrolling: touch;
 }
+
 
 /* In WEEK view, no horizontal scroll needed */
 .week-view .month-scroll #monthTable {
@@ -550,6 +545,39 @@ body {
     max-width: 100%;
     overflow: hidden;      /* prevent page-level scroll */
 }
+  /* Sticky left columns */
+#monthTable th:nth-child(1),
+#monthTable td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 20;
+}
+
+#monthTable th:nth-child(2),
+#monthTable td:nth-child(2) {
+  position: sticky;
+  left: 120px;
+  background: #fff;
+  z-index: 20;
+}
+
+#monthTable th:nth-child(3),
+#monthTable td:nth-child(3) {
+  position: sticky;
+  left: 200px;
+  background: #fff;
+  z-index: 20;
+}
+
+#monthTable th:nth-child(4),
+#monthTable td:nth-child(4) {
+  position: sticky;
+  left: 380px;
+  background: #fff;
+  z-index: 20;
+}
+
 </style>
 </head>
 <body>
@@ -1219,8 +1247,7 @@ employees.forEach((emp, empIndex) => {
     <td>${emp.id}</td>
     <td class="text-start">${emp.name}</td>
     <td>${emp.position}</td>
-    <td class="schedule-cell sticky-col-vl"></td> <!-- VL cell -->
-    <td></td>`;
+    <td class="schedule-cell sticky-col-vl"></td>;
 
   for (let i = 0; i < totalCells; i++) {
     const day = i - startOffset + 1;
@@ -1354,6 +1381,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
