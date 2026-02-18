@@ -484,57 +484,7 @@ body {
 
   <!-- ✅ ADD THIS LINE -->
   <div class="modal-feedback mb-3"></div>
-
-
-        <!-- Tabs -->
-        <ul class="nav nav-pills mb-3">
-          <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#singleAdd">
-              Single Add
-            </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#bulkAdd">
-              Bulk Add
-            </button>
-          </li>
-        </ul>
-
         <div class="tab-content">
-
-          <!-- ✅ SINGLE ADD -->
-          <div class="tab-pane fade show active" id="singleAdd">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Cluster</label>
-                <input id="empCluster" class="form-control">
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">ID Number</label>
-                <input id="empId" class="form-control">
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Name</label>
-                <input id="empName" class="form-control">
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Position</label>
-                <select id="empPosition" class="form-select">
-                  <option>CXSDA</option>
-                  <option>WMA</option>
-                  <option>WMS</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="text-end mt-3">
-              <button class="btn btn-success" onclick="addEmployee()">Add Employee</button>
-            </div>
-          </div>
-
           <!-- ✅ BULK ADD -->
           <div class="tab-pane fade" id="bulkAdd">
             <p class="small text-muted">
@@ -553,7 +503,7 @@ Cluster 2,548601,Smith, Jane B.,WMA
 
             <div class="text-end mt-3">
               <button class="btn btn-success" onclick="bulkAddEmployees()">
-                Add Employees
+                Add Employee(s)
               </button>
             </div>
           </div>
@@ -569,7 +519,7 @@ Cluster 2,548601,Smith, Jane B.,WMA
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title">Bulk Add Employees</h5>
+        <h5 class="modal-title">Add Employee(s)</h5>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
@@ -594,7 +544,7 @@ Cluster 2,548601,Smith, Jane B.,WMA
 
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-success" onclick="bulkAddEmployees()">Add Employees</button>
+        <button class="btn btn-success" onclick="bulkAddEmployees()">Add Employee(s)</button>
       </div>
     </div>
   </div>
@@ -838,33 +788,6 @@ window.applyBulkEdit = () => {
 };
 
   /* ========== ADD EMPLOYEE ========== */
-  window.addEmployee = () => {
-    const cluster = empCluster.value.trim();
-    const id = empId.value.trim();
-    const name = empName.value.trim();
-    const position = empPosition.value;
-
-    if(!cluster || !id || !name){
-      alert("Please complete all fields.");
-      return;
-    }
-
-    employees.push({ cluster, id, name, position });
-    save();
-
-    refreshBulkEmployees();
-    refreshDeleteEmployees();
-
-    viewMode==="month" ? renderMonth() : renderWeek();
-
-bootstrap.Modal.getInstance(
-  document.getElementById("employeeModal")
-).hide();
-
-    empCluster.value = empId.value = empName.value = "";
-  };
-
-  /* ========== BULK ADD EMPLOYEE ========== */
 window.addEmployee = () => {
   const cluster = empCluster.value.trim();
   const id = empId.value.trim();
@@ -1149,6 +1072,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
