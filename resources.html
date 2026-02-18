@@ -388,7 +388,7 @@ body {
   <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#bulkModal">
     <i class="bi bi-pencil-square"></i>
   </button>
-  <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#employeeModal">
+  <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#bulkAddEmployeeModal">
     <i class="bi bi-person-plus"></i>
   </button>
   <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal">
@@ -471,7 +471,6 @@ body {
     </div>
   </div>
 </div>
-<div class="modal fade" id="employeeModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
 
@@ -513,7 +512,6 @@ Cluster 2,548601,Smith, Jane B.,WMA
 
     </div>
   </div>
-</div>
   <div class="modal fade" id="bulkAddEmployeeModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
@@ -787,36 +785,6 @@ window.applyBulkEdit = () => {
   }, 800);
 };
 
-  /* ========== ADD EMPLOYEE ========== */
-window.addEmployee = () => {
-  const cluster = empCluster.value.trim();
-  const id = empId.value.trim();
-  const name = empName.value.trim();
-  const position = empPosition.value;
-
-  if (!cluster || !id || !name)
-    return showModalFeedback("employeeModal", "Please complete all fields.");
-
-  if (employees.some(e => e.id === id))
-    return showModalFeedback("employeeModal", "Employee ID already exists.");
-
-  employees.push({ cluster, id, name, position });
-  save();
-
-  refreshBulkEmployees();
-  refreshDeleteEmployees();
-
-  viewMode === "month" ? renderMonth() : renderWeek();
-
-  showModalFeedback("employeeModal", "Employee added successfully!", "success");
-
-  empCluster.value = empId.value = empName.value = "";
-
-  setTimeout(() => {
-    bootstrap.Modal.getInstance(document.getElementById("employeeModal")).hide();
-  }, 700);
-};
-
   /* ========== DELETE EMPLOYEE ========== */
 window.deleteEmployees = () => {
   const selected = Array.from(deleteEmployeeSelect.selectedOptions)
@@ -1072,6 +1040,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
