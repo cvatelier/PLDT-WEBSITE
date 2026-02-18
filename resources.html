@@ -499,7 +499,9 @@ Cluster 2,548601,Smith, Jane B.,WMA
       </div>
 
     </div>
-  <div class="modal fade" id="bulkAddEmployeeModal" tabindex="-1">
+   
+<!-- ADD EMPLOYEE MODAL -->
+<div class="modal fade" id="bulkAddEmployeeModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
 
@@ -510,30 +512,59 @@ Cluster 2,548601,Smith, Jane B.,WMA
 
       <div class="modal-body">
 
-  <!-- ✅ ADD THIS LINE -->
-  <div class="modal-feedback mb-3"></div>
+        <!-- Feedback -->
+        <div class="modal-feedback mb-3"></div>
 
-        <p class="small text-muted mb-2">
-          One employee per line (CSV format):
+        <!-- Instructions -->
+        <p class="small text-muted mb-3">
+          Enter one employee per line in CSV format: <strong>Cluster,ID,Last Name, First Name, Position</strong>
         </p>
-        <pre class="small bg-light p-2 rounded">
-Cluster 2,548600,Doe, John A.,CXSDA
-Cluster 2,548601,Smith, Jane B.,WMA
-        </pre>
 
+        <!-- Example Table -->
+        <div class="mb-3">
+          <table class="table table-sm table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Cluster</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cluster 2</td>
+                <td>548600</td>
+                <td>Doe, John A.</td>
+                <td>CXSDA</td>
+              </tr>
+              <tr>
+                <td>Cluster 2</td>
+                <td>548601</td>
+                <td>Smith, Jane B.</td>
+                <td>WMA</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Input Area -->
         <textarea id="AddEmployeeText"
-          class="form-control"
-          rows="8"
-          placeholder="Cluster,ID,Name,Position"></textarea>
+                  class="form-control"
+                  rows="8"
+                  placeholder="Cluster,ID,Last Name, First Name, Position"></textarea>
+
       </div>
 
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-success" onclick="bulkAddEmployees()">Add Employee(s)</button>
       </div>
+
     </div>
   </div>
 </div>
+
 
 <!-- ✅ DELETE EMPLOYEE MODAL (SEPARATE) -->
 <div class="modal fade" id="deleteEmployeeModal" tabindex="-1">
@@ -1080,6 +1111,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
