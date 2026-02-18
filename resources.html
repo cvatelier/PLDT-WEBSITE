@@ -253,6 +253,76 @@ body {
   }
 
 }
+   /* =========================
+   PREMIUM MODAL UI
+   ========================= */
+
+.modal-content {
+  border-radius: 22px;
+  border: none;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  font-weight: 600;
+  background: #fff;
+}
+
+.modal-title {
+  font-size: 16px;
+  letter-spacing: -0.3px;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 18px 24px;
+}
+
+.modal .btn {
+  border-radius: 14px;
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+.modal select[multiple] {
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.modal-feedback .alert {
+  font-size: 12px;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+/* Smooth fade animation */
+.modal.fade .modal-dialog {
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+.modal .btn-primary {
+  background: #111;
+  border: none;
+}
+
+.modal .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+.modal .btn-danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(255,0,0,0.15);
+}
+
 </style>
 </head>
 <body>
@@ -347,8 +417,13 @@ body {
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-      <div class="modal-body">
-        <div class="row g-3">
+<div class="modal-body">
+
+  <!-- ✅ ADD THIS LINE -->
+  <div class="modal-feedback mb-3"></div>
+
+  <div class="row g-3">
+
 
           <!-- Employees -->
           <div class="col-md-6">
@@ -406,6 +481,10 @@ body {
       </div>
 
       <div class="modal-body">
+
+  <!-- ✅ ADD THIS LINE -->
+  <div class="modal-feedback mb-3"></div>
+
 
         <!-- Tabs -->
         <ul class="nav nav-pills mb-3">
@@ -495,6 +574,10 @@ Cluster 2,548601,Smith, Jane B.,WMA
       </div>
 
       <div class="modal-body">
+
+  <!-- ✅ ADD THIS LINE -->
+  <div class="modal-feedback mb-3"></div>
+
         <p class="small text-muted mb-2">
           One employee per line (CSV format):
         </p>
@@ -528,6 +611,10 @@ Cluster 2,548601,Smith, Jane B.,WMA
       </div>
 
       <div class="modal-body">
+
+  <!-- ✅ ADD THIS LINE -->
+  <div class="modal-feedback mb-3"></div>
+
         <label class="form-label fw-semibold">Select Employee(s)</label>
 
         <!-- MULTI SELECT -->
@@ -555,6 +642,17 @@ Cluster 2,548601,Smith, Jane B.,WMA
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+
+   function showModalFeedback(modalId, message, type="danger"){
+  const modal = document.getElementById(modalId);
+  const box = modal.querySelector(".modal-feedback");
+  box.innerHTML = `
+    <div class="alert alert-${type} alert-sm fade show">
+      ${message}
+    </div>
+  `;
+}
+
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") {
     document.getElementById("sidebar")?.classList.remove("show");
@@ -702,18 +800,20 @@ window.applyBulkEdit = () => {
   const from = document.getElementById("bulkFrom").value;
   const to   = document.getElementById("bulkTo").value;
 
-  if (!selectedEmployees.length || !code || !from || !to) {
-    alert("Please select employees, schedule code, and date range.");
-    return;
-  }
+  if (!selectedEmployees.length)
+    return showModalFeedback("bulkModal", "Select at least one employee.");
+
+  if (!code)
+    return showModalFeedback("bulkModal", "Select a schedule code.");
+
+  if (!from || !to)
+    return showModalFeedback("bulkModal", "Select a valid date range.");
 
   const start = new Date(from);
   const end   = new Date(to);
 
-  if (start > end) {
-    alert("Invalid date range.");
-    return;
-  }
+  if (start > end)
+    return showModalFeedback("bulkModal", "Invalid date range.");
 
   let d = new Date(start);
   while (d <= end) {
@@ -721,26 +821,20 @@ window.applyBulkEdit = () => {
     schedules[key] ??= {};
 
     selectedEmployees.forEach(empIndex => {
-      const id = `${empIndex}-${d.getDate()}`;
-      schedules[key][id] = code;
+      schedules[key][`${empIndex}-${d.getDate()}`] = code;
     });
 
     d.setDate(d.getDate() + 1);
   }
 
   save();
+  viewMode === "month" ? renderMonth() : renderWeek();
 
-  // re-render current view
-  if (viewMode === "month") {
-    renderMonth();
-  } else {
-    renderWeek();
-  }
+  showModalFeedback("bulkModal", "Bulk schedule applied successfully!", "success");
 
-  // close modal
-  bootstrap.Modal.getInstance(
-    document.getElementById("bulkModal")
-  ).hide();
+  setTimeout(() => {
+    bootstrap.Modal.getInstance(document.getElementById("bulkModal")).hide();
+  }, 800);
 };
 
   /* ========== ADD EMPLOYEE ========== */
@@ -771,102 +865,73 @@ bootstrap.Modal.getInstance(
   };
 
   /* ========== BULK ADD EMPLOYEE ========== */
-  window.bulkAddEmployees = () => {
-  const text = document.getElementById("bulkEmployeeText").value.trim();
-  if (!text) {
-    alert("No data provided.");
-    return;
-  }
+window.addEmployee = () => {
+  const cluster = empCluster.value.trim();
+  const id = empId.value.trim();
+  const name = empName.value.trim();
+  const position = empPosition.value;
 
-  const lines = text.split("\n");
-  let added = 0;
+  if (!cluster || !id || !name)
+    return showModalFeedback("employeeModal", "Please complete all fields.");
 
-  lines.forEach(line => {
-    const parts = line.split(",").map(p => p.trim());
-    if (parts.length < 4) return;
+  if (employees.some(e => e.id === id))
+    return showModalFeedback("employeeModal", "Employee ID already exists.");
 
-    const [cluster, id, ...rest] = parts;
-    const position = rest.pop();
-    const name = rest.join(","); // supports comma in name
-
-    if (!cluster || !id || !name || !position) return;
-
-    employees.push({ cluster, id, name, position });
-    added++;
-  });
-
-  if (!added) {
-    alert("No valid employees found.");
-    return;
-  }
-
+  employees.push({ cluster, id, name, position });
   save();
+
   refreshBulkEmployees();
   refreshDeleteEmployees();
 
   viewMode === "month" ? renderMonth() : renderWeek();
 
-  document.getElementById("bulkEmployeeText").value = "";
+  showModalFeedback("employeeModal", "Employee added successfully!", "success");
 
-bootstrap.Modal.getInstance(
-  document.getElementById("employeeModal")
-).hide();
+  empCluster.value = empId.value = empName.value = "";
 
-  alert(`${added} employees added successfully.`);
+  setTimeout(() => {
+    bootstrap.Modal.getInstance(document.getElementById("employeeModal")).hide();
+  }, 700);
 };
-
 
   /* ========== DELETE EMPLOYEE ========== */
 window.deleteEmployees = () => {
   const selected = Array.from(deleteEmployeeSelect.selectedOptions)
     .map(o => Number(o.value))
-    .sort((a,b) => b - a); // important: delete from highest index
+    .sort((a,b) => b - a);
 
-  if (!selected.length) {
-    alert("Please select at least one employee.");
-    return;
-  }
-
-  const names = selected.map(i => employees[i].name).join("\n");
-
-  if (!confirm(
-    `Delete the following employee(s)?\n\n${names}\n\nThis cannot be undone.`
-  )) return;
+  if (!selected.length)
+    return showModalFeedback("deleteEmployeeModal", "Select at least one employee.");
 
   selected.forEach(index => {
     employees.splice(index, 1);
 
     Object.keys(schedules).forEach(monthKey => {
       const updated = {};
-
       Object.keys(schedules[monthKey]).forEach(k => {
         const [empIdx, day] = k.split("-").map(Number);
-
-        if (empIdx === index) return; // remove schedules
-        if (empIdx > index) {
-          updated[`${empIdx-1}-${day}`] = schedules[monthKey][k];
-        } else {
-          updated[k] = schedules[monthKey][k];
-        }
+        if (empIdx === index) return;
+        updated[
+          empIdx > index ? `${empIdx-1}-${day}` : k
+        ] = schedules[monthKey][k];
       });
-
       schedules[monthKey] = updated;
     });
   });
 
   save();
-
   refreshBulkEmployees();
   refreshDeleteEmployees();
 
   viewMode === "month" ? renderMonth() : renderWeek();
-  applySearchFilter(searchInput.value);
 
-  bootstrap.Modal.getInstance(
-    document.getElementById("deleteEmployeeModal")
-  ).hide();
+  showModalFeedback("deleteEmployeeModal", "Employee(s) deleted.", "success");
 
-  alert("Employee(s) deleted successfully.");
+  setTimeout(() => {
+    bootstrap.Modal.getInstance(
+      document.getElementById("deleteEmployeeModal")
+    ).hide();
+  }, 700);
 };
   
   function isToday(year, month, day) {
@@ -1084,6 +1149,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
