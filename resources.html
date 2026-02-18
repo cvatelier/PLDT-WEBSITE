@@ -471,7 +471,6 @@ body {
     </div>
   </div>
 </div>
-  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
 
       <div class="modal-header">
@@ -511,7 +510,6 @@ Cluster 2,548601,Smith, Jane B.,WMA
       </div>
 
     </div>
-  </div>
   <div class="modal fade" id="bulkAddEmployeeModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
@@ -784,6 +782,62 @@ window.applyBulkEdit = () => {
     bootstrap.Modal.getInstance(document.getElementById("bulkModal")).hide();
   }, 800);
 };
+   
+/* ========== BULK ADD EMPLOYEES ========== */
+window.bulkAddEmployees = () => {
+  const textArea = document.getElementById("bulkEmployeeText");
+  const raw = textArea.value.trim();
+
+  if (!raw)
+    return showModalFeedback(
+      "bulkAddEmployeeModal",
+      "Please enter at least one employee."
+    );
+
+  const lines = raw.split("\n");
+  let added = 0;
+
+  lines.forEach(line => {
+    const parts = line.split(",").map(p => p.trim());
+
+    if (parts.length < 4) return;
+
+    const [cluster, id, name, position] = parts;
+
+    // prevent duplicate ID
+    const exists = employees.some(e => e.id === id);
+    if (exists) return;
+
+    employees.push({ cluster, id, name, position });
+    added++;
+  });
+
+  if (!added)
+    return showModalFeedback(
+      "bulkAddEmployeeModal",
+      "No valid employees added. Check format or duplicate IDs."
+    );
+
+  save();
+  refreshBulkEmployees();
+  refreshDeleteEmployees();
+
+  viewMode === "month" ? renderMonth() : renderWeek();
+
+  textArea.value = "";
+
+  showModalFeedback(
+    "bulkAddEmployeeModal",
+    `${added} employee(s) added successfully!`,
+    "success"
+  );
+
+  setTimeout(() => {
+    bootstrap.Modal.getInstance(
+      document.getElementById("bulkAddEmployeeModal")
+    ).hide();
+  }, 800);
+};
 
   /* ========== DELETE EMPLOYEE ========== */
 window.deleteEmployees = () => {
@@ -1040,6 +1094,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
