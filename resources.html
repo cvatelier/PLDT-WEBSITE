@@ -517,7 +517,8 @@ Cluster 2,548601,Smith, Jane B.,WMA
 
         <!-- Instructions -->
         <p class="small text-muted mb-3">
-          Enter one employee per line in CSV format: <strong>Cluster,ID,Last Name, First Name, Position</strong>
+          Enter one employee per line using <strong>|</strong> as separator: 
+          <strong>Cluster | ID | Last Name, First Name | Position</strong>
         </p>
 
         <!-- Example Table -->
@@ -552,7 +553,7 @@ Cluster 2,548601,Smith, Jane B.,WMA
         <textarea id="AddEmployeeText"
                   class="form-control"
                   rows="8"
-                  placeholder="Cluster,ID,Last Name, First Name, Position"></textarea>
+                  placeholder="Cluster | ID | Last Name, First Name | Position"></textarea>
 
       </div>
 
@@ -564,7 +565,6 @@ Cluster 2,548601,Smith, Jane B.,WMA
     </div>
   </div>
 </div>
-
 
 <!-- ✅ DELETE EMPLOYEE MODAL (SEPARATE) -->
 <div class="modal fade" id="deleteEmployeeModal" tabindex="-1">
@@ -818,7 +818,7 @@ window.bulkAddEmployees = () => {
   let added = 0;
 
   lines.forEach(line => {
-    const parts = line.split(",").map(p => p.trim());
+    const parts = line.split("|").map(p => p.trim());
     if (parts.length < 4) return;
 
     const [cluster, id, name, position] = parts;
@@ -1111,6 +1111,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
