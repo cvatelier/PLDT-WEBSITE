@@ -521,7 +521,7 @@ Cluster 2,548600,Doe, John A.,CXSDA
 Cluster 2,548601,Smith, Jane B.,WMA
         </pre>
 
-        <textarea id="bulkEmployeeText"
+        <textarea id="AddEmployeeText"
           class="form-control"
           rows="8"
           placeholder="Cluster,ID,Name,Position"></textarea>
@@ -774,7 +774,7 @@ window.applyBulkEdit = () => {
    
 /* ========== BULK ADD EMPLOYEES ========== */
 window.bulkAddEmployees = () => {
-  const textArea = document.getElementById("bulkAddEmployeeText");
+  const textArea = document.getElementById("AddEmployeeText");
   const raw = textArea.value.trim();
 
   if (!raw)
@@ -1080,6 +1080,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
