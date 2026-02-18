@@ -488,11 +488,6 @@ Cluster 2,548600,Doe, John A.,CXSDA
 Cluster 2,548601,Smith, Jane B.,WMA
             </pre>
 
-            <textarea id="bulkEmployeeText"
-              class="form-control"
-              rows="8"
-              placeholder="Cluster,ID,Name,Position"></textarea>
-
             <div class="text-end mt-3">
               <button class="btn btn-success" onclick="bulkAddEmployees()">
                 Add Employee(s)
@@ -779,7 +774,7 @@ window.applyBulkEdit = () => {
    
 /* ========== BULK ADD EMPLOYEES ========== */
 window.bulkAddEmployees = () => {
-  const textArea = document.getElementById("bulkEmployeeText");
+  const textArea = document.getElementById("bulkAddEmployeeText");
   const raw = textArea.value.trim();
 
   if (!raw)
@@ -793,14 +788,12 @@ window.bulkAddEmployees = () => {
 
   lines.forEach(line => {
     const parts = line.split(",").map(p => p.trim());
-
     if (parts.length < 4) return;
 
     const [cluster, id, name, position] = parts;
 
     // prevent duplicate ID
-    const exists = employees.some(e => e.id === id);
-    if (exists) return;
+    if (employees.some(e => e.id === id)) return;
 
     employees.push({ cluster, id, name, position });
     added++;
@@ -815,7 +808,6 @@ window.bulkAddEmployees = () => {
   save();
   refreshBulkEmployees();
   refreshDeleteEmployees();
-
   viewMode === "month" ? renderMonth() : renderWeek();
 
   textArea.value = "";
@@ -1088,6 +1080,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
