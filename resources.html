@@ -714,13 +714,6 @@ function refreshBulkEmployees(){
   updateSelectedCount();
 }
 
-   if(confirm(
-  `Apply ${code} to ${selectedEmployees.length} employee(s)\n
-   From ${from} to ${to}?`
-)){
-  // continue
-}
-
 function getSelectedEmployees(){
   return Array.from(document.querySelectorAll(".bulk-check:checked"))
     .map(c => Number(c.value));
@@ -855,8 +848,6 @@ monthBtn.onclick = () => {
   /* ========== BULK EDIT ========== */
 window.applyBulkEdit = () => {
   const selectedEmployees = getSelectedEmployees();
-    .map(opt => Number(opt.value));
-
   const code = document.getElementById("bulkCode").value;
   const from = document.getElementById("bulkFrom").value;
   const to   = document.getElementById("bulkTo").value;
@@ -1206,6 +1197,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
