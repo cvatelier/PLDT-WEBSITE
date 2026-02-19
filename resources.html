@@ -327,7 +327,11 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(255,0,0,0.15);
 }
-
+.modal-section {
+  background:#fafafa;
+  padding:16px;
+  border-radius:16px;
+}
 </style>
 </head>
 <body>
@@ -480,6 +484,8 @@ body {
     <button class="btn btn-outline-secondary btn-sm" onclick="setWholeMonth()">Whole Month</button>
   </div>
 </div>
+
+     <button class="btn btn-outline-secondary" onclick="clearBulkModal()">Clear</button>
 
         </div>
       </div>
@@ -708,6 +714,13 @@ function refreshBulkEmployees(){
   updateSelectedCount();
 }
 
+   if(confirm(
+  `Apply ${code} to ${selectedEmployees.length} employee(s)\n
+   From ${from} to ${to}?`
+)){
+  // continue
+}
+
 function getSelectedEmployees(){
   return Array.from(document.querySelectorAll(".bulk-check:checked"))
     .map(c => Number(c.value));
@@ -782,6 +795,14 @@ function refreshDeleteEmployees(){
     const offset = (first+6)%7;
     return Math.ceil((days+offset)/7);
   }
+
+   function clearBulkModal(){
+  document.querySelectorAll(".bulk-check").forEach(c=>c.checked=false);
+  bulkCode.value="";
+  bulkFrom.value="";
+  bulkTo.value="";
+  updateSelectedCount();
+}
 
   /* ========== SEARCH ========== */
   function applySearchFilter(keyword){
@@ -1185,6 +1206,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
