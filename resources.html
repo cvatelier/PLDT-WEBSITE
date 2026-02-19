@@ -430,27 +430,36 @@ body {
   <div class="row g-3">
 
 
-          <!-- Employees -->
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Employees</label>
-            <select id="bulkEmployees" class="form-select" multiple size="8"></select>
-            <small class="text-muted">Ctrl / Shift to select multiple</small>
-          </div>
+<div class="col-md-6">
+  <label class="form-label fw-semibold">Employees</label>
+
+  <input type="text" id="bulkSearch" 
+         class="form-control form-control-sm mb-2" 
+         placeholder="Search employee...">
+
+  <div class="employee-list border rounded p-2" style="height:220px; overflow:auto;">
+    <!-- populated dynamically -->
+  </div>
+
+  <div class="mt-2 small text-muted">
+    <span id="selectedCount">0 selected</span>
+  </div>
+</div>
 
           <!-- Schedule -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">Schedule Code</label>
             <select id="bulkCode" class="form-select">
               <option value="">-- Select --</option>
-              <option>RD</option>
-              <option>VL</option>
-              <option>SL</option>
-              <option>PL</option>
-              <option>ML</option>
-              <option>HO</option>
-              <option>LA</option>
-              <option>D</option>
-              <option>T</option>
+               <option value="RD">RD – Rest Day</option>
+               <option value="VL">VL – Vacation Leave</option>
+               <option value="SL">SL – Sick Leave</option>
+               <option value="PL">PL – Paternity Leave</option>
+               <option value="ML">ML – Maternity Leave</option>
+               <option value="HO">HO – Holiday Off</option>
+               <option value="LA">LA – Leave of Absence</option>
+               <option value="D">D – Day Shift</option>
+               <option value="T">T – Training</option>
             </select>
           </div>
 
@@ -464,6 +473,13 @@ body {
             <label class="form-label fw-semibold">To</label>
             <input type="date" id="bulkTo" class="form-control">
           </div>
+<div class="col-12">
+  <div class="d-flex gap-2 flex-wrap">
+    <button class="btn btn-outline-secondary btn-sm" onclick="setToday()">Today</button>
+    <button class="btn btn-outline-secondary btn-sm" onclick="setThisWeek()">This Week</button>
+    <button class="btn btn-outline-secondary btn-sm" onclick="setWholeMonth()">Whole Month</button>
+  </div>
+</div>
 
         </div>
       </div>
@@ -671,15 +687,68 @@ document.addEventListener("DOMContentLoaded", () => {
   const empPosition = document.getElementById("empPosition");
 
   /* ========== INIT DROPDOWNS ========== */
-  function refreshBulkEmployees(){
-    bulkEmployees.innerHTML = "";
-    employees.forEach((e,i)=>{
-      const opt = document.createElement("option");
-      opt.value = i;
-      opt.textContent = `${e.name} (${e.position})`;
-      bulkEmployees.appendChild(opt);
-    });
+function refreshBulkEmployees(){
+  const container = document.querySelector(".employee-list");
+  container.innerHTML = "";
+
+  employees.forEach((e,i)=>{
+    const div = document.createElement("div");
+    div.className = "form-check";
+
+    div.innerHTML = `
+      <input class="form-check-input bulk-check" 
+             type="checkbox" value="${i}" id="emp${i}">
+      <label class="form-check-label small" for="emp${i}">
+        ${e.name} (${e.position})
+      </label>
+    `;
+    container.appendChild(div);
+  });
+
+  updateSelectedCount();
+}
+
+function getSelectedEmployees(){
+  return Array.from(document.querySelectorAll(".bulk-check:checked"))
+    .map(c => Number(c.value));
+}
+
+function updateSelectedCount(){
+  document.getElementById("selectedCount").innerText =
+    `${document.querySelectorAll(".bulk-check:checked").length} selected`;
+}
+
+   function setToday(){
+  const today = new Date().toISOString().split("T")[0];
+  bulkFrom.value = today;
+  bulkTo.value = today;
+}
+
+function setThisWeek(){
+  const start = mondayOfWeek(new Date());
+  const end = new Date(start);
+  end.setDate(start.getDate()+6);
+
+  bulkFrom.value = start.toISOString().split("T")[0];
+  bulkTo.value = end.toISOString().split("T")[0];
+}
+
+function setWholeMonth(){
+  const y = currentDate.getFullYear();
+  const m = currentDate.getMonth();
+
+  const start = new Date(y,m,1);
+  const end = new Date(y,m+1,0);
+
+  bulkFrom.value = start.toISOString().split("T")[0];
+  bulkTo.value = end.toISOString().split("T")[0];
+}
+
+document.addEventListener("change", e=>{
+  if(e.target.classList.contains("bulk-check")){
+    updateSelectedCount();
   }
+});
 
 function refreshDeleteEmployees(){
   deleteEmployeeSelect.innerHTML = "";
@@ -764,7 +833,7 @@ monthBtn.onclick = () => {
 
   /* ========== BULK EDIT ========== */
 window.applyBulkEdit = () => {
-  const selectedEmployees = Array.from(bulkEmployees.selectedOptions)
+  const selectedEmployees = getSelectedEmployees();
     .map(opt => Number(opt.value));
 
   const code = document.getElementById("bulkCode").value;
@@ -1116,6 +1185,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
