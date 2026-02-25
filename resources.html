@@ -1173,101 +1173,104 @@ window.deleteEmployees = () => {
     t.getDate() === day
   );
 }
-  /* ========== MONTH VIEW ========== */
-  function renderMonth(){
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const daysInMonth = new Date(year, month+1,0).getDate();
-    const firstDay = new Date(year, month,1).getDay();
-    const startOffset = (firstDay+6)%7;
-    const weeks = weeksInMonth(year, month);
-    const totalCells = weeks*7;
-    const key = `${year}-${month}`;
+/* ========== MONTH VIEW ========== */
+function renderMonth(){
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const startOffset = (firstDay + 6) % 7; // Monday start
+  const weeks = weeksInMonth(year, month);
+  const totalCells = weeks * 7;
+  const key = `${year}-${month}`;
 
-    document.getElementById("monthLabel").innerText =
-      currentDate.toLocaleDateString("en",{month:"long",year:"numeric"});
-
-    const head = document.getElementById("monthHead");
-    const body = document.getElementById("monthBody");
-    head.innerHTML = "";
-    body.innerHTML = "";
-
-let r1 = `<tr>
-  <th rowspan="3" class="sticky-col sticky-1">Cluster</th>
-   <th rowspan="3" class="sticky-col sticky-2">ID</th>
-   <th rowspan="3" class="sticky-col sticky-3">Name</th>
-   <th rowspan="3" class="sticky-col sticky-4">Position</th>
-   <th rowspan="3" class="sticky-col sticky-5">VL</th>
-
-    for(let w=1; w<=weeks; w++) r1+=`<th colspan="7">Week ${w}</th>`;
-    r1+=`</tr>`;
-
-    let r2 = `<tr>`;
-    for(let i=0;i<totalCells;i++) r2+=`<th>${weekDays[i%7]}</th>`;
-    r2+=`</tr>`;
-
-    let r3 = `<tr>`;
-    for(let i=0;i<totalCells;i++){
-      const d=i-startOffset+1;
-      if (d > 0 && d <= daysInMonth) {
-  const isT = isToday(year, month, d);
-  r3 += `
-    <th class="${isT ? "today-header" : ""}">
-      ${isT ? `<span>${d}</span>` : d}
-    </th>`;
-} else {
-  r3 += `<th></th>`;
-}
-    }
-    r3+=`</tr>`;
-
-    head.innerHTML = r1+r2+r3;
-
-employees.forEach((emp, empIndex) => {
-let tr = `<tr>
-  <td class="sticky-col sticky-1">${emp.cluster}</td>
-   <td class="sticky-col sticky-2">${emp.id}</td>
-   <td class="sticky-col sticky-3 text-start">${emp.name}</td>
-   <td class="sticky-col sticky-4">${emp.position}</td>
-   <td class="sticky-col sticky-5 fw-semibold text-primary">
-  ${countVL(empIndex, year, month)}
-</td>`;
-
-  for (let i = 0; i < totalCells; i++) {
-    const day = i - startOffset + 1;
-    let content = "";
-    let classes = "schedule-cell";
-
-    if (day > 0 && day <= daysInMonth) {
-      const val = schedules[key]?.[`${empIndex}-${day}`] || "";
-      const todayCol = isToday(year, month, day) ? "today-cell" : "";
-      classes += ` ${val} ${todayCol}`;
-      content = val;
-    }
-
-    tr += `<td class="${classes}" data-key="${key}" data-id="${empIndex}-${day}">${content}</td>`;
-  }
-
-  tr += `</tr>`;
-  body.insertAdjacentHTML("beforeend", tr);
-});
-
-    bindClicks();
-    applySearchFilter(searchInput.value);
-     enableExcelSelection();
-  }
-  /* ========== WEEK VIEW ========== */
-function renderWeek() {
-  const start = mondayOfWeek(currentDate);
   document.getElementById("monthLabel").innerText =
-    `Week of ${start.toLocaleDateString()}`;
+    currentDate.toLocaleDateString("en", { month: "long", year: "numeric" });
 
   const head = document.getElementById("monthHead");
   const body = document.getElementById("monthBody");
   head.innerHTML = "";
   body.innerHTML = "";
 
-  // HEADER ROW 1: Employee info + Week label
+  // HEADER ROWS
+  let r1 = `<tr>
+    <th rowspan="3" class="sticky-col sticky-1">Cluster</th>
+    <th rowspan="3" class="sticky-col sticky-2">ID</th>
+    <th rowspan="3" class="sticky-col sticky-3">Name</th>
+    <th rowspan="3" class="sticky-col sticky-4">Position</th>
+    <th rowspan="3" class="sticky-col sticky-5">VL</th>
+  `;
+
+  for (let w = 1; w <= weeks; w++) {
+    r1 += `<th colspan="7">Week ${w}</th>`;
+  }
+  r1 += `</tr>`;
+
+  let r2 = `<tr>`;
+  for (let i = 0; i < totalCells; i++) {
+    r2 += `<th>${weekDays[i % 7]}</th>`;
+  }
+  r2 += `</tr>`;
+
+  let r3 = `<tr>`;
+  for (let i = 0; i < totalCells; i++) {
+    const d = i - startOffset + 1;
+    if (d > 0 && d <= daysInMonth) {
+      const isT = isToday(year, month, d);
+      r3 += `<th class="${isT ? "today-header" : ""}">${isT ? `<span>${d}</span>` : d}</th>`;
+    } else {
+      r3 += `<th></th>`;
+    }
+  }
+  r3 += `</tr>`;
+
+  head.innerHTML = r1 + r2 + r3;
+
+  // EMPLOYEE ROWS
+  employees.forEach((emp, empIndex) => {
+    let tr = `<tr>
+      <td class="sticky-col sticky-1">${emp.cluster}</td>
+      <td class="sticky-col sticky-2">${emp.id}</td>
+      <td class="sticky-col sticky-3 text-start">${emp.name}</td>
+      <td class="sticky-col sticky-4">${emp.position}</td>
+      <td class="sticky-col sticky-5 fw-semibold text-primary">${countVL(empIndex, year, month)}</td>
+    `;
+
+    for (let i = 0; i < totalCells; i++) {
+      const day = i - startOffset + 1;
+      let content = "";
+      let classes = "schedule-cell";
+
+      if (day > 0 && day <= daysInMonth) {
+        const val = schedules[key]?.[`${empIndex}-${day}`] || "";
+        const todayCol = isToday(year, month, day) ? "today-cell" : "";
+        classes += ` ${val} ${todayCol}`;
+        content = val;
+      }
+
+      tr += `<td class="${classes}" data-key="${key}" data-id="${empIndex}-${day}">${content}</td>`;
+    }
+
+    tr += `</tr>`;
+    body.insertAdjacentHTML("beforeend", tr);
+  });
+
+  bindClicks();
+  applySearchFilter(searchInput.value);
+  enableExcelSelection();
+}
+
+/* ========== WEEK VIEW ========== */
+function renderWeek() {
+  const start = mondayOfWeek(currentDate);
+  document.getElementById("monthLabel").innerText = `Week of ${start.toLocaleDateString()}`;
+
+  const head = document.getElementById("monthHead");
+  const body = document.getElementById("monthBody");
+  head.innerHTML = "";
+  body.innerHTML = "";
+
+  // HEADER ROWS
   let h1 = `<tr>
     <th rowspan="2">Cluster</th>
     <th rowspan="2">ID</th>
@@ -1277,56 +1280,43 @@ function renderWeek() {
     <th colspan="7">Week</th>
   </tr>`;
 
-  // HEADER ROW 2: Weekday letters and dates
   let h2 = `<tr>`;
   for (let i = 0; i < 7; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
     const isT = isToday(d.getFullYear(), d.getMonth(), d.getDate());
-    h2 += `<th class="${isT ? "today-header" : ""}">${
-      isT ? `<span>${d.getDate()}</span>` : d.getDate()
-    }<br>${["M","T","W","T","F","S","S"][i]}</th>`;
+    h2 += `<th class="${isT ? "today-header" : ""}">${isT ? `<span>${d.getDate()}</span>` : d.getDate()}<br>${weekDays[i]}</th>`;
   }
   h2 += `</tr>`;
 
   head.innerHTML = h1 + h2;
 
-  // BODY: Employee rows
+  // EMPLOYEE ROWS
   employees.forEach((emp, empIndex) => {
     let tr = `<tr>
       <td>${emp.cluster}</td>
       <td>${emp.id}</td>
       <td class="text-start">${emp.name}</td>
       <td>${emp.position}</td>
-      <td class="fw-semibold text-primary">
-  ${(() => {
-    let count = 0;
+      <td class="fw-semibold text-primary">`;
+    
+    let vlCount = 0;
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
       const key = `${d.getFullYear()}-${d.getMonth()}`;
-      if (schedules[key]?.[`${empIndex}-${d.getDate()}`] === "VL") {
-        count++;
-      }
+      if (schedules[key]?.[`${empIndex}-${d.getDate()}`] === "VL") vlCount++;
     }
-    return count;
-  })()}
-</td>
-`; // VL cell
+    tr += vlCount + "</td>";
 
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
-
       const key = `${d.getFullYear()}-${d.getMonth()}`;
-      const id  = `${empIndex}-${d.getDate()}`;
+      const id = `${empIndex}-${d.getDate()}`;
       const val = schedules[key]?.[id] || "";
-      const todayCol = isToday(d.getFullYear(), d.getMonth(), d.getDate())
-        ? "today-cell"
-        : "";
-
-      tr += `<td class="schedule-cell ${val} ${todayCol}" 
-                data-key="${key}" data-id="${id}">${val}</td>`;
+      const todayCol = isToday(d.getFullYear(), d.getMonth(), d.getDate()) ? "today-cell" : "";
+      tr += `<td class="schedule-cell ${val} ${todayCol}" data-key="${key}" data-id="${id}">${val}</td>`;
     }
 
     tr += `</tr>`;
@@ -1335,7 +1325,7 @@ function renderWeek() {
 
   bindClicks();
   applySearchFilter(searchInput.value);
-   enableExcelSelection();
+  enableExcelSelection();
 }
 
   /* ========== CELL EDITING ========== */
@@ -1384,6 +1374,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
