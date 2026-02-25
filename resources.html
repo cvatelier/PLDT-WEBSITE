@@ -231,7 +231,13 @@ body {
   background: #fff;
   z-index: 5;
 }
-
+/* NEW: Freeze Monday header column */
+#monthTable th:nth-child(6),
+#monthTable td:nth-child(6) {
+  left: 570px;          /* Adjust based on total width of previous 5 columns */
+  min-width: 70px;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.08); /* Optional Excel-like shadow */
+  z-index: 6;           /* Above other sticky columns */
 /* =========================
    TOP-LEFT INTERSECTION
    (Excel Corner Cell)
@@ -251,15 +257,11 @@ body {
   content: "";
   position: absolute;
   top: 0;
-  left: 570px;
-  width: 14px;
+  left: 640px; /* Adjust based on width of frozen columns */
+  width: 15px;
   height: 100%;
   pointer-events: none;
-  background: linear-gradient(
-    to right,
-    rgba(0,0,0,0.10),
-    transparent
-  );
+  background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
 }
 #monthTable thead tr:nth-child(1) th { top: 0; }
 #monthTable thead tr:nth-child(2) th { top: 32px; }
@@ -1430,6 +1432,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
