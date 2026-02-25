@@ -287,6 +287,42 @@ body {
   padding: 2px 6px;
   border-radius: 6px;
 }   
+
+/* =========================
+   EXCEL SELECTION SYSTEM
+   ========================= */
+
+.schedule-cell.selected {
+  background: rgba(17,17,17,0.08);
+  outline: 2px solid #111;
+  outline-offset: -2px;
+}
+
+.schedule-cell.range {
+  background: rgba(17,17,17,0.05);
+}
+
+.schedule-cell.RD { background:#ffeaea; }
+.schedule-cell.VL { background:#e8f4ff; }
+.schedule-cell.SL { background:#fff4e5; }
+.schedule-cell.PL { background:#f3e8ff; }
+.schedule-cell.ML { background:#fde2ff; }
+.schedule-cell.HO { background:#e9ffe8; }
+.schedule-cell.LA { background:#f5f5f5; }
+.schedule-cell.D  { background:#e8fff7; }
+.schedule-cell.T  { background:#eef1ff; }
+
+/* Top freeze shadow */
+.month-scroll::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:12px;
+  background:linear-gradient(to bottom, rgba(0,0,0,0.08), transparent);
+  pointer-events:none;
+}   
 /* =========================
    MODALS
    ========================= */
@@ -727,6 +763,125 @@ document.addEventListener("keydown", e => {
 });
 document.addEventListener("DOMContentLoaded", () => {
 
+   /* =========================
+   EXCEL MULTI SELECT
+   ========================= */
+
+let isSelecting = false;
+let startCell = null;
+let selectedCells = [];
+let clipboardValue = null;
+
+function clearSelection() {
+  selectedCells.forEach(c => {
+    c.classList.remove("selected","range");
+  });
+  selectedCells = [];
+}
+
+function getCellCoords(cell){
+  return {
+    row: cell.parentElement.rowIndex,
+    col: cell.cellIndex
+  };
+}
+
+function selectRange(endCell){
+  clearSelection();
+
+  const start = getCellCoords(startCell);
+  const end   = getCellCoords(endCell);
+
+  const minRow = Math.min(start.row,end.row);
+  const maxRow = Math.max(start.row,end.row);
+  const minCol = Math.min(start.col,end.col);
+  const maxCol = Math.max(start.col,end.col);
+
+  const rows = document.querySelectorAll("#monthTable tbody tr");
+
+  rows.forEach((row,rIndex)=>{
+    if(rIndex+1 < minRow || rIndex+1 > maxRow) return;
+
+    [...row.cells].forEach((cell,cIndex)=>{
+      if(cIndex >= minCol && cIndex <= maxCol){
+        cell.classList.add("range");
+        selectedCells.push(cell);
+      }
+    });
+  });
+}
+
+function enableExcelSelection(){
+  document.querySelectorAll(".schedule-cell").forEach(cell=>{
+
+    cell.addEventListener("mousedown", e=>{
+      if(e.button !== 0) return;
+      isSelecting = true;
+      startCell = cell;
+      clearSelection();
+      cell.classList.add("selected");
+      selectedCells = [cell];
+    });
+
+    cell.addEventListener("mouseenter", ()=>{
+      if(!isSelecting || !startCell) return;
+      selectRange(cell);
+    });
+
+  });
+
+  document.addEventListener("mouseup", ()=>{
+    isSelecting = false;
+  });
+}
+
+   /* =========================
+   COPY / PASTE / DELETE
+   ========================= */
+
+document.addEventListener("keydown", e=>{
+
+  // COPY
+  if(e.ctrlKey && e.key === "c"){
+    if(selectedCells.length){
+      clipboardValue = selectedCells[0].innerText.trim();
+    }
+  }
+
+  // PASTE
+  if(e.ctrlKey && e.key === "v"){
+    if(clipboardValue !== null){
+      selectedCells.forEach(cell=>{
+        const key = cell.dataset.key;
+        const id  = cell.dataset.id;
+
+        schedules[key] ??= {};
+        schedules[key][id] = clipboardValue;
+
+        cell.innerText = clipboardValue;
+        cell.className = "schedule-cell " + clipboardValue;
+      });
+
+      save();
+    }
+  }
+
+  // DELETE
+  if(e.key === "Delete"){
+    selectedCells.forEach(cell=>{
+      const key = cell.dataset.key;
+      const id  = cell.dataset.id;
+
+      if(schedules[key]) delete schedules[key][id];
+
+      cell.innerText = "";
+      cell.className = "schedule-cell";
+    });
+
+    save();
+  }
+
+});
    function countVL(empIndex, year, month) {
   const key = `${year}-${month}`;
   if (!schedules[key]) return 0;
@@ -1145,6 +1300,7 @@ let tr = `<tr>
 
     bindClicks();
     applySearchFilter(searchInput.value);
+     enableExcelSelection();
   }
   /* ========== WEEK VIEW ========== */
 function renderWeek() {
@@ -1225,6 +1381,7 @@ function renderWeek() {
 
   bindClicks();
   applySearchFilter(searchInput.value);
+   enableExcelSelection();
 }
 
   /* ========== CELL EDITING ========== */
@@ -1273,6 +1430,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
