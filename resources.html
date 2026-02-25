@@ -165,71 +165,35 @@ body {
 }
 
 #monthTable {
-  table-layout: fixed;     /* VERY IMPORTANT */
+  table-layout: fixed;
   width: max-content;
+  border-collapse: collapse;
 }
 
 #monthTable th, #monthTable td {
-    width: 60px; /* or adjust according to your sticky column widths */
-    min-width: 60px;
-    box-sizing: border-box;
+  width: 60px;
+  min-width: 60px;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
-   
+
 /* =========================
-   FREEZE TOP HEADERS
+   FREEZE TOP HEADERS AND LEFT COLUMNS
    ========================= */
 
 #monthTable thead th {
   position: sticky;
   top: 0;
   background: #fff;
-  z-index: 10;
   box-shadow: inset 0 -1px 0 var(--border);
 }
 
-/* Freeze ONLY first 5 columns (Cluster → VL) */
+/* Multiple header rows top positioning */
+#monthTable thead tr:nth-child(1) th { top: 0; z-index: 30; }
+#monthTable thead tr:nth-child(2) th { top: 32px; z-index: 25; }
+#monthTable thead tr:nth-child(3) th { top: 64px; z-index: 20; }
 
-#monthTable th.sticky-col,
-#monthTable td.sticky-col {
-    position: sticky;
-    left: 0; /* updated per sticky-1 → sticky-5 */
-    background: #fff;
-    z-index: 15;
-}
-
-#monthTable thead th.sticky-col {
-    z-index: 30; /* stays above everything */
-}
-
-/* FIXED COLUMN WIDTHS */
-#monthTable th,
-#monthTable td {
-  white-space: nowrap;
-}
-
-/* LOCK LEFT COLUMNS */
-.sticky-1 { left: 0; width:120px; min-width:120px; }
-.sticky-2 { left: 120px; width:90px; min-width:90px; }
-.sticky-3 { left: 210px; width:220px; min-width:220px; }
-.sticky-4 { left: 430px; width:120px; min-width:120px; }
-.sticky-5 { left: 550px; width:70px; min-width:70px; }
-
-/* Sticky Positions (calculated properly) */
-.sticky-1 { left: 0; }
-.sticky-2 { left: calc(120px); }
-.sticky-3 { left: calc(120px + 90px); }
-.sticky-4 { left: calc(120px + 90px + 220px); }
-.sticky-5 { left: calc(120px + 90px + 220px + 120px); }
-
-/* Freeze Header */
-#monthTable thead th {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  z-index: 20;
-}
-
-/* Freeze Left Columns */
+/* Sticky left columns */
 #monthTable th.sticky-col,
 #monthTable td.sticky-col {
   position: sticky;
@@ -237,29 +201,21 @@ body {
   z-index: 15;
 }
 
-/* When header AND sticky column intersect */
+/* Intersection of header & sticky column */
 #monthTable thead th.sticky-col {
-  z-index: 30;
+  z-index: 35;
 }
-   
-/* =========================
-   SUBTLE FREEZE SHADOW
-   ========================= */
 
-.month-scroll::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 620px; /* after sticky columns */
-  width: 16px;
-  height: 100%;
-  background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
-  pointer-events: none;
-}
-   
-#monthTable thead tr:nth-child(1) th { top: 0; }
-#monthTable thead tr:nth-child(2) th { top: 32px; }
-#monthTable thead tr:nth-child(3) th { top: 64px; }
+/* Sticky columns widths and left positions */
+.sticky-1 { left: 0; width: 120px; min-width: 120px; }
+.sticky-2 { left: 120px; width: 90px; min-width: 90px; }
+.sticky-3 { left: 210px; width: 220px; min-width: 220px; }
+.sticky-4 { left: 430px; width: 120px; min-width: 120px; }
+.sticky-5 { left: 550px; width: 70px; min-width: 70px; }
+
+/* =========================
+   SCHEDULE CELLS
+   ========================= */
 
 .schedule-cell {
   height: 28px;
@@ -271,7 +227,6 @@ body {
   background: #f5f7fa;
 }
 
-/* Today highlight */
 .today-cell {
   background: #fff3cd !important;
   font-weight: 600;
@@ -282,11 +237,7 @@ body {
   color: #fff;
   padding: 2px 6px;
   border-radius: 6px;
-}   
-
-/* =========================
-   EXCEL SELECTION SYSTEM
-   ========================= */
+}
 
 .schedule-cell.selected {
   background: rgba(17,17,17,0.08);
@@ -308,7 +259,10 @@ body {
 .schedule-cell.D  { background:#e8fff7; }
 .schedule-cell.T  { background:#eef1ff; }
 
-/* Top freeze shadow */
+/* =========================
+   SUBTLE SCROLL SHADOWS
+   ========================= */
+
 .month-scroll::before {
   content:"";
   position:absolute;
@@ -318,23 +272,106 @@ body {
   height:12px;
   background:linear-gradient(to bottom, rgba(0,0,0,0.08), transparent);
   pointer-events:none;
-}   
+}
+
+.month-scroll::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 620px; /* after sticky columns */
+  width: 16px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
+  pointer-events: none;
+}
+
 /* =========================
    MODALS
    ========================= */
 
 .modal-content {
-  border-radius: 20px;
-  border: 1px solid var(--border);
+  border-radius: 22px;
+  border: none;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  overflow: hidden;
 }
 
 .modal-header {
+  padding: 20px 24px;
+  font-weight: 600;
+  background: #fff;
   border-bottom: 1px solid var(--border);
 }
 
-.modal-footer {
-  border-top: 1px solid var(--border);
+.modal-title {
+  font-size: 16px;
+  letter-spacing: -0.3px;
 }
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 18px 24px;
+}
+
+.modal .btn {
+  border-radius: 14px;
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+.modal select[multiple] {
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.modal-feedback .alert {
+  font-size: 12px;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+/* Smooth fade animation */
+.modal.fade .modal-dialog {
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+
+.modal .btn-primary {
+  background: #111;
+  border: none;
+}
+
+.modal .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+.modal .btn-danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(255,0,0,0.15);
+}
+
+.modal .btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(255,0,0,0.15);
+}
+
+.modal-section {
+  background:#fafafa;
+  padding:16px;
+  border-radius:16px;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
 
 @media (max-width: 992px) {
 
@@ -357,7 +394,6 @@ body {
     height: 24px;
     font-size: 9px;
   }
-
 }
    /* =========================
    PREMIUM MODAL UI
@@ -1416,6 +1452,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
