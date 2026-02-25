@@ -1324,7 +1324,7 @@ function renderWeek() {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
     const isT = isToday(d.getFullYear(), d.getMonth(), d.getDate());
-    h2 += `<th class="${isT ? "today-header" : ""}">${isT ? `<span>${d.getDate()}</span>` : d.getDate()}<br>${weekDays[i]}</th>`;
+    h2 += `<th class="${isT ? "today-header" : ""}">${weekDays[i]}<br>${isT ? `<span>${d.getDate()}</span>` : d.getDate()}</th>`;
   }
   h2 += `</tr>`;
 
@@ -1413,6 +1413,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
