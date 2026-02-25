@@ -169,10 +169,10 @@ body {
   width: max-content;
 }
 
-#monthTable th,
-#monthTable td {
-  width: 60px;
-  text-align: center;
+#monthTable th, #monthTable td {
+    width: 60px; /* or adjust according to your sticky column widths */
+    min-width: 60px;
+    box-sizing: border-box;
 }
    
 /* =========================
@@ -191,9 +191,14 @@ body {
 
 #monthTable th.sticky-col,
 #monthTable td.sticky-col {
-  position: sticky;
-  background: #fff;
-  z-index: 6;
+    position: sticky;
+    left: 0; /* updated per sticky-1 → sticky-5 */
+    background: #fff;
+    z-index: 15;
+}
+
+#monthTable thead th.sticky-col {
+    z-index: 30; /* stays above everything */
 }
 
 /* FIXED COLUMN WIDTHS */
@@ -211,10 +216,10 @@ body {
 
 /* Sticky Positions (calculated properly) */
 .sticky-1 { left: 0; }
-.sticky-2 { left: 120px; }
-.sticky-3 { left: 210px; }   /* 120 + 90 */
-.sticky-4 { left: 430px; }   /* 210 + 220 */
-.sticky-5 { left: 550px; }   /* 430 + 120 */
+.sticky-2 { left: calc(120px); }
+.sticky-3 { left: calc(120px + 90px); }
+.sticky-4 { left: calc(120px + 90px + 220px); }
+.sticky-5 { left: calc(120px + 90px + 220px + 120px); }
 
 /* Freeze Header */
 #monthTable thead th {
@@ -1266,12 +1271,12 @@ function renderMonth(){
   // EMPLOYEE ROWS
   employees.forEach((emp, empIndex) => {
     let tr = `<tr>
-      <td class="sticky-col sticky-1">${emp.cluster}</td>
-      <td class="sticky-col sticky-2">${emp.id}</td>
-      <td class="sticky-col sticky-3 text-start">${emp.name}</td>
-      <td class="sticky-col sticky-4">${emp.position}</td>
-      <td class="sticky-col sticky-5 fw-semibold text-primary">${countVL(empIndex, year, month)}</td>
-    `;
+    <td class="sticky-col sticky-1">${emp.cluster}</td>
+    <td class="sticky-col sticky-2">${emp.id}</td>
+    <td class="sticky-col sticky-3 text-start">${emp.name}</td>
+    <td class="sticky-col sticky-4">${emp.position}</td>
+    <td class="sticky-col sticky-5 fw-semibold text-primary">${countVL(empIndex, year, month)}</td>
+`;
 
     for (let i = 0; i < totalCells; i++) {
       const day = i - startOffset + 1;
@@ -1411,6 +1416,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
