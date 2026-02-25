@@ -164,24 +164,17 @@ body {
   border-radius: 18px;
 }
 
-/* Make table expand naturally */
 #monthTable {
-  table-layout: auto;
-  min-width: max-content;
+  table-layout: fixed;     /* VERY IMPORTANT */
+  width: max-content;
 }
-
-/* Day columns width (match week spacing) */
-#monthTable th:not(.sticky-col),
-#monthTable td:not(.sticky-col) {
-  min-width: 60px;
-  width: 60px;
-}   
 
 #monthTable th,
 #monthTable td {
-  padding: 6px 4px;
+  width: 60px;
   text-align: center;
 }
+   
 /* =========================
    FREEZE TOP HEADERS
    ========================= */
@@ -209,20 +202,12 @@ body {
   white-space: nowrap;
 }
 
-#monthTable th:nth-child(1),
-#monthTable td:nth-child(1) { width:120px; }
-
-#monthTable th:nth-child(2),
-#monthTable td:nth-child(2) { width:90px; }
-
-#monthTable th:nth-child(3),
-#monthTable td:nth-child(3) { width:220px; }
-
-#monthTable th:nth-child(4),
-#monthTable td:nth-child(4) { width:120px; }
-
-#monthTable th:nth-child(5),
-#monthTable td:nth-child(5) { width:70px; }
+/* LOCK LEFT COLUMNS */
+.sticky-1 { left: 0; width:120px; min-width:120px; }
+.sticky-2 { left: 120px; width:90px; min-width:90px; }
+.sticky-3 { left: 210px; width:220px; min-width:220px; }
+.sticky-4 { left: 430px; width:120px; min-width:120px; }
+.sticky-5 { left: 550px; width:70px; min-width:70px; }
 
 /* Sticky Positions (calculated properly) */
 .sticky-1 { left: 0; }
@@ -1426,6 +1411,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
