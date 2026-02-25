@@ -168,12 +168,19 @@ body {
   white-space: nowrap;
 }
 
-/* Sticky Columns */
 #monthTable th:nth-child(-n+5),
 #monthTable td:nth-child(-n+5) {
   position: sticky;
+  left: 0;
   background: #fff;
-  z-index: 5;
+  z-index: 3;
+}
+
+#monthTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: #fff;
 }
 
 /* Individual Left Positions */
@@ -331,6 +338,14 @@ body {
   background:#fafafa;
   padding:16px;
   border-radius:16px;
+}
+.month-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 75vh;
+}
+#monthTable {
+  min-width: 1200px;
 }
 </style>
 </head>
@@ -1072,12 +1087,6 @@ let tr = `<tr>
     bindClicks();
     applySearchFilter(searchInput.value);
   }
-const weekDates = [];
-for (let i = 0; i < 7; i++) {
-  const d = new Date(start);
-  d.setDate(start.getDate() + i);
-  weekDates.push(d);
-}
   /* ========== WEEK VIEW ========== */
 function renderWeek() {
   const start = mondayOfWeek(currentDate);
@@ -1121,10 +1130,18 @@ function renderWeek() {
       <td class="text-start">${emp.name}</td>
       <td>${emp.position}</td>
       <td class="fw-semibold text-primary">
-  ${weekDates.filter(d => {
-    const key = `${d.getFullYear()}-${d.getMonth()}`;
-    return schedules[key]?.[`${empIndex}-${d.getDate()}`] === "VL";
-  }).length}
+  ${(() => {
+    let count = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      if (schedules[key]?.[`${empIndex}-${d.getDate()}`] === "VL") {
+        count++;
+      }
+    }
+    return count;
+  })()}
 </td>
 `; // VL cell
 
@@ -1197,6 +1214,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
