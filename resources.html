@@ -164,11 +164,24 @@ body {
   border-radius: 18px;
 }
 
-/* Ensure table can scroll horizontally */
+/* Make table expand naturally */
 #monthTable {
-  table-layout: fixed;
+  table-layout: auto;
+  min-width: max-content;
 }
 
+/* Day columns width (match week spacing) */
+#monthTable th:not(.sticky-col),
+#monthTable td:not(.sticky-col) {
+  min-width: 60px;
+  width: 60px;
+}   
+
+#monthTable th,
+#monthTable td {
+  padding: 6px 4px;
+  text-align: center;
+}
 /* =========================
    FREEZE TOP HEADERS
    ========================= */
@@ -1413,6 +1426,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
