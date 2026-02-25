@@ -169,6 +169,7 @@ body {
   border-collapse: separate;
   border-spacing: 0;
   min-width: 1400px;
+  table-layout: fixed;
 }
 
 /* =========================
@@ -192,16 +193,53 @@ body {
   z-index: 6;
 }
 
-/* Column positions */
+/* FIXED COLUMN WIDTHS */
+#monthTable th,
+#monthTable td {
+  white-space: nowrap;
+}
+
+#monthTable th:nth-child(1),
+#monthTable td:nth-child(1) { width:120px; }
+
+#monthTable th:nth-child(2),
+#monthTable td:nth-child(2) { width:90px; }
+
+#monthTable th:nth-child(3),
+#monthTable td:nth-child(3) { width:220px; }
+
+#monthTable th:nth-child(4),
+#monthTable td:nth-child(4) { width:120px; }
+
+#monthTable th:nth-child(5),
+#monthTable td:nth-child(5) { width:70px; }
+
+/* Sticky Positions (calculated properly) */
 .sticky-1 { left: 0; }
 .sticky-2 { left: 120px; }
-.sticky-3 { left: 200px; }
-.sticky-4 { left: 380px; }
-.sticky-5 { left: 500px; }
+.sticky-3 { left: 210px; }   /* 120 + 90 */
+.sticky-4 { left: 430px; }   /* 210 + 220 */
+.sticky-5 { left: 550px; }   /* 430 + 120 */
 
-/* Keep headers above */
+/* Freeze Header */
 #monthTable thead th {
-  z-index: 10;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 20;
+}
+
+/* Freeze Left Columns */
+#monthTable th.sticky-col,
+#monthTable td.sticky-col {
+  position: sticky;
+  background: #fff;
+  z-index: 15;
+}
+
+/* When header AND sticky column intersect */
+#monthTable thead th.sticky-col {
+  z-index: 30;
 }
    
 /* =========================
@@ -209,10 +247,14 @@ body {
    ========================= */
 
 .month-scroll::after {
-  left: 620px; /* Place shadow just after Monday column */
-  width: 15px;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 620px; /* after sticky columns */
+  width: 16px;
   height: 100%;
   background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
+  pointer-events: none;
 }
    
 #monthTable thead tr:nth-child(1) th { top: 0; }
@@ -1374,6 +1416,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
