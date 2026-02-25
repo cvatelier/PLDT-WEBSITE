@@ -187,79 +187,46 @@ body {
    FREEZE LEFT COLUMNS (1–5)
    ========================= */
 
-#monthTable th:nth-child(1),
-#monthTable td:nth-child(1) {
+/* Freeze employee info columns + first weekday column (Monday of Week 1) */
+#monthTable th:nth-child(-n+6),
+#monthTable td:nth-child(-n+6) {
   position: sticky;
-  left: 0;
-  min-width: 120px;
   background: #fff;
   z-index: 5;
 }
 
-#monthTable th:nth-child(2),
-#monthTable td:nth-child(2) {
-  position: sticky;
-  left: 120px;
-  min-width: 80px;
+/* Left positions for sticky columns */
+#monthTable th:nth-child(1), #monthTable td:nth-child(1) { left: 0; }
+#monthTable th:nth-child(2), #monthTable td:nth-child(2) { left: 120px; }
+#monthTable th:nth-child(3), #monthTable td:nth-child(3) { left: 200px; }
+#monthTable th:nth-child(4), #monthTable td:nth-child(4) { left: 380px; }
+#monthTable th:nth-child(5), #monthTable td:nth-child(5) { left: 500px; }
+
+/* Freeze Monday column (first weekday column) */
+#monthTable th:nth-child(6),
+#monthTable td:nth-child(6) {
+  left: 570px; /* Adjust width based on total of first 5 columns */
+  min-width: 50px;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.08);
+  z-index: 6;
+}
+
+/* Make the week header row stay above */
+#monthTable thead tr:first-child th {
+  z-index: 10;
   background: #fff;
-  z-index: 5;
 }
-
-#monthTable th:nth-child(3),
-#monthTable td:nth-child(3) {
-  position: sticky;
-  left: 200px;
-  min-width: 180px;
-  background: #fff;
-  z-index: 5;
-}
-
-#monthTable th:nth-child(4),
-#monthTable td:nth-child(4) {
-  position: sticky;
-  left: 380px;
-  min-width: 120px;
-  background: #fff;
-  z-index: 5;
-}
-
-#monthTable th:nth-child(5),
-#monthTable td:nth-child(5) {
-  position: sticky;
-  left: 500px;
-  min-width: 70px;
-  background: #fff;
-  z-index: 5;
-}
-/* =========================
-   TOP-LEFT INTERSECTION
-   (Excel Corner Cell)
-   ========================= */
-
-#monthTable thead th:nth-child(-n+5) {
-  z-index: 15;
-  box-shadow: inset -1px 0 0 var(--border),
-              inset 0 -1px 0 var(--border);
-}
-
 /* =========================
    SUBTLE FREEZE SHADOW
    ========================= */
 
 .month-scroll::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 570px;
-  width: 14px;
+  left: 620px; /* Place shadow just after Monday column */
+  width: 15px;
   height: 100%;
-  pointer-events: none;
-  background: linear-gradient(
-    to right,
-    rgba(0,0,0,0.10),
-    transparent
-  );
+  background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
 }
+   
 #monthTable thead tr:nth-child(1) th { top: 0; }
 #monthTable thead tr:nth-child(2) th { top: 32px; }
 #monthTable thead tr:nth-child(3) th { top: 64px; }
@@ -1429,6 +1396,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
