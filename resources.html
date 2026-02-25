@@ -195,14 +195,6 @@ body {
 #monthTable td {
   white-space: nowrap;
 }
-   /* Make schedule (day) columns equal width */
-#monthTable th:not(.sticky-col),
-#monthTable td:not(.sticky-col) {
-  width: 60px;       /* adjust if you want wider */
-  min-width: 38px;
-  max-width: 38px;
-  padding: 4px 0;
-}
 
 #monthTable th:nth-child(1),
 #monthTable td:nth-child(1) { width:120px; }
@@ -212,12 +204,6 @@ body {
 
 #monthTable th:nth-child(3),
 #monthTable td:nth-child(3) { width:220px; }
-
-#monthTable thead tr:nth-child(3) th {
-  font-weight: 600;
-  font-size: 12px;
-  text-align: center;
-}   
 
 #monthTable th:nth-child(4),
 #monthTable td:nth-child(4) { width:120px; }
@@ -1427,6 +1413,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
