@@ -154,72 +154,139 @@ body {
 }
 
 /* =========================
-   TABLE / CALENDAR
+   EXCEL-LIKE FREEZE PANES
    ========================= */
 
-/* EXCEL STYLE FREEZE */
+.month-scroll {
+  position: relative;
+  overflow: auto;
+  max-height: 75vh;
+  border-radius: 18px;
+}
 
+/* Ensure table can scroll horizontally */
 #monthTable {
   border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1400px;
 }
 
-#monthTable th,
-#monthTable td {
-  white-space: nowrap;
-}
-
-#monthTable th:nth-child(-n+5),
-#monthTable td:nth-child(-n+5) {
-  position: sticky;
-  left: 0;
-  background: #fff;
-  z-index: 3;
-}
+/* =========================
+   FREEZE TOP HEADERS
+   ========================= */
 
 #monthTable thead th {
   position: sticky;
   top: 0;
-  z-index: 6;
   background: #fff;
+  z-index: 10;
+  box-shadow: inset 0 -1px 0 var(--border);
 }
 
-/* Individual Left Positions */
+/* =========================
+   FREEZE LEFT COLUMNS (1–5)
+   ========================= */
+
 #monthTable th:nth-child(1),
-#monthTable td:nth-child(1) { left: 0; min-width:120px; }
+#monthTable td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  min-width: 120px;
+  background: #fff;
+  z-index: 5;
+}
 
 #monthTable th:nth-child(2),
-#monthTable td:nth-child(2) { left:120px; min-width:80px; }
+#monthTable td:nth-child(2) {
+  position: sticky;
+  left: 120px;
+  min-width: 80px;
+  background: #fff;
+  z-index: 5;
+}
 
 #monthTable th:nth-child(3),
-#monthTable td:nth-child(3) { left:200px; min-width:180px; }
+#monthTable td:nth-child(3) {
+  position: sticky;
+  left: 200px;
+  min-width: 180px;
+  background: #fff;
+  z-index: 5;
+}
 
 #monthTable th:nth-child(4),
-#monthTable td:nth-child(4) { left:380px; min-width:120px; }
+#monthTable td:nth-child(4) {
+  position: sticky;
+  left: 380px;
+  min-width: 120px;
+  background: #fff;
+  z-index: 5;
+}
 
 #monthTable th:nth-child(5),
-#monthTable td:nth-child(5) { left:500px; min-width:70px; }
+#monthTable td:nth-child(5) {
+  position: sticky;
+  left: 500px;
+  min-width: 70px;
+  background: #fff;
+  z-index: 5;
+}
 
-/* Header Above All */
-#monthTable thead th {
-  z-index: 10;
+/* =========================
+   TOP-LEFT INTERSECTION
+   (Excel Corner Cell)
+   ========================= */
+
+#monthTable thead th:nth-child(-n+5) {
+  z-index: 15;
+  box-shadow: inset -1px 0 0 var(--border),
+              inset 0 -1px 0 var(--border);
 }
-   
-.month-scroll {
-  position: relative;
-}
+
+/* =========================
+   SUBTLE FREEZE SHADOW
+   ========================= */
 
 .month-scroll::after {
   content: "";
   position: absolute;
   top: 0;
   left: 570px;
-  width: 15px;
+  width: 14px;
   height: 100%;
   pointer-events: none;
-  background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.10),
+    transparent
+  );
+}
+#monthTable thead tr:nth-child(1) th { top: 0; }
+#monthTable thead tr:nth-child(2) th { top: 32px; }
+#monthTable thead tr:nth-child(3) th { top: 64px; }
+
+.schedule-cell {
+  height: 28px;
+  cursor: pointer;
+  font-weight: 500;
 }
 
+.schedule-cell:hover {
+  background: #f5f7fa;
+}
 
+/* Today highlight */
+.today-cell {
+  background: #fff3cd !important;
+  font-weight: 600;
+}
+
+.today-header span {
+  background: #111;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 6px;
+}   
 /* =========================
    MODALS
    ========================= */
@@ -339,14 +406,6 @@ body {
   padding:16px;
   border-radius:16px;
 }
-.month-scroll {
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: 75vh;
-}
-#monthTable {
-  min-width: 1200px;
-}
 </style>
 </head>
 <body>
@@ -422,12 +481,12 @@ body {
 
 <!-- Schedule Section -->
 <div class="card">
-  <div class="month-scroll">
-    <table class="table table-bordered text-center align-middle small" id="monthTable">
-      <thead id="monthHead"></thead>
-      <tbody id="monthBody"></tbody>
-    </table>
-  </div>
+<div class="month-scroll">
+  <table id="monthTable" class="table table-bordered text-center align-middle small">
+    <thead id="monthHead"></thead>
+    <tbody id="monthBody"></tbody>
+  </table>
+</div>
 </div>
 </main>
   
@@ -1214,6 +1273,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
