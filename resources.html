@@ -159,16 +159,14 @@ body {
 .sticky-col {
   position: sticky;
   background: #fff;
-  z-index: 25;
+  z-index: 50;
   box-shadow: 2px 0 4px rgba(0,0,0,0.03);
 }
-
-/* Left positions for columns 1-5 */
-.sticky-1 { left: 0; width: 120px; z-index: 50; }
-.sticky-2 { left: 120px; width: 90px; z-index: 50; }
-.sticky-3 { left: 210px; width: 220px; z-index: 50; }
-.sticky-4 { left: 430px; width: 120px; z-index: 50; }
-.sticky-5 { left: 550px; width: 70px; z-index: 50; }
+.sticky-1 { left: 0; width: 120px; }
+.sticky-2 { left: 120px; width: 90px; }
+.sticky-3 { left: 210px; width: 220px; }
+.sticky-4 { left: 430px; width: 120px; }
+.sticky-5 { left: 550px; width: 70px; }
 
 /* Keep header above cells */
 #monthTable thead .sticky-col {
@@ -405,6 +403,18 @@ body {
 /* Keep header above cells */
 th.vl-col {
   z-index: 7;
+}
+
+/* Horizontal scroll wrapper */
+.month-scroll-outer {
+  overflow-x: auto; /* horizontal scroll */
+  max-width: 100%;
+  position: relative;
+}
+
+.month-scroll-inner {
+  display: inline-block; /* so table scrolls inside wrapper */
+  min-width: max-content;
 }
    
 /* =========================
@@ -667,12 +677,14 @@ th.vl-col {
 
 <!-- Schedule Section -->
 <div class="card">
-<div class="month-scroll">
-  <table id="monthTable" class="table table-bordered text-center align-middle small">
-    <thead id="monthHead"></thead>
-    <tbody id="monthBody"></tbody>
-  </table>
-</div>
+  <div class="month-scroll-outer">
+    <div class="month-scroll-inner">
+      <table id="monthTable" class="table table-bordered text-center align-middle small">
+        <thead id="monthHead"></thead>
+        <tbody id="monthBody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 </main>
   
@@ -1499,6 +1511,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
