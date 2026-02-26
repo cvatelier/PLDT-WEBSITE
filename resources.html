@@ -154,18 +154,16 @@ body {
 #monthTable thead tr:nth-child(3) th { top: 64px; z-index: 30; }
 
 /* =========================
-   STICKY LEFT COLUMNS (1-5)
+   STICKY LEFT COLUMNS
    ========================= */
 .sticky-col {
   position: sticky;
-  left: 0; /* default left */
   background: #fff;
   z-index: 25;
   box-shadow: 2px 0 4px rgba(0,0,0,0.03);
 }
 
-/* Individual left offsets */
-.sticky-col { position: sticky; left: 0; background: #fff; z-index: 25; box-shadow: 2px 0 4px rgba(0,0,0,0.03); }
+/* Left positions for columns 1-5 */
 .sticky-1 { left: 0; width: 120px; z-index: 50; }
 .sticky-2 { left: 120px; width: 90px; z-index: 50; }
 .sticky-3 { left: 210px; width: 220px; z-index: 50; }
@@ -174,7 +172,7 @@ body {
 
 /* Keep header above cells */
 #monthTable thead .sticky-col {
-  z-index: 60 !important;
+  z-index: 50 !important;
 }
 
 /* =========================
@@ -1374,8 +1372,9 @@ r1 += `</tr>`;
 
 // Weekday row
 let r2 = `<tr>`;
-// first 5 empty sticky headers to align
+// first 5 empty sticky headers
 for (let i = 0; i < 5; i++) r2 += `<th class="sticky-col sticky-${i + 1}"></th>`;
+// scrolling weekdays
 for (let i = 0; i < totalCells; i++) {
   r2 += `<th>${weekDays[i % 7]}</th>`;
 }
@@ -1383,8 +1382,9 @@ r2 += `</tr>`;
 
 // Date row
 let r3 = `<tr>`;
-// first 5 empty sticky headers to align
+// first 5 empty sticky headers
 for (let i = 0; i < 5; i++) r3 += `<th class="sticky-col sticky-${i + 1}"></th>`;
+// scrolling dates
 for (let i = 0; i < totalCells; i++) {
   const d = i - startOffset + 1;
   if (d > 0 && d <= daysInMonth) {
@@ -1499,6 +1499,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
