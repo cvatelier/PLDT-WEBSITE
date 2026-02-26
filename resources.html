@@ -113,8 +113,8 @@ body {
 
 .month-scroll {
   max-height: 72vh;
-  overflow-y: auto;       /* vertical scroll */
-  overflow-x: auto;       /* horizontal scroll for dates */
+  overflow-y: auto;
+  overflow-x: auto;
   position: relative;
 }
 
@@ -165,6 +165,7 @@ body {
 }
 
 /* Individual left offsets */
+.sticky-col { position: sticky; left: 0; background: #fff; z-index: 25; box-shadow: 2px 0 4px rgba(0,0,0,0.03); }
 .sticky-1 { left: 0; width: 120px; z-index: 50; }
 .sticky-2 { left: 120px; width: 90px; z-index: 50; }
 .sticky-3 { left: 210px; width: 220px; z-index: 50; }
@@ -1393,41 +1394,54 @@ function renderMonth(){
   head.innerHTML = r1 + r2 + r3;
 
   // EMPLOYEE ROWS
-  employees.forEach((emp, empIndex) => {
-    let tr = `<tr>
-    <td class="sticky-col sticky-1">${emp.cluster}</td>
-    <td class="sticky-col sticky-2">${emp.id}</td>
-    <td class="sticky-col sticky-3 text-start">${emp.name}</td>
-    <td class="sticky-col sticky-4">${emp.position}</td>
-    <td class="sticky-col sticky-5 fw-semibold text-primary">${countVL(empIndex, year, month)}</td>
-`;
+employees.forEach((emp, empIndex) => {
+  let tr = `<tr>`;
 
-    for (let i = 0; i < totalCells; i++) {
-      const day = i - startOffset + 1;
-      let content = "";
-      let classes = "schedule-cell";
+  // LEFT STICKY COLUMNS
+  const leftCols = [
+    emp.cluster,
+    emp.id,
+    emp.name,
+    emp.position,
+    countVL(empIndex, year, month)
+  ];
 
-      if (day > 0 && day <= daysInMonth) {
-        const val = schedules[key]?.[`${empIndex}-${day}`] || "";
-        const todayCol = isToday(year, month, day) ? "today-cell" : "";
-        classes += ` ${val} ${todayCol}`;
-        content = val;
-      }
+  leftCols.forEach((val, i) => {
+    tr += `<td class="sticky-col sticky-${i + 1} ${i === 2 ? 'text-start' : ''} ${i === 4 ? 'fw-semibold text-primary' : ''}">
+             ${val}
+           </td>`;
+  });
 
-      if (day > 0 && day <= daysInMonth) {
-  tr += `<td class="${classes}"
-           data-key="${key}"
-           data-id="${empIndex}-${day}">
-           ${content}
-         </td>`;
-} else {
-  tr += `<td></td>`;
-}
+  // DATE COLUMNS
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const startOffset = (firstDay + 6) % 7; // Monday start
+  const weeks = weeksInMonth(year, month);
+  const totalCells = weeks * 7;
+  const key = `${year}-${month}`;
+
+  for (let i = 0; i < totalCells; i++) {
+    const day = i - startOffset + 1;
+    let content = "";
+    let classes = "schedule-cell";
+
+    if (day > 0 && day <= daysInMonth) {
+      const val = schedules[key]?.[`${empIndex}-${day}`] || "";
+      const todayCol = isToday(year, month, day) ? "today-cell" : "";
+      classes += ` ${val} ${todayCol}`;
+      content = val;
     }
 
-    tr += `</tr>`;
-    body.insertAdjacentHTML("beforeend", tr);
-  });
+    tr += `<td class="${classes}"
+             data-key="${key}"
+             data-id="${empIndex}-${day}">
+             ${content}
+           </td>`;
+  }
+
+  tr += `</tr>`;
+  body.insertAdjacentHTML("beforeend", tr);
+});
 
   bindClicks();
   applySearchFilter(searchInput.value);
@@ -1480,6 +1494,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
