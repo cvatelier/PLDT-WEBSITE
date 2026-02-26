@@ -112,9 +112,9 @@ body {
    ========================= */
 
 .month-scroll {
-  position: relative;
   max-height: 72vh;
-  overflow: auto;
+  overflow-y: auto;     /* vertical scroll */
+  overflow-x: hidden;   /* prevent outer horizontal scroll */
 }
 
 /* =========================
@@ -1489,6 +1489,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
