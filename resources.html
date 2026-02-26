@@ -183,13 +183,6 @@ body {
   min-width: 60px;
 }
 
-/* WEEK VIEW WIDTH */
-.week-view #monthTable td:not(.sticky-col),
-.week-view #monthTable th:not(.sticky-col) {
-  width: 120px;
-  min-width: 120px;
-}
-
 /* =========================
    SCHEDULE CELLS
    ========================= */
@@ -405,11 +398,6 @@ body {
 #monthTable td,
 #monthTable th {
   border: 1px solid var(--border);
-}
-   
-.week-view #monthTable th,
-.week-view #monthTable td {
-  width: 100px;
 }
    
 /* =========================
@@ -645,10 +633,6 @@ body {
       <h3 class="mb-0">Schedule</h3>
 
       <div class="d-flex align-items-center gap-2">
-        <div class="btn-group btn-group-sm">
-          <button id="weekViewBtn" class="btn btn-outline-secondary active">Week</button>
-          <button id="monthViewBtn" class="btn btn-outline-secondary">Month</button>
-        </div>
 
         <div class="d-flex align-items-center gap-1">
           <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(-1)">‹</button>
@@ -1064,13 +1048,11 @@ document.addEventListener("keydown", e=>{
   const scheduleOptions = ["RD","VL","SL","PL","ML","HO","LA","D","T"];
   const weekDays = ["M","T","W","T","F","S","S"];
 
-  let viewMode = "week";
+  let viewMode = "month";
   let currentDate = new Date();
   let schedules = JSON.parse(localStorage.getItem("monthSchedules")) || {};
 
   /* ========== DOM REFS ========== */
-  const weekBtn  = document.getElementById("weekViewBtn");
-  const monthBtn = document.getElementById("monthViewBtn");
   const searchInput = document.getElementById("searchInput");
   const bulkEmployees = document.getElementById("bulkEmployees");
   const deleteEmployeeSelect = document.getElementById("deleteEmployeeSelect");
@@ -1197,42 +1179,11 @@ function refreshDeleteEmployees(){
     applySearchFilter(searchInput.value)
   );
 
-  /* ========== NAVIGATION ========== */
-  window.changeMonth = dir => {
-    if(viewMode === "month"){
-      currentDate.setMonth(currentDate.getMonth()+dir);
-      renderMonth();
-    } else {
-      currentDate.setDate(currentDate.getDate()+dir*7);
-      renderWeek();
-    }
-  };
-
-weekBtn.onclick = () => {
-  viewMode = "week";
-
-  weekBtn.classList.add("active");
-  monthBtn.classList.remove("active");
-
-  document.body.classList.remove("month-view");
-  document.body.classList.add("week-view");
-
-  renderWeek();
-};
-
-monthBtn.onclick = () => {
-  viewMode = "month";
-  currentDate.setDate(1);
-
-  monthBtn.classList.add("active");
-  weekBtn.classList.remove("active");
-
-  document.body.classList.remove("week-view");
-  document.body.classList.add("month-view");
-
+window.changeMonth = dir => {
+  currentDate.setMonth(currentDate.getMonth() + dir);
   renderMonth();
 };
-
+   
   /* ========== BULK EDIT ========== */
 window.applyBulkEdit = () => {
   const selectedEmployees = getSelectedEmployees();
@@ -1268,7 +1219,7 @@ window.applyBulkEdit = () => {
   }
 
   save();
-  viewMode === "month" ? renderMonth() : renderWeek();
+  renderMonth();
 
   showModalFeedback("bulkModal", "Bulk schedule applied successfully!", "success");
 
@@ -1313,7 +1264,7 @@ window.bulkAddEmployees = () => {
   save();
   refreshBulkEmployees();
   refreshDeleteEmployees();
-  viewMode === "month" ? renderMonth() : renderWeek();
+  renderMonth();
 
   textArea.value = "";
 
@@ -1359,7 +1310,7 @@ window.deleteEmployees = () => {
   refreshBulkEmployees();
   refreshDeleteEmployees();
 
-  viewMode === "month" ? renderMonth() : renderWeek();
+  renderMonth();
 
   showModalFeedback("deleteEmployeeModal", "Employee(s) deleted.", "success");
 
@@ -1475,96 +1426,6 @@ function renderMonth(){
   enableExcelSelection();
 }
 
-/* ========== WEEK VIEW ========== */
-function renderWeek() {
-  const start = mondayOfWeek(currentDate);
-
-  document.getElementById("monthLabel").innerText =
-    `Week of ${start.toLocaleDateString()}`;
-
-  const head = document.getElementById("monthHead");
-  const body = document.getElementById("monthBody");
-  head.innerHTML = "";
-  body.innerHTML = "";
-
-  // SAME HEADER STRUCTURE AS MONTH
-  let r1 = `<tr>
-    <th rowspan="3" class="sticky-col sticky-1">Cluster</th>
-    <th rowspan="3" class="sticky-col sticky-2">ID</th>
-    <th rowspan="3" class="sticky-col sticky-3">Name</th>
-    <th rowspan="3" class="sticky-col sticky-4">Position</th>
-    <th rowspan="3" class="sticky-col sticky-5">VL</th>
-    <th colspan="7">Week</th>
-  </tr>`;
-
-  let r2 = `<tr>`;
-  for (let i = 0; i < 7; i++) {
-    r2 += `<th>${weekDays[i]}</th>`;
-  }
-  r2 += `</tr>`;
-
-  let r3 = `<tr>`;
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    const isT = isToday(d.getFullYear(), d.getMonth(), d.getDate());
-    r3 += `<th class="${isT ? "today-header" : ""}">
-      ${isT ? `<span>${d.getDate()}</span>` : d.getDate()}
-    </th>`;
-  }
-  r3 += `</tr>`;
-
-  head.innerHTML = r1 + r2 + r3;
-
-  // BODY (WITH STICKY COLUMNS)
-  employees.forEach((emp, empIndex) => {
-
-    let vlCount = 0;
-    let tr = `<tr>
-      <td class="sticky-col sticky-1">${emp.cluster}</td>
-      <td class="sticky-col sticky-2">${emp.id}</td>
-      <td class="sticky-col sticky-3 text-start">${emp.name}</td>
-      <td class="sticky-col sticky-4">${emp.position}</td>
-      <td class="sticky-col sticky-5 fw-semibold text-primary">`;
-
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      const key = `${d.getFullYear()}-${d.getMonth()}`;
-      if (schedules[key]?.[`${empIndex}-${d.getDate()}`] === "VL") {
-        vlCount++;
-      }
-    }
-
-    tr += vlCount + "</td>";
-
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-
-      const key = `${d.getFullYear()}-${d.getMonth()}`;
-      const id = `${empIndex}-${d.getDate()}`;
-      const val = schedules[key]?.[id] || "";
-      const todayCol = isToday(d.getFullYear(), d.getMonth(), d.getDate())
-        ? "today-cell"
-        : "";
-
-      tr += `<td class="schedule-cell ${val} ${todayCol}"
-              data-key="${key}"
-              data-id="${id}">
-              ${val}
-            </td>`;
-    }
-
-    tr += `</tr>`;
-    body.insertAdjacentHTML("beforeend", tr);
-  });
-
-  bindClicks();
-  applySearchFilter(searchInput.value);
-  enableExcelSelection();
-}
-
   /* ========== CELL EDITING ========== */
   function bindClicks(){
     document.querySelectorAll(".schedule-cell").forEach(cell=>{
@@ -1605,12 +1466,13 @@ select.onchange = () => {
     });
   }
   /* ========== INIT ========== */
-  renderWeek();
+  renderMonth();
 
 });
 </script>
 </body>
 </html>
+
 
 
 
