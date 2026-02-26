@@ -416,6 +416,42 @@ th.vl-col {
   display: inline-block; /* so table scrolls inside wrapper */
   min-width: max-content;
 }
+
+/* Horizontal scroll wrapper */
+.month-scroll-outer {
+  overflow-x: auto;       /* allows horizontal scroll */
+  max-width: 100%;        /* fit container */
+  position: relative;
+}
+
+.month-scroll-inner {
+  display: inline-block;  /* table expands naturally */
+  min-width: max-content;
+}
+
+/* Sticky columns */
+.sticky-col {
+  position: sticky;
+  background: #fff;
+  z-index: 50;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.03);
+}
+
+/* Adjust left offset for each frozen column */
+.sticky-1 { left: 0; width: 120px; }
+.sticky-2 { left: 120px; width: 90px; }
+.sticky-3 { left: 210px; width: 220px; }
+.sticky-4 { left: 430px; width: 120px; }
+.sticky-5 { left: 550px; width: 70px; }
+
+/* Sticky header */
+#monthTable thead th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+}
    
 /* =========================
    MODALS
@@ -678,13 +714,13 @@ th.vl-col {
 <!-- Schedule Section -->
 <div class="card">
   <div class="month-scroll-outer">
-    <div class="month-scroll-inner">
-      <table id="monthTable" class="table table-bordered text-center align-middle small">
-        <thead id="monthHead"></thead>
-        <tbody id="monthBody"></tbody>
-      </table>
-    </div>
+  <div class="month-scroll-inner">
+    <table id="monthTable" class="table table-bordered text-center align-middle small">
+      <thead id="monthHead"></thead>
+      <tbody id="monthBody"></tbody>
+    </table>
   </div>
+</div>
 </div>
 </main>
   
@@ -1412,7 +1448,14 @@ head.innerHTML = r1 + r2 + r3;
 
   // EMPLOYEE ROWS
 employees.forEach((emp, empIndex) => {
-  let tr = `<tr>`;
+  let tr = `<tr>
+    <td class="sticky-col sticky-1">${emp.cluster}</td>
+    <td class="sticky-col sticky-2">${emp.id}</td>
+    <td class="sticky-col sticky-3 text-start">${emp.name}</td>
+    <td class="sticky-col sticky-4">${emp.position}</td>
+    <td class="sticky-col sticky-5 fw-semibold text-primary">${countVL(empIndex, year, month)}</td>
+`;
+  // then loop for day cells...
 
   // LEFT STICKY COLUMNS
   const leftCols = [
@@ -1511,6 +1554,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
