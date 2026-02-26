@@ -1336,6 +1336,7 @@ function renderMonth(){
 /* ========== WEEK VIEW ========== */
 function renderWeek() {
   const start = mondayOfWeek(currentDate);
+
   document.getElementById("monthLabel").innerText =
     `Week of ${start.toLocaleDateString()}`;
 
@@ -1344,32 +1345,36 @@ function renderWeek() {
   head.innerHTML = "";
   body.innerHTML = "";
 
-  // HEADER ROWS (same structure as month)
-  let h1 = `<tr>
-    <th rowspan="2" class="sticky-col sticky-1">Cluster</th>
-    <th rowspan="2" class="sticky-col sticky-2">ID</th>
-    <th rowspan="2" class="sticky-col sticky-3">Name</th>
-    <th rowspan="2" class="sticky-col sticky-4">Position</th>
-    <th rowspan="2" class="sticky-col sticky-5">VL</th>
+  // SAME HEADER STRUCTURE AS MONTH
+  let r1 = `<tr>
+    <th rowspan="3" class="sticky-col sticky-1">Cluster</th>
+    <th rowspan="3" class="sticky-col sticky-2">ID</th>
+    <th rowspan="3" class="sticky-col sticky-3">Name</th>
+    <th rowspan="3" class="sticky-col sticky-4">Position</th>
+    <th rowspan="3" class="sticky-col sticky-5">VL</th>
     <th colspan="7">Week</th>
   </tr>`;
 
-  let h2 = `<tr>`;
+  let r2 = `<tr>`;
+  for (let i = 0; i < 7; i++) {
+    r2 += `<th>${weekDays[i]}</th>`;
+  }
+  r2 += `</tr>`;
+
+  let r3 = `<tr>`;
   for (let i = 0; i < 7; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
     const isT = isToday(d.getFullYear(), d.getMonth(), d.getDate());
-
-    h2 += `<th class="${isT ? "today-header" : ""}">
-      ${weekDays[i]}<br>
+    r3 += `<th class="${isT ? "today-header" : ""}">
       ${isT ? `<span>${d.getDate()}</span>` : d.getDate()}
     </th>`;
   }
-  h2 += `</tr>`;
+  r3 += `</tr>`;
 
-  head.innerHTML = h1 + h2;
+  head.innerHTML = r1 + r2 + r3;
 
-  // EMPLOYEE ROWS
+  // BODY (WITH STICKY COLUMNS)
   employees.forEach((emp, empIndex) => {
 
     let vlCount = 0;
@@ -1464,6 +1469,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
