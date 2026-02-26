@@ -1358,40 +1358,45 @@ function renderMonth(){
   body.innerHTML = "";
 
   // HEADER ROWS
-  let r1 = `<tr>
-    <th rowspan="3" class="sticky-col sticky-1">Cluster</th>
-    <th rowspan="3" class="sticky-col sticky-2">ID</th>
-    <th rowspan="3" class="sticky-col sticky-3">Name</th>
-    <th rowspan="3" class="sticky-col sticky-4">Position</th>
-    <th rowspan="3" class="sticky-col sticky-5">VL</th>
-  `;
+let r1 = `<tr>
+  <th rowspan="3" class="sticky-col sticky-1">Cluster</th>
+  <th rowspan="3" class="sticky-col sticky-2">ID</th>
+  <th rowspan="3" class="sticky-col sticky-3 text-start">Name</th>
+  <th rowspan="3" class="sticky-col sticky-4">Position</th>
+  <th rowspan="3" class="sticky-col sticky-5">VL</th>
+`;
 
-  for (let w = 0; w < weeks; w++) {
-  r1 += `<th colspan="7" class="text-center fw-semibold">
-           Week ${w + 1}
-         </th>`;
+// Week headers
+for (let w = 0; w < weeks; w++) {
+  r1 += `<th colspan="7" class="text-center fw-semibold">Week ${w + 1}</th>`;
 }
-  r1 += `</tr>`;
+r1 += `</tr>`;
 
-  let r2 = `<tr>`;
-  for (let i = 0; i < totalCells; i++) {
-    r2 += `<th>${weekDays[i % 7]}</th>`;
+// Weekday row
+let r2 = `<tr>`;
+// first 5 empty sticky headers to align
+for (let i = 0; i < 5; i++) r2 += `<th class="sticky-col sticky-${i + 1}"></th>`;
+for (let i = 0; i < totalCells; i++) {
+  r2 += `<th>${weekDays[i % 7]}</th>`;
+}
+r2 += `</tr>`;
+
+// Date row
+let r3 = `<tr>`;
+// first 5 empty sticky headers to align
+for (let i = 0; i < 5; i++) r3 += `<th class="sticky-col sticky-${i + 1}"></th>`;
+for (let i = 0; i < totalCells; i++) {
+  const d = i - startOffset + 1;
+  if (d > 0 && d <= daysInMonth) {
+    const isT = isToday(year, month, d);
+    r3 += `<th class="${isT ? "today-header" : ""}">${isT ? `<span>${d}</span>` : d}</th>`;
+  } else {
+    r3 += `<th></th>`;
   }
-  r2 += `</tr>`;
+}
+r3 += `</tr>`;
 
-  let r3 = `<tr>`;
-  for (let i = 0; i < totalCells; i++) {
-    const d = i - startOffset + 1;
-    if (d > 0 && d <= daysInMonth) {
-      const isT = isToday(year, month, d);
-      r3 += `<th class="${isT ? "today-header" : ""}">${isT ? `<span>${d}</span>` : d}</th>`;
-    } else {
-      r3 += `<th></th>`;
-    }
-  }
-  r3 += `</tr>`;
-
-  head.innerHTML = r1 + r2 + r3;
+head.innerHTML = r1 + r2 + r3;
 
   // EMPLOYEE ROWS
 employees.forEach((emp, empIndex) => {
@@ -1494,6 +1499,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
