@@ -167,7 +167,19 @@ body {
 .sticky-2 { left: 120px; width: 90px; }
 .sticky-3 { left: 210px; width: 220px; }
 .sticky-4 { left: 430px; width: 120px; }
-.sticky-5 { left: 550px; width: 70px; }
+/* Freeze VL column to RIGHT instead of left */
+.sticky-5 {
+  position: sticky;
+  right: 0;
+  width: 70px;
+  background: #fff;
+  z-index: 45;
+  box-shadow: -3px 0 6px rgba(0,0,0,0.05);
+}
+
+#monthTable thead .sticky-5 {
+  z-index: 60 !important;
+}
 
 #monthTable thead .sticky-col {
   z-index: 50 !important;
@@ -398,6 +410,11 @@ body {
 #monthTable td,
 #monthTable th {
   border: 1px solid var(--border);
+}
+
+/* Keep header above cells */
+th.vl-col {
+  z-index: 7;
 }
    
 /* =========================
@@ -1472,6 +1489,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
