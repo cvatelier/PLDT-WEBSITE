@@ -13,7 +13,7 @@
 
 <style>
 /* =====================================================
-   PREMIUM MINIMAL LUXURY UI – FULL SYSTEM
+   PREMIUM SCHEDULER UI – FULL PROFESSIONAL VERSION
    Caesar Romero Scheduler
    ===================================================== */
 
@@ -78,12 +78,8 @@ body {
   color: #ffffff;
 }
 
-#sidebar .nav-link i {
-  font-size: 15px;
-}
-
 /* =========================
-   MAIN HEADER BAR
+   HEADER BAR
    ========================= */
 
 .main-bar {
@@ -100,7 +96,7 @@ body {
 }
 
 /* =========================
-   CARDS
+   CARD
    ========================= */
 
 .card {
@@ -108,7 +104,147 @@ body {
   border-radius: var(--radius);
   background: var(--card);
   box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  overflow: hidden;
 }
+
+/* =========================
+   SCROLL CONTAINER
+   ========================= */
+
+.month-scroll {
+  position: relative;
+  max-height: 72vh;
+  overflow: auto;
+}
+
+/* =========================
+   TABLE BASE
+   ========================= */
+
+#monthTable {
+  table-layout: fixed;
+  width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+
+#monthTable td,
+#monthTable th {
+  border: 1px solid var(--border);
+  padding: 4px 6px;
+}
+
+/* =========================
+   STICKY HEADER (FREEZE TOP)
+   ========================= */
+
+#monthTable thead th {
+  position: sticky;
+  background: #fff;
+  z-index: 20;
+  height: 32px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+}
+
+#monthTable thead tr:nth-child(1) th { top: 0; z-index: 40; }
+#monthTable thead tr:nth-child(2) th { top: 32px; z-index: 35; }
+#monthTable thead tr:nth-child(3) th { top: 64px; z-index: 30; }
+
+/* =========================
+   STICKY LEFT COLUMNS
+   ========================= */
+
+.sticky-col {
+  position: sticky;
+  background: #fff;
+  z-index: 25;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.03);
+}
+
+.sticky-1 { left: 0; width: 120px; }
+.sticky-2 { left: 120px; width: 90px; }
+.sticky-3 { left: 210px; width: 220px; }
+.sticky-4 { left: 430px; width: 120px; }
+.sticky-5 { left: 550px; width: 70px; }
+
+#monthTable thead .sticky-col {
+  z-index: 50 !important;
+}
+
+/* =========================
+   DAY CELL WIDTH
+   ========================= */
+
+#monthTable td:not(.sticky-col),
+#monthTable th:not(.sticky-col) {
+  width: 60px;
+  min-width: 60px;
+}
+
+/* WEEK VIEW WIDTH */
+.week-view #monthTable td:not(.sticky-col),
+.week-view #monthTable th:not(.sticky-col) {
+  width: 120px;
+  min-width: 120px;
+}
+
+/* =========================
+   SCHEDULE CELLS
+   ========================= */
+
+.schedule-cell {
+  height: 28px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.schedule-cell:hover {
+  background: #f8fafc;
+}
+
+.schedule-cell.selected {
+  background: rgba(17,17,17,0.08);
+  outline: 2px solid #111;
+  outline-offset: -2px;
+}
+
+.schedule-cell.range {
+  background: rgba(17,17,17,0.05);
+}
+
+/* =========================
+   TODAY
+   ========================= */
+
+.today-cell {
+  background: #fff7e6 !important;
+  font-weight: 600;
+  border: 1px solid #ffcc80 !important;
+}
+
+.today-header span {
+  background: #111;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+/* =========================
+   SCHEDULE COLOR CODES
+   ========================= */
+
+.schedule-cell.RD { background:#ffeaea; }
+.schedule-cell.VL { background:#e8f4ff; }
+.schedule-cell.SL { background:#fff4e5; }
+.schedule-cell.PL { background:#f3e8ff; }
+.schedule-cell.ML { background:#fde2ff; }
+.schedule-cell.HO { background:#e9ffe8; }
+.schedule-cell.LA { background:#f5f5f5; }
+.schedule-cell.D  { background:#e8fff7; }
+.schedule-cell.T  { background:#eef1ff; }
 
 /* =========================
    BUTTONS
@@ -131,11 +267,6 @@ body {
   opacity: 0.85;
 }
 
-.btn-outline-secondary {
-  border-color: var(--border);
-  background: transparent;
-}
-
 /* =========================
    INPUTS
    ========================= */
@@ -153,62 +284,71 @@ body {
   border-color: var(--accent);
 }
 
-/* ===== FIXED STICKY SYSTEM ===== */
+/* =========================
+   MODALS (PREMIUM STYLE)
+   ========================= */
 
-#monthTable {
-  table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 0;
+.modal-content {
+  border-radius: 22px;
+  border: none;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  overflow: hidden;
 }
 
-/* Header sticky */
-#monthTable thead th {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  z-index: 20;
+.modal-header {
+  padding: 20px 24px;
+  font-weight: 600;
   border-bottom: 1px solid var(--border);
 }
 
-/* Multiple header rows */
-#monthTable thead tr:nth-child(1) th { top: 0; z-index: 40; }
-#monthTable thead tr:nth-child(2) th { top: 32px; z-index: 35; }
-#monthTable thead tr:nth-child(3) th { top: 64px; z-index: 30; }
-
-/* Sticky left columns */
-#monthTable .sticky-col {
-  position: sticky;
-  left: 0;
-  background: #fff;
-  z-index: 25;
+.modal-body {
+  padding: 24px;
 }
 
-/* Individual left positions */
-.sticky-1 { left: 0; width: 120px; }
-.sticky-2 { left: 120px; width: 90px; }
-.sticky-3 { left: 210px; width: 220px; }
-.sticky-4 { left: 430px; width: 120px; }
-.sticky-5 { left: 550px; width: 70px; }
-
-/* Header + sticky intersection */
-#monthTable thead .sticky-col {
-  z-index: 50 !important;
+.modal-footer {
+  padding: 18px 24px;
 }
 
-#monthTable td:not(.sticky-col),
-#monthTable th:not(.sticky-col) {
-  width: 60px;
-  min-width: 60px;
+.modal .btn {
+  border-radius: 14px;
+  padding: 8px 18px;
+  font-size: 13px;
 }
-   
+
+.modal.fade .modal-dialog {
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+
 /* =========================
-   SCHEDULE CELLS
+   RESPONSIVE
    ========================= */
 
-.schedule-cell {
-  height: 28px;
-  cursor: pointer;
-  font-weight: 500;
+@media (max-width: 992px) {
+
+  #sidebar {
+    position: fixed;
+    z-index: 1000;
+    background: #fff;
+  }
+
+  .month-scroll {
+    max-height: 60vh;
+  }
+
+  #monthTable {
+    font-size: 11px;
+    min-width: 900px;
+  }
+
+  .schedule-cell {
+    height: 24px;
+    font-size: 9px;
+  }
 }
 
 .schedule-cell:hover {
@@ -1471,6 +1611,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
