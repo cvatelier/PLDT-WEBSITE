@@ -177,12 +177,33 @@ body {
 .sticky-3 { left: 210px; width: 220px; }
 .sticky-4 { left: 430px; width: 120px; }
 .sticky-5 { left: 550px; width: 70px; }
+.sticky-6 {
+  position: sticky;
+  left: 700px; /* sum of previous column widths: 140+100+260+120+80 = 700 */
+  background: #fff;
+  z-index: 60; /* above normal sticky columns but below header */
+  box-shadow: 2px 0 4px rgba(0,0,0,0.04);
+}
 
 /* IMPORTANT: Header sticky columns must sit ABOVE body cells */
 #monthTable thead .sticky-col {
   z-index: 350 !important;
 }
 
+#monthTable tbody tr:nth-child(1) td,
+#monthTable tbody tr:nth-child(1) th {
+  position: sticky;
+  top: 96px; /* sum of row1+row2+row3: 32+32+32px */
+  background: #fff;
+  z-index: 100;
+}   
+
+#monthTable tbody tr:nth-child(1) td.sticky-6 {
+  top: 96px;
+  left: 700px;
+  z-index: 120; /* above both row and column sticky layers */
+}
+   
 /* =========================
    DAY CELL WIDTH
    ========================= */
@@ -1422,6 +1443,7 @@ employees.forEach((emp, empIndex) => {
     <td class="sticky-col sticky-3 text-start">${emp.name}</td>
     <td class="sticky-col sticky-4">${emp.position}</td>
     <td class="sticky-col sticky-5 fw-semibold text-primary">${countVL(empIndex, year, month)}</td>
+    <td class="sticky-6">Column 6 Data</td>
 `;
 
   // DATE COLUMNS
@@ -1506,6 +1528,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
