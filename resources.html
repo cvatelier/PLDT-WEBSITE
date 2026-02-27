@@ -139,25 +139,22 @@ body {
 #monthTable thead th {
   position: sticky;
   background: #fff;
-  z-index: 200; /* base header layer */
-}
-
-/* Row 1 (Week Row) */
-#monthTable thead tr:nth-child(1) th {
-  top: 0;
   z-index: 300;
 }
 
-/* Row 2 (Weekday Row) */
-#monthTable thead tr:nth-child(2) th {
-  top: 32px; /* height of row 1 */
-  z-index: 290;
+/* Row 1 */
+#monthTable thead tr:nth-child(1) th {
+  top: 0;
 }
 
-/* Row 3 (Date Row) */
+/* Row 2 */
+#monthTable thead tr:nth-child(2) th {
+  top: 32px;
+}
+
+/* Row 3 */
 #monthTable thead tr:nth-child(3) th {
-  top: 64px; /* height of row 1 + row 2 */
-  z-index: 280;
+  top: 64px;
 }
 
 /* =========================
@@ -167,42 +164,19 @@ body {
 .sticky-col {
   position: sticky;
   background: #fff;
-  z-index: 250;
-  box-shadow: 2px 0 4px rgba(0,0,0,0.04);
+  z-index: 200;
 }
 
-/* Column widths + left offsets */
-.sticky-1 { left: 0; width: 120px; }
-.sticky-2 { left: 120px; width: 90px; }
-.sticky-3 { left: 210px; width: 220px; }
-.sticky-4 { left: 430px; width: 120px; }
-.sticky-5 { left: 550px; width: 70px; }
-.sticky-6 {
-  position: sticky;
-  left: 700px; /* sum of previous column widths: 140+100+260+120+80 = 700 */
-  background: #fff;
-  z-index: 60; /* above normal sticky columns but below header */
-  box-shadow: 2px 0 4px rgba(0,0,0,0.04);
-}
+/* Exact stacking */
+.sticky-1 { left: 0; width: 140px; }
+.sticky-2 { left: 140px; width: 100px; }
+.sticky-3 { left: 240px; width: 260px; }
+.sticky-4 { left: 500px; width: 120px; }
+.sticky-5 { left: 620px; width: 80px; }
 
-/* IMPORTANT: Header sticky columns must sit ABOVE body cells */
 #monthTable thead .sticky-col {
-  z-index: 350 !important;
-}
-
-#monthTable tbody tr:nth-child(1) td,
-#monthTable tbody tr:nth-child(1) th {
-  position: sticky;
-  top: 96px; /* sum of row1+row2+row3: 32+32+32px */
-  background: #fff;
-  z-index: 100;
+  z-index: 400;
 }   
-
-#monthTable tbody tr:nth-child(1) td.sticky-6 {
-  top: 96px;
-  left: 700px;
-  z-index: 120; /* above both row and column sticky layers */
-}
    
 /* =========================
    DAY CELL WIDTH
@@ -1528,6 +1502,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
