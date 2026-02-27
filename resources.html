@@ -138,34 +138,49 @@ body {
 
 #monthTable thead th {
   position: sticky;
-  top: 0;
   background: #fff;
-  z-index: 100;
-  border-bottom: 1px solid var(--border);
+  z-index: 200; /* base header layer */
 }
 
-#monthTable thead tr:nth-child(1) th { top: 0; z-index: 40; }
-#monthTable thead tr:nth-child(2) th { top: 32px; z-index: 35; }
-#monthTable thead tr:nth-child(3) th { top: 64px; z-index: 30; }
+/* Row 1 (Week Row) */
+#monthTable thead tr:nth-child(1) th {
+  top: 0;
+  z-index: 300;
+}
+
+/* Row 2 (Weekday Row) */
+#monthTable thead tr:nth-child(2) th {
+  top: 32px; /* height of row 1 */
+  z-index: 290;
+}
+
+/* Row 3 (Date Row) */
+#monthTable thead tr:nth-child(3) th {
+  top: 64px; /* height of row 1 + row 2 */
+  z-index: 280;
+}
 
 /* =========================
    STICKY LEFT COLUMNS
    ========================= */
+
 .sticky-col {
   position: sticky;
   background: #fff;
-  z-index: 50;
-  box-shadow: 2px 0 4px rgba(0,0,0,0.03);
+  z-index: 250;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.04);
 }
+
+/* Column widths + left offsets */
 .sticky-1 { left: 0; width: 120px; }
 .sticky-2 { left: 120px; width: 90px; }
 .sticky-3 { left: 210px; width: 220px; }
 .sticky-4 { left: 430px; width: 120px; }
 .sticky-5 { left: 550px; width: 70px; }
 
-/* Keep header above cells */
+/* IMPORTANT: Header sticky columns must sit ABOVE body cells */
 #monthTable thead .sticky-col {
-  z-index: 50 !important;
+  z-index: 350 !important;
 }
 
 /* =========================
@@ -1507,6 +1522,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
