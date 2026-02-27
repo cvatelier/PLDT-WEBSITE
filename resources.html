@@ -339,11 +339,6 @@ body {
     background: #fff;
   }
 
-  #monthTable {
-    font-size: 11px;
-    min-width: 900px;
-  }
-
   .schedule-cell {
     height: 24px;
     font-size: 9px;
@@ -400,42 +395,36 @@ th.vl-col {
   z-index: 7;
 }
 
-/* =========================
-   TABLE SCROLL CONTAINER
-   ========================= */
-
 .table-scroll {
   max-height: 72vh;
-  overflow: auto;              /* BOTH horizontal + vertical */
+  overflow: auto;
   position: relative;
-  border-radius: var(--radius);
 }
 
-/* Optional premium scrollbar */
-.table-scroll::-webkit-scrollbar {
-  height: 10px;
-  width: 10px;
+#monthTable {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
 }
 
-.table-scroll::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
-  border-radius: 10px;
-}
-   
 /* Sticky columns */
 .sticky-col {
   position: sticky;
   background: #fff;
-  z-index: 50;
-  box-shadow: 2px 0 4px rgba(0,0,0,0.03);
+  z-index: 10;
 }
 
-/* Adjust left offset for each frozen column */
-.sticky-1 { left: 0; width: 120px; }
-.sticky-2 { left: 120px; width: 90px; }
-.sticky-3 { left: 210px; width: 220px; }
-.sticky-4 { left: 430px; width: 120px; }
-.sticky-5 { left: 550px; width: 70px; }
+/* Exact width + left stacking */
+.sticky-1 { left: 0; width: 140px; }
+.sticky-2 { left: 140px; width: 100px; }
+.sticky-3 { left: 240px; width: 260px; }
+.sticky-4 { left: 500px; width: 120px; }
+.sticky-5 { left: 620px; width: 80px; }
+
+/* Header must be above body */
+#monthTable thead .sticky-col {
+  z-index: 50;
+}
    
 /* =========================
    MODALS
@@ -535,11 +524,6 @@ th.vl-col {
 
   .month-scroll {
     max-height: 60vh;
-  }
-
-  #monthTable {
-    font-size: 11px;
-    min-width: 900px;
   }
 
   .schedule-cell {
@@ -1522,6 +1506,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
