@@ -1430,7 +1430,7 @@ employees.forEach((emp, empIndex) => {
   const firstDay = new Date(year, month, 1).getDay();
   const startOffset = (firstDay + 6) % 7; // Monday start
   const weeks = weeksInMonth(year, month);
-  const totalCells = weeks * 7;
+  const totalCells = daysInMonth;
   const key = `${year}-${month}`;
 
   for (let i = 0; i < totalCells; i++) {
@@ -1507,6 +1507,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
