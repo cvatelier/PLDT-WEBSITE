@@ -1359,7 +1359,7 @@ function renderMonth(){
   const firstDay = new Date(year, month, 1).getDay();
   const startOffset = (firstDay + 6) % 7; // Monday start
   const weeks = weeksInMonth(year, month);
-  const totalCells = weeks * 7;
+  const totalCells = daysInMonth;
   const key = `${year}-${month}`;
 
   document.getElementById("monthLabel").innerText =
@@ -1400,8 +1400,7 @@ let r3 = `<tr>`;
 // first 5 empty sticky headers
 for (let i = 0; i < 5; i++) r3 += `<th class="sticky-col sticky-${i + 1}"></th>`;
 // scrolling dates
-for (let i = 0; i < totalCells; i++) {
-  const d = i - startOffset + 1;
+for (let day = 1; day <= daysInMonth; day++) {
   if (d > 0 && d <= daysInMonth) {
     const isT = isToday(year, month, d);
     r3 += `<th class="${isT ? "today-header" : ""}">${isT ? `<span>${d}</span>` : d}</th>`;
@@ -1505,6 +1504,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
