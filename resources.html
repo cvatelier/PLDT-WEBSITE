@@ -1422,22 +1422,6 @@ employees.forEach((emp, empIndex) => {
     <td class="sticky-col sticky-4">${emp.position}</td>
     <td class="sticky-col sticky-5 fw-semibold text-primary">${countVL(empIndex, year, month)}</td>
 `;
-  // then loop for day cells...
-
-  // LEFT STICKY COLUMNS
-  const leftCols = [
-    emp.cluster,
-    emp.id,
-    emp.name,
-    emp.position,
-    countVL(empIndex, year, month)
-  ];
-
-  leftCols.forEach((val, i) => {
-    tr += `<td class="sticky-col sticky-${i + 1} ${i === 2 ? 'text-start' : ''} ${i === 4 ? 'fw-semibold text-primary' : ''}">
-             ${val}
-           </td>`;
-  });
 
   // DATE COLUMNS
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -1521,6 +1505,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
