@@ -111,12 +111,7 @@ body {
    SCROLL CONTAINER
    ========================= */
 
-.month-scroll {
-  max-height: 72vh;
-  overflow-y: auto;
-  overflow-x: auto;
-  position: relative;
-}
+
 
 /* =========================
    TABLE BASE
@@ -124,7 +119,8 @@ body {
 
 #monthTable {
   table-layout: fixed;
-  width: max-content;
+  width: max-content;   /* makes horizontal scroll work */
+  min-width: 100%;      /* prevents collapse */
   border-collapse: separate;
   border-spacing: 0;
   font-size: 12px;
@@ -142,10 +138,9 @@ body {
 
 #monthTable thead th {
   position: sticky;
+  top: 0;
   background: #fff;
-  z-index: 20;
-  height: 32px;
-  vertical-align: middle;
+  z-index: 100;
   border-bottom: 1px solid var(--border);
 }
 
@@ -329,10 +324,6 @@ body {
     background: #fff;
   }
 
-  .month-scroll {
-    max-height: 60vh;
-  }
-
   #monthTable {
     font-size: 11px;
     min-width: 900px;
@@ -384,17 +375,6 @@ body {
    SUBTLE SCROLL SHADOWS
    ========================= */
 
-.month-scroll::before {
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:12px;
-  background:linear-gradient(to bottom, rgba(0,0,0,0.08), transparent);
-  pointer-events:none;
-}
-
 #monthTable td,
 #monthTable th {
   border: 1px solid var(--border);
@@ -405,30 +385,28 @@ th.vl-col {
   z-index: 7;
 }
 
-/* Horizontal scroll wrapper */
-.month-scroll-outer {
-  overflow-x: auto; /* horizontal scroll */
-  max-width: 100%;
+/* =========================
+   TABLE SCROLL CONTAINER
+   ========================= */
+
+.table-scroll {
+  max-height: 72vh;
+  overflow: auto;              /* BOTH horizontal + vertical */
   position: relative;
+  border-radius: var(--radius);
 }
 
-.month-scroll-inner {
-  display: inline-block; /* so table scrolls inside wrapper */
-  min-width: max-content;
+/* Optional premium scrollbar */
+.table-scroll::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
 }
 
-/* Horizontal scroll wrapper */
-.month-scroll-outer {
-  overflow-x: auto;       /* allows horizontal scroll */
-  max-width: 100%;        /* fit container */
-  position: relative;
+.table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
 }
-
-.month-scroll-inner {
-  display: inline-block;  /* table expands naturally */
-  min-width: max-content;
-}
-
+   
 /* Sticky columns */
 .sticky-col {
   position: sticky;
@@ -443,15 +421,6 @@ th.vl-col {
 .sticky-3 { left: 210px; width: 220px; }
 .sticky-4 { left: 430px; width: 120px; }
 .sticky-5 { left: 550px; width: 70px; }
-
-/* Sticky header */
-#monthTable thead th {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  z-index: 100;
-  border-bottom: 1px solid var(--border);
-}
    
 /* =========================
    MODALS
@@ -713,14 +682,12 @@ th.vl-col {
 
 <!-- Schedule Section -->
 <div class="card">
-  <div class="month-scroll-outer">
-  <div class="month-scroll-inner">
-    <table id="monthTable" class="table table-bordered text-center align-middle small">
+  <div class="table-scroll">
+    <table id="monthTable" class="table table-bordered text-center align-middle small mb-0">
       <thead id="monthHead"></thead>
       <tbody id="monthBody"></tbody>
     </table>
   </div>
-</div>
 </div>
 </main>
   
@@ -1554,6 +1521,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
