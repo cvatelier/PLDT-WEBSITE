@@ -1101,11 +1101,11 @@ function renderMonth(){
 
   // HEADER ROWS
 let r1 = `<tr>
-  <th rowspan="3" class="sticky-col sticky-1">Cluster</th>
-  <th rowspan="3" class="sticky-col sticky-2">ID</th>
-  <th rowspan="3" class="sticky-col sticky-3 text-start">Name</th>
-  <th rowspan="3" class="sticky-col sticky-4">Position</th>
-  <th rowspan="3" class="sticky-col sticky-5">VL</th>
+  <th rowspan="3" class="sticky-col">Cluster</th>
+  <th rowspan="3" class="sticky-col">ID</th>
+  <th rowspan="3" class="sticky-col">Name</th>
+  <th rowspan="3" class="sticky-col">Position</th>
+  <th rowspan="3" class="sticky-col">VL</th>
 `;
 
 // Week headers
@@ -1163,11 +1163,11 @@ head.innerHTML = r1 + r2 + r3;
   // EMPLOYEE ROWS
 employees.forEach((emp, empIndex) => {
   let tr = `<tr>
-    <td class="sticky-col sticky-1">${emp.cluster}</td>
-    <td class="sticky-col sticky-2">${emp.id}</td>
-    <td class="sticky-col sticky-3 text-start">${emp.name}</td>
-    <td class="sticky-col sticky-4">${emp.position}</td>
-    <td class="sticky-col sticky-5 fw-semibold text-primary">${countVL(empIndex, year, month)}</td>
+    <td class="sticky-col">${emp.cluster}</td>
+    <td class="sticky-col">${emp.id}</td>
+    <td class="sticky-col">${emp.name}</td>
+    <td class="sticky-col">${emp.position}</td>
+    <td class="sticky-col">${countVL(empIndex, year, month)}</td>
 `;
 
   // DATE COLUMNS
@@ -1201,11 +1201,13 @@ for (let day = 1; day <= daysInMonth; day++) {
   bindClicks();
   applySearchFilter(searchInput.value);
   enableExcelSelection();
+  applyDynamicStickyColumns();
+   
 }
 
 function applyDynamicStickyColumns() {
   const table = document.getElementById("monthTable");
-  const stickyCount = 5; // first 5 columns frozen
+  const stickyCount = 5;
 
   let leftOffset = 0;
 
@@ -1214,19 +1216,20 @@ function applyDynamicStickyColumns() {
       `tr > *:nth-child(${i + 1})`
     );
 
+    const headerCell = table.querySelector(
+      `thead tr:first-child > *:nth-child(${i + 1})`
+    );
+
+    if (!headerCell) return;
+
     cells.forEach(cell => {
       cell.style.left = leftOffset + "px";
     });
 
-    // Use first row cell to measure width
-    const firstCell = table.querySelector(
-      `tr > *:nth-child(${i + 1})`
-    );
-
-    leftOffset += firstCell.offsetWidth;
+    leftOffset += headerCell.offsetWidth;
   }
 }
-renderCalendar();
+renderMonth();
 applyDynamicStickyColumns();
 
 window.addEventListener("resize", () => {
@@ -1279,6 +1282,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
