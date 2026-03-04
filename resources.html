@@ -114,18 +114,16 @@ body {
   max-height: 75vh;
   overflow: auto;
   position: relative;
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on mobile */
 }
 
 /* =========================
    TABLE BASE
    ========================= */
 #monthTable {
-  table-layout: auto;
-  border-collapse: separate;
-  border-spacing: 0;
-  width: max-content;
   min-width: 100%;
-  font-size: 12px;
+  width: max-content; /* allow horizontal scroll */
+  table-layout: fixed; /* allow flexible widths */
 }
 
 /* =========================
@@ -285,61 +283,48 @@ body {
    RESPONSIVE
    ========================= */
 
-@media (max-width: 992px) {
-
-  #sidebar {
-    position: fixed;
-    z-index: 1000;
-    background: #fff;
+@media (max-width: 768px) {
+  #monthTable td:not(.sticky-col),
+  #monthTable th:not(.sticky-col) {
+    width: 40px;
+    min-width: 40px;
+    font-size: 10px;
+    padding: 2px;
   }
 
-  .month-scroll {
-    max-height: 60vh;
+  .sticky-col {
+    min-width: 60px;
+    left: 0 !important; /* resets offsets dynamically */
   }
 
-  .schedule-cell {
-    height: 24px;
-    font-size: 9px;
+  .main-bar,
+  .d-flex.gap-2 {
+    flex-wrap: wrap;
+  }
+
+  #searchInput {
+    max-width: 100%;
+    margin-top: 8px;
+  }
+
+  .btn {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .table-scroll {
+    max-height: 50vh;
   }
 }
 
-.schedule-cell:hover {
-  background: #f5f7fa;
+@media (max-width: 576px) {
+  #monthTable th:nth-child(1),
+  #monthTable th:nth-child(5),
+  #monthTable td:nth-child(1),
+  #monthTable td:nth-child(5) {
+    display: none;
+  }
 }
-
-.schedule-cell.selected {
-  background: rgba(17,17,17,0.08);
-  outline: 2px solid #111;
-  outline-offset: -2px;
-}
-
-.schedule-cell.range {
-  background: rgba(17,17,17,0.05);
-}
-
-/* =========================
-   SUBTLE SCROLL SHADOWS
-   ========================= */
-
-#monthTable td,
-#monthTable th {
-  border: 1px solid var(--border);
-}
-
-/* Keep header above cells */
-th.vl-col {
-  z-index: 7;
-}
-
-.table-scroll::-webkit-scrollbar {
-  height: 10px;
-  width: 10px;
-}
-
-.table-scroll::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 20px;
-}      
 </style>
 </head>
 <body>
@@ -411,7 +396,7 @@ th.vl-col {
 
 <!-- Schedule Section -->
 <div class="card">
-  <div class="table-scroll">
+  <div class="table-scroll d-inline-block w-100 overflow-auto">
     <table id="monthTable" class="table table-bordered text-center align-middle small mb-0">
       <thead id="monthHead"></thead>
       <tbody id="monthBody"></tbody>
@@ -1208,25 +1193,20 @@ for (let day = 1; day <= daysInMonth; day++) {
 function applyDynamicStickyColumns() {
   const table = document.getElementById("monthTable");
   const stickyCount = 5;
-
   let leftOffset = 0;
 
   for (let i = 0; i < stickyCount; i++) {
-    const cells = table.querySelectorAll(
-      `tr > *:nth-child(${i + 1})`
-    );
-
-    const headerCell = table.querySelector(
-      `thead tr:first-child > *:nth-child(${i + 1})`
-    );
-
+    const cells = table.querySelectorAll(`tr > *:nth-child(${i + 1})`);
+    const headerCell = table.querySelector(`thead tr:first-child > *:nth-child(${i + 1})`);
     if (!headerCell) return;
 
+    const width = headerCell.getBoundingClientRect().width;
     cells.forEach(cell => {
       cell.style.left = leftOffset + "px";
+      cell.style.minWidth = width + "px";
     });
 
-    leftOffset += headerCell.offsetWidth;
+    leftOffset += width;
   }
 }
 renderMonth();
@@ -1282,6 +1262,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
