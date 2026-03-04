@@ -154,23 +154,13 @@ body {
   height: 38px;
 }
 
-/* =========================
-   STICKY LEFT COLUMNS
-   ========================= */
 .sticky-col {
   position: sticky;
+  left: 0;              /* JS will override */
   background: #fff;
   z-index: 25;
 }
 
-/* Let browser calculate left automatically */
-.sticky-1 { left: 0; min-width: 140px; }
-.sticky-2 { left: 140px; min-width: 100px; }
-.sticky-3 { left: 240px; min-width: 260px; }
-.sticky-4 { left: 500px; min-width: 120px; }
-.sticky-5 { left: 620px; min-width: 80px; }
-
-/* Ensure header stays above sticky columns */
 #monthTable thead .sticky-col {
   z-index: 35;
 }
@@ -1213,6 +1203,36 @@ for (let day = 1; day <= daysInMonth; day++) {
   enableExcelSelection();
 }
 
+function applyDynamicStickyColumns() {
+  const table = document.getElementById("monthTable");
+  const stickyCount = 5; // first 5 columns frozen
+
+  let leftOffset = 0;
+
+  for (let i = 0; i < stickyCount; i++) {
+    const cells = table.querySelectorAll(
+      `tr > *:nth-child(${i + 1})`
+    );
+
+    cells.forEach(cell => {
+      cell.style.left = leftOffset + "px";
+    });
+
+    // Use first row cell to measure width
+    const firstCell = table.querySelector(
+      `tr > *:nth-child(${i + 1})`
+    );
+
+    leftOffset += firstCell.offsetWidth;
+  }
+}
+renderCalendar();
+applyDynamicStickyColumns();
+
+window.addEventListener("resize", () => {
+  applyDynamicStickyColumns();
+});   
+   
   /* ========== CELL EDITING ========== */
   function bindClicks(){
     document.querySelectorAll(".schedule-cell").forEach(cell=>{
@@ -1259,6 +1279,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
