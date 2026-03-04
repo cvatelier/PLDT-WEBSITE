@@ -110,78 +110,64 @@ body {
 /* =========================
    SCROLL CONTAINER
    ========================= */
-
-
+.table-scroll {
+  max-height: 75vh;
+  overflow: auto;
+  position: relative;
+}
 
 /* =========================
    TABLE BASE
    ========================= */
-
 #monthTable {
-  table-layout: fixed;
-  width: max-content;   /* makes horizontal scroll work */
-  min-width: 100%;      /* prevents collapse */
+  table-layout: auto;
   border-collapse: separate;
   border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
   font-size: 12px;
 }
 
-#monthTable td,
-#monthTable th {
-  border: 1px solid var(--border);
-  padding: 4px 6px;
-}
-
 /* =========================
-   STICKY HEADER (FREEZE TOP)
+   HEADER (3 LEVEL FREEZE)
    ========================= */
-
 #monthTable thead th {
   position: sticky;
   background: #fff;
-  z-index: 300;
+  z-index: 20;
+  border: 1px solid var(--border);
 }
 
-/* Row 1 */
-#monthTable thead tr:nth-child(1) th {
-  top: 0;
-}
-
-/* Row 2 */
-#monthTable thead tr:nth-child(2) th {
-  top: 32px;
-}
-
-/* Row 3 */
-#monthTable thead tr:nth-child(3) th {
-  top: 64px;
-}
+/* Row stacking */
+#monthTable thead tr:nth-child(1) th { top: 0; }
+#monthTable thead tr:nth-child(2) th { top: 38px; }
+#monthTable thead tr:nth-child(3) th { top: 76px; }
 
 /* =========================
    STICKY LEFT COLUMNS
    ========================= */
-
 .sticky-col {
   position: sticky;
   background: #fff;
-  z-index: 200;
+  z-index: 15;
+  border: 1px solid var(--border);
 }
 
-/* Exact stacking */
-.sticky-1 { left: 0; width: 140px; }
-.sticky-2 { left: 140px; width: 100px; }
-.sticky-3 { left: 240px; width: 260px; }
-.sticky-4 { left: 500px; width: 120px; }
-.sticky-5 { left: 620px; width: 80px; }
+/* Let browser calculate left automatically */
+.sticky-1 { left: 0; min-width: 140px; }
+.sticky-2 { left: 140px; min-width: 100px; }
+.sticky-3 { left: 240px; min-width: 260px; }
+.sticky-4 { left: 500px; min-width: 120px; }
+.sticky-5 { left: 620px; min-width: 80px; }
 
+/* Ensure header stays above sticky columns */
 #monthTable thead .sticky-col {
-  z-index: 400;
-}   
-   
-/* =========================
-   DAY CELL WIDTH
-   ========================= */
+  z-index: 30;
+}
 
+/* =========================
+   DAY CELLS
+   ========================= */
 #monthTable td:not(.sticky-col),
 #monthTable th:not(.sticky-col) {
   width: 60px;
@@ -189,38 +175,11 @@ body {
 }
 
 /* =========================
-   SCHEDULE CELLS
+   TODAY COLUMN
    ========================= */
-
-.schedule-cell {
-  height: 28px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
-
-.schedule-cell:hover {
-  background: #f8fafc;
-}
-
-.schedule-cell.selected {
-  background: rgba(17,17,17,0.08);
-  outline: 2px solid #111;
-  outline-offset: -2px;
-}
-
-.schedule-cell.range {
-  background: rgba(17,17,17,0.05);
-}
-
-/* =========================
-   TODAY
-   ========================= */
-
 .today-cell {
-  background: #fff7e6 !important;
+  background: #fff3cd !important;
   font-weight: 600;
-  border: 1px solid #ffcc80 !important;
 }
 
 .today-header span {
@@ -229,7 +188,7 @@ body {
   padding: 2px 6px;
   border-radius: 6px;
 }
-
+   
 /* =========================
    SCHEDULE COLOR CODES
    ========================= */
@@ -407,7 +366,7 @@ th.vl-col {
 }   
    
 #monthTable {
-  table-layout: fixed;
+  table-layout: auto;
   width: max-content;
   min-width: 100%;
   border-collapse: separate;
@@ -1532,6 +1491,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
