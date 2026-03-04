@@ -138,10 +138,21 @@ body {
   border: 1px solid var(--border);
 }
 
-/* Row stacking */
-#monthTable thead tr:nth-child(1) th { top: 0; }
-#monthTable thead tr:nth-child(2) th { top: 100%; }
-#monthTable thead tr:nth-child(3) th { top: 200%; }
+/* Lock header heights */
+#monthTable thead tr:nth-child(1) th { 
+  top: 0;
+  height: 38px;
+}
+
+#monthTable thead tr:nth-child(2) th { 
+  top: 38px;
+  height: 38px;
+}
+
+#monthTable thead tr:nth-child(3) th { 
+  top: 76px;
+  height: 38px;
+}
 
 /* =========================
    STICKY LEFT COLUMNS
@@ -149,8 +160,7 @@ body {
 .sticky-col {
   position: sticky;
   background: #fff;
-  z-index: 15;
-  border: 1px solid var(--border);
+  z-index: 25;
 }
 
 /* Let browser calculate left automatically */
@@ -162,7 +172,7 @@ body {
 
 /* Ensure header stays above sticky columns */
 #monthTable thead .sticky-col {
-  z-index: 30;
+  z-index: 35;
 }
 
 /* =========================
@@ -1132,7 +1142,8 @@ r1 += `</tr>`;
 // Weekday row
 let r2 = `<tr>`;
 // first 5 empty sticky headers
-for (let i = 0; i < 5; i++) r2 += `<th class="sticky-col sticky-${i + 1}"></th>`;
+for (let i = 0; i < 5; i++) 
+  r2 += `<th class="sticky-col sticky-${i + 1}" style="background:#fff"></th>`;
 // scrolling weekdays
 for (let i = 0; i < totalCells; i++) {
   r2 += `<th>${weekDays[i % 7]}</th>`;
@@ -1248,6 +1259,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
