@@ -111,10 +111,9 @@ body {
    SCROLL CONTAINER
    ========================= */
 .table-scroll {
-  max-height: 75vh;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
   position: relative;
-  -webkit-overflow-scrolling: touch; /* smooth scrolling on mobile */
 }
 
 /* =========================
@@ -1192,17 +1191,21 @@ for (let day = 1; day <= daysInMonth; day++) {
 
 function applyDynamicStickyColumns() {
   const table = document.getElementById("monthTable");
-  const stickyCount = 5;
+  const stickyCount = 5; // Cluster, ID, Name, Position, VL
   let leftOffset = 0;
 
   for (let i = 0; i < stickyCount; i++) {
     const cells = table.querySelectorAll(`tr > *:nth-child(${i + 1})`);
     const headerCell = table.querySelector(`thead tr:first-child > *:nth-child(${i + 1})`);
-    if (!headerCell) return;
+    if (!headerCell) continue;
 
     const width = headerCell.getBoundingClientRect().width;
+
     cells.forEach(cell => {
+      cell.style.position = "sticky";
       cell.style.left = leftOffset + "px";
+      cell.style.background = "#fff";
+      cell.style.zIndex = i < 4 ? 25 : 30; // VL column slightly higher
       cell.style.minWidth = width + "px";
     });
 
@@ -1262,6 +1265,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
