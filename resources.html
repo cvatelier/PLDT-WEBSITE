@@ -131,37 +131,41 @@ body {
 #monthTable thead th {
   position: sticky;
   background: #fff;
-  z-index: 20;
   border: 1px solid var(--border);
 }
 
-/* Lock header heights */
+/* Row heights */
 #monthTable thead tr:nth-child(1) th { 
   top: 0;
   height: 38px;
+  z-index: 30; /* highest */
 }
 
 #monthTable thead tr:nth-child(2) th { 
-  top: 38px;
+  top: 38px;  /* offset by first row height */
   height: 38px;
-}
-
-#monthTable thead tr:nth-child(3) th { 
-  top: 76px;
-  height: 38px;
-}
-
-.sticky-col {
-  position: sticky;
-  left: 0;              /* JS will override */
-  background: #fff;
   z-index: 25;
 }
 
-#monthTable thead .sticky-col {
-  z-index: 35;
+#monthTable thead tr:nth-child(3) th { 
+  top: 76px;  /* offset by first + second row */
+  height: 38px;
+  z-index: 20;
 }
 
+/* Sticky first 5 columns (Cluster, ID, Name, Position, VL) */
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 15;
+}
+
+/* Sticky header + sticky column intersection */
+#monthTable thead .sticky-col {
+  z-index: 35; /* must be above other headers */
+}
+   
 /* =========================
    DAY CELLS
    ========================= */
@@ -1265,6 +1269,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
