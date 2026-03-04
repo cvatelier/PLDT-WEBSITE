@@ -396,29 +396,48 @@ th.vl-col {
   position: relative;
 }
 
-#monthTable {
-  border-collapse: separate;
-  border-spacing: 0;
-  table-layout: fixed;
+.table-scroll::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
 }
 
-/* Sticky columns */
+.table-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 20px;
+}   
+   
+#monthTable {
+  table-layout: fixed;
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#monthTable thead th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 50;
+}
+
+#monthTable thead tr:nth-child(2) th { top: 32px; }
+#monthTable thead tr:nth-child(3) th { top: 64px; }
+
 .sticky-col {
   position: sticky;
   background: #fff;
-  z-index: 10;
+  z-index: 40;
 }
 
-/* Exact width + left stacking */
 .sticky-1 { left: 0; width: 140px; }
 .sticky-2 { left: 140px; width: 100px; }
 .sticky-3 { left: 240px; width: 260px; }
 .sticky-4 { left: 500px; width: 120px; }
 .sticky-5 { left: 620px; width: 80px; }
 
-/* Header must be above body */
 #monthTable thead .sticky-col {
-  z-index: 50;
+  z-index: 60;
 }
    
 /* =========================
@@ -1374,8 +1393,23 @@ let r1 = `<tr>
 `;
 
 // Week headers
+let dayCounter = 1;
 for (let w = 0; w < weeks; w++) {
-  r1 += `<th colspan="7" class="text-center fw-semibold">Week ${w + 1}</th>`;
+  let daysThisWeek = 0;
+
+  for (let i = 0; i < 7; i++) {
+    const globalIndex = w * 7 + i;
+    const day = globalIndex - startOffset + 1;
+    if (day > 0 && day <= daysInMonth) {
+      daysThisWeek++;
+    }
+  }
+
+  if (daysThisWeek > 0) {
+    r1 += `<th colspan="${daysThisWeek}" class="text-center fw-semibold">
+             Week ${w + 1}
+           </th>`;
+  }
 }
 r1 += `</tr>`;
 
@@ -1417,7 +1451,6 @@ employees.forEach((emp, empIndex) => {
     <td class="sticky-col sticky-3 text-start">${emp.name}</td>
     <td class="sticky-col sticky-4">${emp.position}</td>
     <td class="sticky-col sticky-5 fw-semibold text-primary">${countVL(empIndex, year, month)}</td>
-    <td class="sticky-6">Column 6 Data</td>
 `;
 
   // DATE COLUMNS
@@ -1428,7 +1461,7 @@ employees.forEach((emp, empIndex) => {
   const totalCells = daysInMonth;
   const key = `${year}-${month}`;
 
-  for (let i = 0; i < totalCells; i++) {
+  for (let day = 1; day <= daysInMonth; day++) {
     const day = i - startOffset + 1;
     let content = "";
     let classes = "schedule-cell";
@@ -1502,6 +1535,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
