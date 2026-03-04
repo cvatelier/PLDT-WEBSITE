@@ -1461,24 +1461,21 @@ employees.forEach((emp, empIndex) => {
   const totalCells = daysInMonth;
   const key = `${year}-${month}`;
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const day = i - startOffset + 1;
-    let content = "";
-    let classes = "schedule-cell";
+for (let day = 1; day <= daysInMonth; day++) {
 
-    if (day > 0 && day <= daysInMonth) {
-      const val = schedules[key]?.[`${empIndex}-${day}`] || "";
-      const todayCol = isToday(year, month, day) ? "today-cell" : "";
-      classes += ` ${val} ${todayCol}`;
-      content = val;
-    }
+  const val = schedules[key]?.[`${empIndex}-${day}`] || "";
+  const todayCol = isToday(year, month, day) ? "today-cell" : "";
 
-    tr += `<td class="${classes}"
-             data-key="${key}"
-             data-id="${empIndex}-${day}">
-             ${content}
-           </td>`;
-  }
+  const classes = `schedule-cell ${val} ${todayCol}`.trim();
+
+  tr += `
+    <td class="${classes}"
+        data-key="${key}"
+        data-id="${empIndex}-${day}">
+        ${val}
+    </td>
+  `;
+}
 
   tr += `</tr>`;
   body.insertAdjacentHTML("beforeend", tr);
@@ -1535,6 +1532,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
