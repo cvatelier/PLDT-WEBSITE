@@ -1201,7 +1201,6 @@ for (let day = 1; day <= daysInMonth; day++) {
   applySearchFilter(searchInput.value);
   enableExcelSelection();
   applyDynamicStickyColumns();
-  applyWeekOneSticky();
 }
 
 function applyDynamicStickyColumns() {
@@ -1220,7 +1219,7 @@ function applyDynamicStickyColumns() {
       cell.style.position = "sticky";
       cell.style.left = leftOffset + "px";
       cell.style.background = "#fff";
-      cell.style.zIndex = i < 4 ? 25 : 30; // VL column slightly higher
+      cell.style.zIndex = 30;
       cell.style.minWidth = width + "px";
     });
 
@@ -1229,62 +1228,9 @@ function applyDynamicStickyColumns() {
 }
 renderMonth();
 applyDynamicStickyColumns();
-
-function applyWeekOneSticky() {
-
-  const table = document.getElementById("monthTable");
-  const baseSticky = 5; // first frozen columns
-
-  const weekHeader = table.querySelector(
-    "#monthHead tr:first-child th[colspan]"
-  );
-
-  if (!weekHeader) return;
-
-  const weekOneColCount = parseInt(weekHeader.getAttribute("colspan"));
-
-  let leftOffset = 0;
-
-  // Get left offset after first 5 sticky columns
-  for (let i = 0; i < baseSticky; i++) {
-    const headerCell = table.querySelector(
-      `thead tr:first-child > *:nth-child(${i + 1})`
-    );
-    if (!headerCell) continue;
-    leftOffset += headerCell.getBoundingClientRect().width;
-  }
-
-  // Freeze actual Week 1 visible columns
-  for (let i = 0; i < weekOneColCount; i++) {
-
-    const colIndex = baseSticky + 1 + i;
-
-    const cells = table.querySelectorAll(
-      `tr > *:nth-child(${colIndex})`
-    );
-
-    const headerCell = table.querySelector(
-      `thead tr:nth-child(3) > *:nth-child(${colIndex})`
-    );
-
-    if (!headerCell) continue;
-
-    const width = headerCell.getBoundingClientRect().width;
-
-    cells.forEach(cell => {
-      cell.style.position = "sticky";
-      cell.style.left = leftOffset + "px";
-      cell.style.zIndex = 35;
-      cell.style.background = "#fff";
-    });
-
-    leftOffset += width;
-  }
-}
    
 window.addEventListener("resize", () => {
   applyDynamicStickyColumns();
-  applyWeekOneSticky();
 });  
    
   /* ========== CELL EDITING ========== */
@@ -1333,6 +1279,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
