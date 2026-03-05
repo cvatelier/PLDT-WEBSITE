@@ -133,6 +133,7 @@ body {
   position: sticky;
   background: #ffffff;
   border: 1px solid var(--border);
+  z-index: 70;
 }
 
 /* Row 1 (Week Headers) */
@@ -1097,24 +1098,34 @@ let r1 = `<tr>
 `;
 
 // Week headers
-let dayCounter = 1;
+let weekOneColCount = 0;
+let dayIndex = 0;
+
 for (let w = 0; w < weeks; w++) {
   let daysThisWeek = 0;
 
   for (let i = 0; i < 7; i++) {
     const globalIndex = w * 7 + i;
     const day = globalIndex - startOffset + 1;
+
     if (day > 0 && day <= daysInMonth) {
       daysThisWeek++;
     }
   }
 
   if (daysThisWeek > 0) {
-    r1 += `<th colspan="${daysThisWeek}" class="text-center fw-semibold">
-             Week ${w + 1}
+
+    if (w === 0) {
+      weekOneColCount = daysThisWeek;  // 🔥 store week 1 size
+    }
+
+    r1 += `<th colspan="${daysThisWeek}" 
+              class="text-center fw-semibold week-header-${w}">
+              Week ${w + 1}
            </th>`;
   }
 }
+   
 r1 += `</tr>`;
 
 // Weekday row
@@ -1190,6 +1201,7 @@ for (let day = 1; day <= daysInMonth; day++) {
   applySearchFilter(searchInput.value);
   enableExcelSelection();
   applyDynamicStickyColumns();
+  applyWeekOneSticky(weekOneColCount);
    
 }
 
@@ -1219,6 +1231,50 @@ function applyDynamicStickyColumns() {
 renderMonth();
 applyDynamicStickyColumns();
 
+function applyWeekOneSticky(weekOneColCount) {
+
+  const table = document.getElementById("monthTable");
+  const stickyBaseColumns = 5; // Cluster, ID, Name, Position, VL
+
+  // Calculate starting left offset after frozen columns
+  let leftOffset = 0;
+
+  for (let i = 0; i < stickyBaseColumns; i++) {
+    const headerCell = table.querySelector(
+      `thead tr:first-child > *:nth-child(${i + 1})`
+    );
+    if (!headerCell) continue;
+    leftOffset += headerCell.getBoundingClientRect().width;
+  }
+
+  // Freeze Week 1 date columns
+  for (let i = 0; i < weekOneColCount; i++) {
+
+    const colIndex = stickyBaseColumns + 1 + i;
+
+    const cells = table.querySelectorAll(
+      `tr > *:nth-child(${colIndex})`
+    );
+
+    const headerCell = table.querySelector(
+      `thead tr:nth-child(3) > *:nth-child(${colIndex})`
+    );
+
+    if (!headerCell) continue;
+
+    const width = headerCell.getBoundingClientRect().width;
+
+    cells.forEach(cell => {
+      cell.style.position = "sticky";
+      cell.style.left = leftOffset + "px";
+      cell.style.zIndex = 28;
+      cell.style.background = "#fff";
+    });
+
+    leftOffset += width;
+  }
+}
+   
 window.addEventListener("resize", () => {
   applyDynamicStickyColumns();
 });   
@@ -1269,6 +1325,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
