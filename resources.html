@@ -1203,27 +1203,41 @@ for (let day = 1; day <= daysInMonth; day++) {
 
 function applyDynamicStickyColumns() {
   const table = document.getElementById("monthTable");
-  const stickyCount = 5; // Cluster, ID, Name, Position, VL
-  let leftOffset = 0;
+  const stickyCount = 5; // first 5 columns
+  const scrollContainer = table.closest(".table-scroll");
 
+  const leftOffsets = [];
+  let offset = 0;
+
+  // Calculate cumulative widths of sticky columns
+  for (let i = 0; i < stickyCount; i++) {
+    const cell = table.querySelector(`thead tr:first-child > *:nth-child(${i + 1})`);
+    if (!cell) continue;
+    leftOffsets.push(offset);
+    offset += cell.getBoundingClientRect().width;
+  }
+
+  // Apply sticky styles
   for (let i = 0; i < stickyCount; i++) {
     const cells = table.querySelectorAll(`tr > *:nth-child(${i + 1})`);
-    const headerCell = table.querySelector(`thead tr:first-child > *:nth-child(${i + 1})`);
-    if (!headerCell) continue;
-
-    const width = headerCell.getBoundingClientRect().width;
-
     cells.forEach(cell => {
       cell.style.position = "sticky";
-      cell.style.left = leftOffset + "px";
-      cell.style.top = cell.tagName === "TH" ? `${parseInt(cell.offsetTop)}px` : "0px"; 
-      cell.style.background = "#fff";
+      cell.style.left = leftOffsets[i] + "px";
       cell.style.zIndex = cell.tagName === "TH" ? 75 : 50;
+      cell.style.background = "#fff";
     });
-
-    leftOffset += width;
   }
 }
+
+// Re-apply sticky columns on scroll to fix horizontal alignment
+const scrollContainer = document.querySelector(".table-scroll");
+scrollContainer.addEventListener("scroll", () => {
+  applyDynamicStickyColumns();
+});
+
+// Initial call
+applyDynamicStickyColumns();
+window.addEventListener("resize", applyDynamicStickyColumns);
 renderMonth();
 applyDynamicStickyColumns();
    
@@ -1277,6 +1291,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
