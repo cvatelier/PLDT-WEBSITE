@@ -1201,8 +1201,7 @@ for (let day = 1; day <= daysInMonth; day++) {
   applySearchFilter(searchInput.value);
   enableExcelSelection();
   applyDynamicStickyColumns();
-  applyWeekOneSticky(weekOneColCount);
-   
+  applyWeekOneSticky();
 }
 
 function applyDynamicStickyColumns() {
@@ -1231,15 +1230,23 @@ function applyDynamicStickyColumns() {
 renderMonth();
 applyDynamicStickyColumns();
 
-function applyWeekOneSticky(weekOneColCount) {
+function applyWeekOneSticky() {
 
   const table = document.getElementById("monthTable");
-  const stickyBaseColumns = 5; // Cluster, ID, Name, Position, VL
+  const baseSticky = 5; // first frozen columns
 
-  // Calculate starting left offset after frozen columns
+  const weekHeader = table.querySelector(
+    "#monthHead tr:first-child th[colspan]"
+  );
+
+  if (!weekHeader) return;
+
+  const weekOneColCount = parseInt(weekHeader.getAttribute("colspan"));
+
   let leftOffset = 0;
 
-  for (let i = 0; i < stickyBaseColumns; i++) {
+  // Get left offset after first 5 sticky columns
+  for (let i = 0; i < baseSticky; i++) {
     const headerCell = table.querySelector(
       `thead tr:first-child > *:nth-child(${i + 1})`
     );
@@ -1247,10 +1254,10 @@ function applyWeekOneSticky(weekOneColCount) {
     leftOffset += headerCell.getBoundingClientRect().width;
   }
 
-  // Freeze Week 1 date columns
+  // Freeze actual Week 1 visible columns
   for (let i = 0; i < weekOneColCount; i++) {
 
-    const colIndex = stickyBaseColumns + 1 + i;
+    const colIndex = baseSticky + 1 + i;
 
     const cells = table.querySelectorAll(
       `tr > *:nth-child(${colIndex})`
@@ -1267,7 +1274,7 @@ function applyWeekOneSticky(weekOneColCount) {
     cells.forEach(cell => {
       cell.style.position = "sticky";
       cell.style.left = leftOffset + "px";
-      cell.style.zIndex = 28;
+      cell.style.zIndex = 35;
       cell.style.background = "#fff";
     });
 
@@ -1277,7 +1284,8 @@ function applyWeekOneSticky(weekOneColCount) {
    
 window.addEventListener("resize", () => {
   applyDynamicStickyColumns();
-});   
+  applyWeekOneSticky();
+});  
    
   /* ========== CELL EDITING ========== */
   function bindClicks(){
@@ -1325,6 +1333,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
