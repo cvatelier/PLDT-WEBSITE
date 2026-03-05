@@ -111,8 +111,8 @@ body {
    SCROLL CONTAINER
    ========================= */
 .table-scroll {
-  overflow-x: auto;
-  overflow-y: auto;
+  height: 75vh;          /* 🔥 required for vertical sticky */
+  overflow: auto;        /* both x and y scroll */
   position: relative;
 }
 
@@ -126,31 +126,31 @@ body {
 }
 
 /* =========================
-   HEADER (3 LEVEL FREEZE)
+   TRUE 3-ROW FREEZE HEADER
    ========================= */
+
 #monthTable thead th {
   position: sticky;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--border);
 }
 
-/* Row heights */
-#monthTable thead tr:nth-child(1) th { 
+/* Row 1 (Week Headers) */
+#monthTable thead tr:nth-child(1) th {
   top: 0;
-  height: 38px;
-  z-index: 30; /* highest */
+  z-index: 50;
 }
 
-#monthTable thead tr:nth-child(2) th { 
-  top: 38px;  /* offset by first row height */
-  height: 38px;
-  z-index: 25;
+/* Row 2 (Weekday Letters) */
+#monthTable thead tr:nth-child(2) th {
+  top: 38px;
+  z-index: 45;
 }
 
-#monthTable thead tr:nth-child(3) th { 
-  top: 76px;  /* offset by first + second row */
-  height: 38px;
-  z-index: 20;
+/* Row 3 (Date Numbers) */
+#monthTable thead tr:nth-child(3) th {
+  top: 76px;
+  z-index: 40;
 }
 
 /* Sticky first 5 columns (Cluster, ID, Name, Position, VL) */
@@ -161,9 +161,9 @@ body {
   z-index: 15;
 }
 
-/* Sticky header + sticky column intersection */
+/* Sticky column + sticky header intersection */
 #monthTable thead .sticky-col {
-  z-index: 35; /* must be above other headers */
+  z-index: 60 !important;
 }
    
 /* =========================
@@ -1269,6 +1269,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
