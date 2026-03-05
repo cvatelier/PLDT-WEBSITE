@@ -159,22 +159,20 @@ body {
   position: sticky;
   left: 0;
   background: #fff;
-  z-index: 15;
+  z-index: 50; /* higher to appear above day cells */
 }
 
 /* Sticky column + sticky header intersection */
 #monthTable thead .sticky-col {
-  z-index: 60 !important;
+  z-index: 75 !important; /* above regular headers */
 }
-   
-/* =========================
-   DAY CELLS
-   ========================= */
-#monthTable td:not(.sticky-col),
-#monthTable th:not(.sticky-col) {
-  width: 60px;
-  min-width: 60px;
-}
+
+/* Dynamically position each sticky column */
+.sticky-col:nth-child(1) { left: 0px; }
+.sticky-col:nth-child(2) { left: 120px; } /* width of first column */
+.sticky-col:nth-child(3) { left: 200px; }
+.sticky-col:nth-child(4) { left: 350px; }
+.sticky-col:nth-child(5) { left: 450px; }
 
 /* =========================
    TODAY COLUMN
@@ -1218,9 +1216,9 @@ function applyDynamicStickyColumns() {
     cells.forEach(cell => {
       cell.style.position = "sticky";
       cell.style.left = leftOffset + "px";
+      cell.style.top = cell.tagName === "TH" ? `${parseInt(cell.offsetTop)}px` : "0px"; 
       cell.style.background = "#fff";
-      cell.style.zIndex = 30;
-      cell.style.minWidth = width + "px";
+      cell.style.zIndex = cell.tagName === "TH" ? 75 : 50;
     });
 
     leftOffset += width;
@@ -1279,6 +1277,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
