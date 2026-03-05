@@ -107,73 +107,48 @@ body {
   overflow: hidden;
 }
 
-/* =========================
-   SCROLL CONTAINER
-   ========================= */
 .table-scroll {
-  height: 75vh;          /* 🔥 required for vertical sticky */
-  overflow: auto;        /* both x and y scroll */
-  position: relative;
+  max-height: 75vh;       /* vertical scroll */
+  overflow: auto;          /* horizontal + vertical scroll */
 }
 
-/* =========================
-   TABLE BASE
-   ========================= */
 #monthTable {
-  min-width: 100%;
-  width: max-content; /* allow horizontal scroll */
-  table-layout: fixed; /* allow flexible widths */
+  width: max-content;      /* allow horizontal scroll */
+  border-collapse: collapse;
 }
 
-/* =========================
-   TRUE 3-ROW FREEZE HEADER
-   ========================= */
-
-#monthTable thead th {
-  position: sticky;
-  background: #ffffff;
-  border: 1px solid var(--border);
-  z-index: 70;
+#monthTable th,
+#monthTable td {
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  white-space: nowrap;
 }
 
-/* Row 1 (Week Headers) */
-#monthTable thead tr:nth-child(1) th {
-  top: 0;
-  z-index: 50;
-}
+/* Sticky headers: top 3 rows */
+#monthTable thead tr:nth-child(1) th { position: sticky; top: 0; background: #fff; z-index: 50; }
+#monthTable thead tr:nth-child(2) th { position: sticky; top: 38px; background: #fff; z-index: 45; }
+#monthTable thead tr:nth-child(3) th { position: sticky; top: 76px; background: #fff; z-index: 40; }
 
-/* Row 2 (Weekday Letters) */
-#monthTable thead tr:nth-child(2) th {
-  top: 38px;
-  z-index: 45;
-}
-
-/* Row 3 (Date Numbers) */
-#monthTable thead tr:nth-child(3) th {
-  top: 76px;
-  z-index: 40;
-}
-
-/* Sticky first 5 columns (Cluster, ID, Name, Position, VL) */
-.sticky-col {
+/* Sticky first 5 columns */
+#monthTable th:nth-child(-n+5),
+#monthTable td:nth-child(-n+5) {
   position: sticky;
   left: 0;
   background: #fff;
-  z-index: 50; /* higher to appear above day cells */
+  z-index: 60; /* higher than regular cells */
 }
 
-/* Sticky column + sticky header intersection */
-#monthTable thead .sticky-col {
-  z-index: 75 !important; /* above regular headers */
-}
-
-/* Dynamically position each sticky column */
-.sticky-col:nth-child(1) { left: 0px; }
-.sticky-col:nth-child(2) { left: 120px; } /* width of first column */
-.sticky-col:nth-child(3) { left: 200px; }
-.sticky-col:nth-child(4) { left: 350px; }
-.sticky-col:nth-child(5) { left: 450px; }
-
+/* Increment left offsets for each sticky column */
+#monthTable th:nth-child(1),
+#monthTable td:nth-child(1) { left: 0px; }
+#monthTable th:nth-child(2),
+#monthTable td:nth-child(2) { left: 120px; }
+#monthTable th:nth-child(3),
+#monthTable td:nth-child(3) { left: 200px; }
+#monthTable th:nth-child(4),
+#monthTable td:nth-child(4) { left: 350px; }
+#monthTable th:nth-child(5),
+#monthTable td:nth-child(5) { left: 450px; }
 /* =========================
    TODAY COLUMN
    ========================= */
@@ -397,13 +372,11 @@ body {
 </div>
 
 <!-- Schedule Section -->
-<div class="card">
-  <div class="table-scroll d-inline-block w-100 overflow-auto">
-    <table id="monthTable" class="table table-bordered text-center align-middle small mb-0">
-      <thead id="monthHead"></thead>
-      <tbody id="monthBody"></tbody>
-    </table>
-  </div>
+<div class="table-scroll">
+  <table id="monthTable">
+    <thead id="monthHead"></thead>
+    <tbody id="monthBody"></tbody>
+  </table>
 </div>
 </main>
   
@@ -1291,6 +1264,7 @@ select.onchange = () => {
 </script>
 </body>
 </html>
+
 
 
 
