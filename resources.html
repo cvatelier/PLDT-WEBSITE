@@ -1014,12 +1014,13 @@ r2 += `</tr>`;
 head.innerHTML = r1 + r2;
   // EMPLOYEE ROWS
 employees.forEach((emp, empIndex) => {
-  let tr = `<tr>
-    <td class="sticky-col">${emp.cluster}</td>
-    <td class="sticky-col">${emp.id}</td>
-    <td class="sticky-col">${emp.name}</td>
-    <td class="sticky-col">${emp.position}</td>
-    <td class="sticky-col">${countVL(empIndex, year, month)}</td>
+// Inside renderMonth() employee row
+let tr = `<tr>
+  <td class="sticky-col">${emp.cluster}</td>
+  <td class="sticky-col">${emp.id}</td>
+  <td class="sticky-col">${emp.name}</td>
+  <td class="sticky-col">${emp.position}</td>
+  <td class="sticky-col">${countVL(empIndex, year, month)}</td>
 `;
 
 for (let day = 1; day <= daysInMonth; day++) {
@@ -1050,7 +1051,8 @@ for (let day = 1; day <= daysInMonth; day++) {
 
 function applyDynamicStickyColumns() {
   const table = document.getElementById("monthTable");
-  const stickyCount = 5; // first 5 columns
+  const stickyCols = table.querySelectorAll("thead th.sticky-col");
+  const stickyCount = stickyCols.length; // automatically count sticky columns
   const scrollContainer = table.closest(".table-scroll");
 
   const leftOffsets = [];
@@ -1064,16 +1066,34 @@ function applyDynamicStickyColumns() {
     offset += cell.getBoundingClientRect().width;
   }
 
-  // Apply sticky styles
-  for (let i = 0; i < stickyCount; i++) {
-    const cells = table.querySelectorAll(`tr > *:nth-child(${i + 1})`);
-    cells.forEach(cell => {
-      cell.style.position = "sticky";
-      cell.style.left = leftOffsets[i] + "px";
-      cell.style.zIndex = cell.tagName === "TH" ? 75 : 50;
-      cell.style.background = "#fff";
-    });
-  }
+// Apply sticky styles dynamically to all .sticky-col cells
+const stickyCols = table.querySelectorAll("thead th.sticky-col");
+const leftOffsets = [];
+let offset = 0;
+
+// Calculate left offsets for each sticky column
+stickyCols.forEach((cell, i) => {
+  leftOffsets[i] = offset;
+  offset += cell.getBoundingClientRect().width;
+});
+
+// Apply sticky style to header and body cells
+stickyCols.forEach((cell, i) => {
+  cell.style.position = "sticky";
+  cell.style.left = leftOffsets[i] + "px";
+  cell.style.zIndex = 75; // header
+  cell.style.background = "#fff";
+});
+
+// Apply same left offsets to body cells
+for (let i = 0; i < stickyCols.length; i++) {
+  const bodyCells = table.querySelectorAll(`tbody tr > *:nth-child(${i + 1})`);
+  bodyCells.forEach(cell => {
+    cell.style.position = "sticky";
+    cell.style.left = leftOffsets[i] + "px";
+    cell.style.zIndex = 50; // body
+    cell.style.background = "#fff";
+  });
 }
 
 const scrollContainer = document.querySelector(".table-scroll");
