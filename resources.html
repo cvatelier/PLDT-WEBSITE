@@ -129,26 +129,6 @@ body {
 #monthTable thead tr:nth-child(2) th { position: sticky; top: 38px; background: #fff; z-index: 45; }
 #monthTable thead tr:nth-child(3) th { position: sticky; top: 76px; background: #fff; z-index: 40; }
 
-/* Sticky first 5 columns */
-#monthTable th:nth-child(-n+5),
-#monthTable td:nth-child(-n+5) {
-  position: sticky;
-  left: 0;
-  background: #fff;
-  z-index: 60; /* higher than regular cells */
-}
-
-/* Increment left offsets for each sticky column */
-#monthTable th:nth-child(1),
-#monthTable td:nth-child(1) { left: 0px; }
-#monthTable th:nth-child(2),
-#monthTable td:nth-child(2) { left: 120px; }
-#monthTable th:nth-child(3),
-#monthTable td:nth-child(3) { left: 200px; }
-#monthTable th:nth-child(4),
-#monthTable td:nth-child(4) { left: 350px; }
-#monthTable th:nth-child(5),
-#monthTable td:nth-child(5) { left: 450px; }
 /* =========================
    TODAY COLUMN
    ========================= */
@@ -302,6 +282,15 @@ body {
     display: none;
   }
 }
+
+.schedule-cell.selected {
+  outline: 2px solid #111;
+}
+
+.schedule-cell.range {
+  background: #e9f2ff;
+}   
+   
 </style>
 </head>
 <body>
@@ -462,34 +451,6 @@ body {
     </div>
   </div>
 </div>
-    <div class="modal-content">
-      <div class="modal-body">
-
-  <!-- ✅ ADD THIS LINE -->
-  <div class="modal-feedback mb-3"></div>
-        <div class="tab-content">
-          <!-- ✅ BULK ADD -->
-          <div class="tab-pane fade" id="bulkAdd">
-            <p class="small text-muted">
-              One employee per line (CSV format):
-            </p>
-
-            <pre class="small bg-light p-2 rounded">
-Cluster 2,548600,Doe, John A.,CXSDA
-Cluster 2,548601,Smith, Jane B.,WMA
-            </pre>
-
-            <div class="text-end mt-3">
-              <button class="btn btn-success" onclick="bulkAddEmployees()">
-                Add Employee(s)
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
    
 <!-- ADD EMPLOYEE MODAL -->
 <div class="modal fade" id="bulkAddEmployeeModal" tabindex="-1">
@@ -1066,10 +1027,8 @@ let r1 = `<tr>
   <th rowspan="3" class="sticky-col">Name</th>
   <th rowspan="3" class="sticky-col">Position</th>
   <th rowspan="3" class="sticky-col">VL</th>
-`;
-
-// No week headers — just empty cells spanning the days
-r1 += `<th colspan="${daysInMonth}"></th>`;
+  <th colspan="${daysInMonth}"></th>
+</tr>`;
 
 // Weekday row
 let r2 = `<tr>`;
@@ -1111,14 +1070,6 @@ employees.forEach((emp, empIndex) => {
     <td class="sticky-col">${emp.position}</td>
     <td class="sticky-col">${countVL(empIndex, year, month)}</td>
 `;
-
-  // DATE COLUMNS
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay();
-  const startOffset = (firstDay + 6) % 7; // Monday start
-  const weeks = weeksInMonth(year, month);
-  const totalCells = daysInMonth;
-  const key = `${year}-${month}`;
 
 for (let day = 1; day <= daysInMonth; day++) {
 
@@ -1174,11 +1125,12 @@ function applyDynamicStickyColumns() {
   }
 }
 
-// Re-apply sticky columns on scroll to fix horizontal alignment
 const scrollContainer = document.querySelector(".table-scroll");
-scrollContainer.addEventListener("scroll", () => {
-  applyDynamicStickyColumns();
-});
+if (scrollContainer) {
+  scrollContainer.addEventListener("scroll", () => {
+    applyDynamicStickyColumns();
+  });
+};
 
 // Initial call
 applyDynamicStickyColumns();
