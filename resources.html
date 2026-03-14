@@ -1051,50 +1051,40 @@ for (let day = 1; day <= daysInMonth; day++) {
 
 function applyDynamicStickyColumns() {
   const table = document.getElementById("monthTable");
-  const stickyCols = table.querySelectorAll("thead th.sticky-col");
-  const stickyCount = stickyCols.length; // automatically count sticky columns
-  const scrollContainer = table.closest(".table-scroll");
+  if (!table) return;
 
+  const stickyCols = table.querySelectorAll("thead th.sticky-col");
   const leftOffsets = [];
   let offset = 0;
 
-  // Calculate cumulative widths of sticky columns
-  for (let i = 0; i < stickyCount; i++) {
-    const cell = table.querySelector(`thead tr:first-child > *:nth-child(${i + 1})`);
-    if (!cell) continue;
-    leftOffsets.push(offset);
+  // Calculate left offsets
+  stickyCols.forEach((cell, i) => {
+    leftOffsets[i] = offset;
     offset += cell.getBoundingClientRect().width;
-  }
+  });
 
-// Apply sticky styles dynamically to all .sticky-col cells
-const stickyCols = table.querySelectorAll("thead th.sticky-col");
-const leftOffsets = [];
-let offset = 0;
-
-// Calculate left offsets for each sticky column
-stickyCols.forEach((cell, i) => {
-  leftOffsets[i] = offset;
-  offset += cell.getBoundingClientRect().width;
-});
-
-// Apply sticky style to header and body cells
-stickyCols.forEach((cell, i) => {
-  cell.style.position = "sticky";
-  cell.style.left = leftOffsets[i] + "px";
-  cell.style.zIndex = 75; // header
-  cell.style.background = "#fff";
-});
-
-// Apply same left offsets to body cells
-for (let i = 0; i < stickyCols.length; i++) {
-  const bodyCells = table.querySelectorAll(`tbody tr > *:nth-child(${i + 1})`);
-  bodyCells.forEach(cell => {
+  // Apply sticky style to header
+  stickyCols.forEach((cell, i) => {
     cell.style.position = "sticky";
     cell.style.left = leftOffsets[i] + "px";
-    cell.style.zIndex = 50; // body
+    cell.style.zIndex = 75;
     cell.style.background = "#fff";
   });
+
+  // Apply sticky style to body columns
+  for (let i = 0; i < stickyCols.length; i++) {
+    const bodyCells = table.querySelectorAll(`tbody tr > *:nth-child(${i + 1})`);
+    bodyCells.forEach(cell => {
+      cell.style.position = "sticky";
+      cell.style.left = leftOffsets[i] + "px";
+      cell.style.zIndex = 50;
+      cell.style.background = "#fff";
+    });
+  }
 }
+
+// Call on render and window resize
+window.addEventListener("resize", applyDynamicStickyColumns);
 
 const scrollContainer = document.querySelector(".table-scroll");
 if (scrollContainer) {
@@ -1154,6 +1144,7 @@ select.onchange = () => {
   }
   /* ========== INIT ========== */
   renderMonth();
+  applyDynamicStickyColumns();
 
 });
 </script>
