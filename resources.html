@@ -1068,36 +1068,8 @@ let r1 = `<tr>
   <th rowspan="3" class="sticky-col">VL</th>
 `;
 
-// Week headers
-let weekOneColCount = 0;
-let dayIndex = 0;
-
-for (let w = 0; w < weeks; w++) {
-  let daysThisWeek = 0;
-
-  for (let i = 0; i < 7; i++) {
-    const globalIndex = w * 7 + i;
-    const day = globalIndex - startOffset + 1;
-
-    if (day > 0 && day <= daysInMonth) {
-      daysThisWeek++;
-    }
-  }
-
-  if (daysThisWeek > 0) {
-
-    if (w === 0) {
-      weekOneColCount = daysThisWeek;  // 🔥 store week 1 size
-    }
-
-    r1 += `<th colspan="${daysThisWeek}" 
-              class="text-center fw-semibold week-header-${w}">
-              Week ${w + 1}
-           </th>`;
-  }
-}
-   
-r1 += `</tr>`;
+// No week headers — just empty cells spanning the days
+r1 += `<th colspan="${daysInMonth}"></th>`;
 
 // Weekday row
 let r2 = `<tr>`;
