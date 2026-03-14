@@ -986,7 +986,26 @@ let r1 = `<tr>
   <th rowspan="2" class="sticky-col">Name</th>
   <th rowspan="2" class="sticky-col">Position</th>
   <th rowspan="2" class="sticky-col">VL</th>
-</tr>`;
+`;
+// HEADER ROW 2
+let r2 = `<tr>`;
+
+for (let day = 1; day <= daysInMonth; day++) {
+
+  const isT = isToday(year, month, day);
+
+  r2 += `<th class="${isT ? "today-header" : ""}">
+           ${isT ? `<span>${day}</span>` : day}
+         </th>`;
+}
+
+r2 += `</tr>`;
+// Weekday headers
+for (let i = 0; i < daysInMonth; i++) {
+  r1 += `<th>${weekDays[(i + startOffset) % 7]}</th>`;
+}
+
+r1 += `</tr>`;
 
 // Weekday row
 let r2 = `<tr>`;
@@ -1017,7 +1036,7 @@ for (let day = 1; day <= daysInMonth; day++) {
 
 r3 += `</tr>`;
 
-head.innerHTML = r1 + r2 + r3;
+thead.innerHTML = r1 + r2;
 
   // EMPLOYEE ROWS
 employees.forEach((emp, empIndex) => {
