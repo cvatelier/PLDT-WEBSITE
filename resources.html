@@ -979,7 +979,10 @@ function renderMonth(){
   head.innerHTML = "";
   body.innerHTML = "";
 
-  // HEADER ROWS
+/* =========================
+   HEADER ROWS
+   ========================= */
+
 let r1 = `<tr>
   <th rowspan="2" class="sticky-col">Cluster</th>
   <th rowspan="2" class="sticky-col">ID</th>
@@ -987,57 +990,28 @@ let r1 = `<tr>
   <th rowspan="2" class="sticky-col">Position</th>
   <th rowspan="2" class="sticky-col">VL</th>
 `;
-// HEADER ROW 2
-let r2 = `<tr>`;
 
-for (let day = 1; day <= daysInMonth; day++) {
-
-  const isT = isToday(year, month, day);
-
-  r2 += `<th class="${isT ? "today-header" : ""}">
-           ${isT ? `<span>${day}</span>` : day}
-         </th>`;
-}
-
-r2 += `</tr>`;
-// Weekday headers
+// WEEKDAYS
 for (let i = 0; i < daysInMonth; i++) {
   r1 += `<th>${weekDays[(i + startOffset) % 7]}</th>`;
 }
 
 r1 += `</tr>`;
 
-// Weekday row
+// DATES
 let r2 = `<tr>`;
-// first 5 empty sticky headers
-for (let i = 0; i < 5; i++) 
-  r2 += `<th class="sticky-col sticky-${i + 1}" style="background:#fff"></th>`;
-// scrolling weekdays
-for (let i = 0; i < totalCells; i++) {
-  r2 += `<th>${weekDays[i % 7]}</th>`;
+for (let day = 1; day <= daysInMonth; day++) {
+
+  const isT = isToday(year, month, day);
+
+  r2 += `<th class="${isT ? "today-header" : ""}">
+          ${isT ? `<span>${day}</span>` : day}
+        </th>`;
 }
+
 r2 += `</tr>`;
 
-// Date row
-let r3 = `<tr>`;
-
-// first 5 empty sticky headers
-for (let i = 0; i < 5; i++) {
-  r3 += `<th class="sticky-col sticky-${i + 1}"></th>`;
-}
-
-// scrolling dates
-for (let day = 1; day <= daysInMonth; day++) {
-  const isT = isToday(year, month, day);
-  r3 += `<th class="${isT ? "today-header" : ""}">
-            ${isT ? `<span>${day}</span>` : day}
-         </th>`;
-}
-
-r3 += `</tr>`;
-
-thead.innerHTML = r1 + r2;
-
+head.innerHTML = r1 + r2;
   // EMPLOYEE ROWS
 employees.forEach((emp, empIndex) => {
   let tr = `<tr>
