@@ -113,15 +113,18 @@ body {
 
 .table-scroll {
   max-height: 75vh;
-  overflow: auto;
+  overflow-x: auto; /* allow horizontal scroll */
+  overflow-y: auto; /* vertical scroll remains */
   border-radius: var(--radius);
+  /* optional: add padding to prevent clipping of sticky columns */
+  padding-left: 0; 
 }
 
 /* Table */
 #monthTable {
   border-collapse: separate;
   border-spacing: 0;
-  width: max-content;
+  width: max-content; /* this ensures table can be wider than container */
   font-size: 12px;
 }
 
@@ -169,9 +172,9 @@ body {
 
 .sticky-col {
   position: sticky;
-  left: 0;
+  left: 0; /* dynamic left applied in JS */
   background: #fff;
-  z-index: 80;
+  z-index: 90; /* higher than tbody cells but lower than sticky headers if needed */
   font-weight: 500;
 }
 
@@ -238,8 +241,8 @@ body {
    ========================= */
 
 .table-scroll::-webkit-scrollbar {
-  height: 10px;
-  width: 10px;
+  height: 10px; /* horizontal scrollbar height */
+  width: 10px;  /* vertical scrollbar width */
 }
 
 .table-scroll::-webkit-scrollbar-thumb {
